@@ -24,4 +24,12 @@ public class Sede {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
+    @Override
+    public String toString() {
+        return "Sede{" +
+                "codice=" + codice +
+                ", nome='" + nome + '\'' +
+                '}';
+    }
 }

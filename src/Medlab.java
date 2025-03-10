@@ -13,11 +13,10 @@ public class Medlab {
     private Medlab() {
         this.pazienti = new HashMap<String,Paziente>();
         this.amministratore= new Amministratore();
-        // this.pazienteCorrente=null;
+        this.pazienteCorrente=null;
         this.sedi = new ArrayList<>();
+        CaricamentoDati();  //per caricare dati persistenti
     }
-
-
 
     public static Medlab getInstance() {
         if (medlab == null)
@@ -34,7 +33,8 @@ public class Medlab {
     public Map<String, Paziente> getPazienti() {
         return pazienti;
     }
-//UC1
+
+//UC1 Gestione pazienti Medlab (inserimento paziente)
     public void aggiungiPaziente() {
         Scanner scanner = new Scanner(System.in);
         LocalDate dataNascita = null;
@@ -76,6 +76,7 @@ public class Medlab {
     public void nuovoPaziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso ) {
         Paziente paziente = new Paziente( nome, cognome, dataNascita, cf, sesso);
         this.pazienteCorrente = paziente;
+
     }
     public void confermaPaziente() {
         if (this.pazienteCorrente == null) {
@@ -83,54 +84,57 @@ public class Medlab {
             return;
         }
         this.pazienti.put(this.pazienteCorrente.getCf(), this. pazienteCorrente);
-
         System.out.println("Riepilogo informazioni inserite: ");
         System.out.print(this.pazienteCorrente.toString());
         this.pazienteCorrente = null;
 
     }
-    public void aggiungiSede() {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Inserisci codice sede: ");
-        int codice = Integer.parseInt(scanner.nextLine());
-        System.out.println("Inserisci nome sede: ");
-        String nome = scanner.nextLine();
 
-        Sede nuovaSede = new Sede(nome,codice);  // Creazione di un oggetto Sede
-        sedi.add(nuovaSede);  // Aggiunta dell'oggetto Sede alla lista
-        System.out.println("Sede " + nome + " aggiunta con successo.");
-    }
-    public void selezionaSedePerPaziente() {
-
-       /* if (pazienteCorrente.getSede()!= null)
-            System.out.println("Hai già una sede preferita: " + pazienteCorrente.getSede().getNome()); */
-
+    //UC2 Registrazione sede laboratorio
+    public void RegistrazioneSede() {
+        if (pazienteCorrente == null) {
+            System.out.println("Errore: Nessun paziente attualmente autenticato!");
+            return;
+        }
+        visualizzaSedi();
         Scanner scanner = new Scanner(System.in);
         System.out.print("Inserisci il codice della sede scelta: ");
-        int codiceSede = Integer.parseInt(scanner.nextLine());
-        for (Sede sede : sedi) {
-            if (sede.getCodice()==codiceSede) {
-                pazienteCorrente.setSede(sede);
-                System.out.println("Sede " + sede.getNome() + " assegnata a: " +  pazienteCorrente.getNome() + pazienteCorrente.getCognome());
-                return;
+        int codiceSede=-1;
+        while (codiceSede<0) {
+            try {
+                codiceSede = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Errore: Devi inserire un codice(intero) valido.");
             }
         }
-        System.out.println("Sede non trovata. Riprova.");
+        Sede sedeSelezionata=selezionaSedePaziente(codiceSede);
+        if (sedeSelezionata != null) {
+            confermaSede(sedeSelezionata);
+        } else {
+            System.out.println("Sede non trovata. Riprova.");
+        }
+
+    }
+    public void confermaSede(Sede sedeSelezionata) {
+        pazienteCorrente.setSede(sedeSelezionata);
+        System.out.println("Sede " + sedeSelezionata.getNome() + " assegnata a: " + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome());
     }
 
-
-
+    public Sede selezionaSedePaziente(Integer codSede) {
+        for (Sede sede : sedi){
+            if (sede.getCodice()==codSede) {
+                return sede;
+            }
+        }
+                return null;
+    }
 
     public void visualizzaSedi() {
         System.out.println("Sedi disponibili:");
         for (Sede sede : sedi) {
-            System.out.println(sede.getCodice() + ": " + sede.getNome());
+            System.out.println(sede.toString());
         }
     }
-
-
-
-
 
     public void visualizzaPazienti() {
         if (pazienti.isEmpty()) {
@@ -147,6 +151,7 @@ public class Medlab {
         if (verificaAmministratore(codice, password)) {
             return "amministratore";
         } else if (verificaPaziente(codice, password)) {
+            this.pazienteCorrente = this.pazienti.get(codice);
             return "paziente";
        /* } else if (verificaPersonaleLaboratorio(codice, password)) {
             return "personale";  */
@@ -162,7 +167,6 @@ public class Medlab {
         return false;
     }
 
-
     public boolean verificaPaziente( String codice, String password) {
         Paziente paziente = this.pazienti.get(codice);
         if (paziente != null && paziente.verificaPassword(password)) {
@@ -170,10 +174,53 @@ public class Medlab {
         }
         return false;
     }
-
-
-    public void prenotazioneEsame() {
+    public void logout() {
+        this.pazienteCorrente = null;
+        System.out.println("Logout eseguito con successo.");
     }
+
+    //caricamento dei dati inseriti da default come gli utenti e le prenotazioni e le sedi
+    public void CaricamentoDati(){
+        Paziente paziente1 = new Paziente("Matteo","Milano",LocalDate.of(2000, 12, 11),"MMLNOS00P22V462F","M");
+        Paziente paziente2 = new Paziente("Maria","Salemi",LocalDate.of(1986, 9, 2),"SLMWG349P33G342LP","F");
+        Sede Sede1 = new Sede("Catania",0);
+        Sede Sede2 = new Sede("Messina",1);
+        this.sedi.add(Sede1);
+        this.sedi.add(Sede2);  // Aggiunta dell'oggetto Sede alla lista
+        this.pazienti.put(paziente1.getCf(), paziente1);
+        this.pazienti.put(paziente2.getCf(), paziente2);
+
+    }
+
+    // UC4 Inserimento nuova sede di laboratorio
+    public void aggiungiSede() {
+        Scanner scanner = new Scanner(System.in);
+        Integer codice;
+        while (true) {
+            try {
+                System.out.print("Inserisci il codice della sede nuova (numero intero): ");
+                codice = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Errore: Devi inserire un numero intero per il codice sede! ");
+            }
+        }
+        // Verifica se una sede con lo stesso codice esiste già
+        for (Sede sede : sedi) {
+            if (sede.getCodice() == codice) {
+                System.out.println("Errore: Una sede con il codice " + codice + " esiste già.");
+                return; // Esci senza aggiungere la sede
+            }
+        }
+
+        System.out.println("Inserisci nome sede: ");
+        String nome = scanner.nextLine();
+
+        Sede nuovaSede = new Sede(nome,codice);  // Creazione di un oggetto Sede
+        sedi.add(nuovaSede);  // Aggiunta dell'oggetto Sede alla lista
+        System.out.println("Sede " + nome + " aggiunta con successo.");
+    }
+
     @Override
     public String toString() {
         return "Medlab{" +

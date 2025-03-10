@@ -43,8 +43,8 @@ public class App {
         int scelta;
         do {
             System.out.println("\n===== MENU AMMINISTRATORE =====");
-            System.out.println("1. Gestisci pazienti");
-            System.out.println("2. Gestisci sedi");
+            System.out.println("1. Inserimento nuovo paziente");
+            System.out.println("2. Inserimento nuova sede");
             System.out.println("3. Gestisci esami");
             System.out.println("4. Gestisci personale laboratorio");
             System.out.println("5. Generazione report");
@@ -72,7 +72,7 @@ public class App {
                     System.out.println("Report");
                     break;
                 case 6:
-                    System.out.println("Logout effettuato");
+                   sistema.logout();
                    return;
 
                 default:
@@ -86,7 +86,7 @@ public class App {
         int scelta;
         do {
             System.out.println("\n===== MENU PAZIENTE =====");
-            System.out.println("1. Registrazione sede laboratorio");
+            System.out.println("1. Registrazione nuova sede di laboratorio");
             System.out.println("2. Prenotazione esame");
             System.out.println("3. Visualizza il proprio referto");
             System.out.println("4. Modifica i dati personali");
@@ -99,11 +99,7 @@ public class App {
 
             switch (scelta) {
                 case 1:
-
-                    sistema.visualizzaSedi();
-                    sistema.selezionaSedePerPaziente();
-                    sistema.toString();
-                    //  System.out.println("Registrato");
+                    sistema.RegistrazioneSede();
                     break;
                 case 2:
                     System.out.println("Prenotato");
@@ -121,9 +117,8 @@ public class App {
                     System.out.println("prenotazioni attive");
                     break;
                 case 7:
-                    System.out.println("Logout effettuato");
-
-                   return;
+                    sistema.logout();
+                    return;
                 default:
                     System.out.println("Opzione non valida.");
             }

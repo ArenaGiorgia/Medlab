@@ -119,8 +119,6 @@ public class Paziente {
                 ", dataNascita=" + dataNascita +
                 ", cf='" + cf + '\'' +
                 ", sesso='" + sesso + '\'' +
-                ", età=" + età +
-                ", sede=" + sede +
-                '}';
+                ", età=" + età + '}';
     }
 }
