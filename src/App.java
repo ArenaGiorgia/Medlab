@@ -43,7 +43,7 @@ public class App {
         int scelta;
         do {
             System.out.println("\n===== MENU AMMINISTRATORE =====");
-            System.out.println("1. Inserimento nuovo paziente");
+            System.out.println("1. Gestione pazienti");
             System.out.println("2. Inserimento nuova sede");
             System.out.println("3. Gestisci esami");
             System.out.println("4. Gestisci personale laboratorio");
@@ -55,7 +55,7 @@ public class App {
 
             switch (scelta) {
                 case 1:
-                    sistema.aggiungiPaziente();
+                    gestionePazienti(scanner, sistema);
 
                     break;
                 case 2:
@@ -80,6 +80,37 @@ public class App {
             }
         } while (true);
     }
+    private static void gestionePazienti(Scanner scanner, Medlab sistema) {
+        int scelta;
+        do {
+            System.out.println("\n===== GESTIONE PAZIENTI =====");
+            System.out.println("1. Aggiungi paziente");
+            System.out.println("2. Elimina paziente");
+            System.out.println("3. Modifica paziente");
+            System.out.println("4. Torna al menu principale");
+            System.out.print("Scegli un'opzione: ");
+
+            scelta = scanner.nextInt();
+            scanner.nextLine(); // Consuma newline dopo nextInt()
+
+            switch (scelta) {
+                case 1:
+                    sistema.aggiungiPaziente();
+                    break;
+                case 2:
+                    sistema.eliminaPaziente();
+                    break;
+                case 3:
+                    sistema.ModificaPazienteAmministratore();
+                    break;
+                case 4:
+                    return; // Torna al menu principale
+                default:
+                    System.out.println("Opzione non valida. Riprova.");
+            }
+        } while (true);
+    }
+
 
     // Menu Paziente
     private static void menuPaziente(Scanner scanner, Medlab sistema) {

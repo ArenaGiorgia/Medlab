@@ -73,6 +73,7 @@ public class Medlab {
         confermaPaziente();
     }
 
+
     public void nuovoPaziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso ) {
         Paziente paziente = new Paziente( nome, cognome, dataNascita, cf, sesso);
         this.pazienteCorrente = paziente;
@@ -89,6 +90,50 @@ public class Medlab {
         this.pazienteCorrente = null;
 
     }
+
+    //Eliminare il paziente
+    public void eliminaPaziente() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Inserisci il codice fiscale del paziente da eliminare: ");
+        String codiceFiscale = scanner.nextLine();
+
+        if (pazienti.containsKey(codiceFiscale)) {
+            pazienti.remove(codiceFiscale);
+            System.out.println("Paziente con codice fiscale " + codiceFiscale + " eliminato con successo.");
+        } else {
+            System.out.println("Errore: Nessun paziente trovato con il codice fiscale specificato.");
+        }
+    }
+
+
+    //modificare il paziente da amministratore
+    public void ModificaPazienteAmministratore(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Clienti disponibili: ");
+        for (Paziente paziente : pazienti.values()) {
+            System.out.println(paziente.toString());
+        }
+        System.out.print("Inserisci il codice fiscale del paziente da modificare: ");
+        String codiceFiscale = scanner.nextLine();
+        modificaPaziente(codiceFiscale);
+    }
+//il modificaPaziente che richiama quello del paziente per modificare ditettamente dalla classe
+    public void modificaPaziente( String cf){
+        Paziente paziente = selezionaPaziente(cf);
+        paziente.modificaPaziente();
+        this.pazienteCorrente = null;
+    }
+
+    public Paziente selezionaPaziente( String cf){
+Paziente paziente = this.pazienti.get(cf);
+if(paziente == null){
+    System.out.println("Errore: Paziente non trovato.");
+}
+this.pazienteCorrente = paziente;
+return paziente;
+    }
+
+
 
     //UC2 Registrazione sede laboratorio
     public void RegistrazioneSede() {
