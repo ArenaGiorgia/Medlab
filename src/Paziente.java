@@ -1,7 +1,7 @@
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
-import java.util.Scanner;
+import java.util.*;
 
 public class Paziente {
 
@@ -13,7 +13,8 @@ public class Paziente {
     private String sesso;
     private Integer età;
     private Sede sede;
-
+    private List<Sede> sedi;
+    private Map<String, Prenotazione> prenotazioni;
 
     public Paziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso) {
 
@@ -24,7 +25,18 @@ public class Paziente {
         this.password=cf; //password settata automaticamente al codice fiscale
         this.sesso = sesso;
         this.età = calcolaEta(dataNascita);
+        this.prenotazioni = new HashMap<>();
+        this.sedi = new ArrayList<>();
     }
+
+    public List<Sede> getSedi() {
+        return sedi;
+    }
+
+    public Map<String, Prenotazione> getPrenotazioni() {
+        return prenotazioni;
+    }
+
     private int calcolaEta(LocalDate dataNascita) {
         return Period.between(dataNascita, LocalDate.now()).getYears();
     }
@@ -58,6 +70,14 @@ public class Paziente {
         return sede;
     }
 
+    public void setSedi(List<Sede> sedi) {
+        this.sedi = sedi;
+    }
+
+    public void setPrenotazioni(Map<String, Prenotazione> prenotazioni) {
+        this.prenotazioni = prenotazioni;
+    }
+
     public void setCognome(String cognome) {
         this.cognome = cognome;
     }
@@ -68,6 +88,7 @@ public class Paziente {
 
     public void setDataNascita(LocalDate dataNascita) {
         this.dataNascita = dataNascita;
+        this.età = calcolaEta(dataNascita); // Aggiorna l'età
     }
 
     public void setCf(String cf) {
@@ -79,7 +100,10 @@ public class Paziente {
     }
 
     public void setSede(Sede sede) {
-        this.sede = sede;
+        if (this.sedi == null) {
+            this.sedi = new ArrayList<>();
+        }
+        this.sedi.add(sede);
     }
     public void setPassword(String password) {
         this.password = password;
@@ -98,18 +122,14 @@ public class Paziente {
 //metodo che mi servira per il caso duso 8 oltre che per l 1 per essere richiamato dall admin
 public void modificaPaziente() {
     Scanner scanner = new Scanner(System.in);
-    System.out.println("I clienti nel sistema sono: ");
-    System.out.println(toString());
-    System.out.print("Inserisci il codice fiscale del paziente da modificare: ");
-    String codiceFiscale = scanner.nextLine();
-
     int scelta;
     do {
-        System.out.println("\nSeleziona il campo da modificare: ");
+        System.out.println("Seleziona il campo da modificare: ");
         System.out.println("1. Nome");
         System.out.println("2. Cognome");
         System.out.println("3. Data di nascita");
         System.out.println("4. Sesso");
+        System.out.println("5. Password");
         System.out.println("0. Esci");
         System.out.print("Inserisci il numero corrispondente: ");
         scelta = scanner.nextInt();
@@ -152,6 +172,9 @@ public void modificaPaziente() {
                         System.out.println("Errore: Devi inserire solo 'M' per maschio o 'F' per femmina.");
                     }
                 } while (true);
+                break;
+            case 5:
+                modificaPassword();
                 break;
             case 0:
                 System.out.println("Modifica paziente terminata.");

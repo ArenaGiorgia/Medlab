@@ -1,187 +1,162 @@
 import java.util.Scanner;
-
 public class App {
     public static void main(String[] args) {
-        Medlab sistema= Medlab.getInstance();
-
+        Medlab sistema = Medlab.getInstance();
         Scanner scanner = new Scanner(System.in);
-        /* sistema.visualizzaPazienti(); */
 
         while (true) {
             System.out.println("\n===== MEDLAB =====");
+            System.out.println("1. Accedi");
+            System.out.println("2. Esci");
+            System.out.print("Scegli un'opzione: ");
+
+            int scelta = 0;
+
+            while (scelta < 1 || scelta > 2) {
+                try {
+                    scelta = Integer.parseInt(scanner.nextLine());
+                    if (scelta < 1 || scelta > 2) {
+                        System.out.println("Opzione non valida. Inserisci un numero tra 1 e 2.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Errore: Devi inserire un numero intero!");
+                    scelta = 0;
+                }
+            }
+
+            if (scelta == 2) {
+                System.out.println("Chiusura del programma");
+                System.exit(0);
+            }
+
             System.out.print("Inserisci il codice fiscale: ");
-            String codice = scanner.nextLine();
+            String codiceFiscale = scanner.nextLine();
             System.out.print("Inserisci la password: ");
             String password = scanner.nextLine();
+            String ruolo = sistema.VerificaAccesso(codiceFiscale, password);
 
-            // Verifica delle credenziali di MedLab in base al ruolo
-            String ruolo = sistema.VerificaAccesso(codice, password);
+            if (ruolo.equals("amministratore")) {
+                System.out.println("Accesso amministratore effettuato!");
 
-            switch (ruolo) {
-                case "amministratore":
+                while (true) {
+                    System.out.println("\n===== MENU AMMINISTRATORE =====");
+                    System.out.println("1. Aggiungi paziente");
+                    System.out.println("2. Modifica paziente");
+                    System.out.println("3. Elimina paziente");
+                    System.out.println("4. Inserimento nuova sede");
+                    System.out.println("5. Modifica sede");
+                    System.out.println("6. Elimina sede");
+                    System.out.println("7. Gestisci esami");
+                    System.out.println("8. Gestisci personale laboratorio");
+                    System.out.println("9. Generazione report");
+                    System.out.println("10. Logout");
+                    System.out.print("Scegli un'opzione: ");
 
-                    System.out.println("Accesso amministratore: " + sistema.getAmministratore() + " effettuato! ");
-                    menuAmministratore(scanner, sistema);
-                    break;
-                case "paziente":
-                    System.out.println("Accesso paziente effettuato!");
-                    menuPaziente(scanner,sistema);
-                    break;
+                    scelta = 0;
+                    while (scelta < 1 || scelta > 10) {
+                        try {
+                            scelta = Integer.parseInt(scanner.nextLine());
+                            if (scelta < 1 || scelta > 10) {
+                                System.out.println("Opzione non valida. Inserisci un numero tra 1 e 10.");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Errore: Devi inserire un numero intero!");
+                            scelta = 0;
+                        }
+                    }
 
-              /*  case "personale":
-                    System.out.println("Accesso personale di laboratorio effettuato!");
-                    menuPersonale(scanner);
-                    break; */
+                    if (scelta == 10) {
+                        System.out.println("Logout amministratore...");
+                        sistema.logout();
+                        break;
+                    }
 
-                default:
-                    System.out.println("Credenziali errate. Riprova.");
+                    switch (scelta) {
+                        case 1:
+                            sistema.aggiungiPaziente();
+                            break;
+                        case 2:
+                            sistema.modificaPazienteAmministratore();
+                            break;
+                        case 3:
+                            sistema.eliminaPaziente();
+                            break;
+                        case 4:
+                            sistema.aggiungiSede();
+                            break;
+                        case 5:
+                            sistema.modificaSedeAmministratore();
+                            break;
+                        case 6:
+                            sistema.eliminaSede();
+                            break;
+                        case 7:
+                            System.out.println("Gestione esami...");
+                            break;
+                        case 8:
+                            System.out.println("Gestione personale laboratorio...");
+                            break;
+                        case 9:
+                            System.out.println("Generazione report...");
+                            break;
+                    }
+                }
+            } else if (ruolo.equals("paziente")) {
+                System.out.println("Accesso paziente effettuato!");
+
+                while (true) {
+                    System.out.println("\n===== MENU PAZIENTE =====");
+                    System.out.println("1. Registrazione nuova sede");
+                    System.out.println("2. Prenotazione esame");
+                    System.out.println("3. Visualizza referto");
+                    System.out.println("4. Modifica dati personali");
+                    System.out.println("5. Inserisci recensione");
+                    System.out.println("6. Visualizza prenotazioni");
+                    System.out.println("7. Logout");
+                    System.out.print("Scegli un'opzione: ");
+
+                    scelta = 0;
+                    while (scelta < 1 || scelta > 7) {
+                        try {
+                            scelta = Integer.parseInt(scanner.nextLine());
+                            if (scelta < 1 || scelta > 7) {
+                                System.out.println("Opzione non valida. Inserisci un numero tra 1 e 7.");
+                            }
+                        } catch (NumberFormatException e) {
+                            System.out.println("Errore: Devi inserire un numero intero!");
+                            scelta = 0;
+                        }
+                    }
+                    if (scelta == 7) {
+                        System.out.println("Logout paziente...");
+                        sistema.logout();
+                        break;
+                    }
+
+                    switch (scelta) {
+                        case 1:
+                            sistema.RegistrazioneSede();
+                            break;
+                        case 2:
+                            sistema.PrenotazioneEsame(codiceFiscale);
+                            break;
+                        case 3:
+                            System.out.println("Visualizzazione referto...");
+                            break;
+                        case 4:
+                            System.out.println("Modifica dati personali...");
+                            break;
+                        case 5:
+                            System.out.println("Inserisci recensione...");
+                            break;
+                        case 6:
+                            System.out.println("Visualizza prenotazioni...");
+                            break;
+                    }
+                }
+            } else {
+                System.out.println("Credenziali errate. Riprova.");
             }
-
         }
     }
-    private static void menuAmministratore(Scanner scanner, Medlab sistema) {
-        int scelta;
-        do {
-            System.out.println("\n===== MENU AMMINISTRATORE =====");
-            System.out.println("1. Gestione pazienti");
-            System.out.println("2. Inserimento nuova sede");
-            System.out.println("3. Gestisci esami");
-            System.out.println("4. Gestisci personale laboratorio");
-            System.out.println("5. Generazione report");
-            System.out.println("6. Logout");
-            System.out.print("Scegli un'opzione: ");
-            scelta = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (scelta) {
-                case 1:
-                    gestionePazienti(scanner, sistema);
-
-                    break;
-                case 2:
-                    sistema.aggiungiSede();
-
-                    break;
-                case 3:
-                    System.out.println("esami");
-                    break;
-                case 4:
-                    System.out.println("Personale laboratorio");
-                    break;
-                case 5:
-                    System.out.println("Report");
-                    break;
-                case 6:
-                   sistema.logout();
-                   return;
-
-                default:
-                    System.out.println("Opzione non valida.");
-            }
-        } while (true);
-    }
-    private static void gestionePazienti(Scanner scanner, Medlab sistema) {
-        int scelta;
-        do {
-            System.out.println("\n===== GESTIONE PAZIENTI =====");
-            System.out.println("1. Aggiungi paziente");
-            System.out.println("2. Elimina paziente");
-            System.out.println("3. Modifica paziente");
-            System.out.println("4. Torna al menu principale");
-            System.out.print("Scegli un'opzione: ");
-
-            scelta = scanner.nextInt();
-            scanner.nextLine(); // Consuma newline dopo nextInt()
-
-            switch (scelta) {
-                case 1:
-                    sistema.aggiungiPaziente();
-                    break;
-                case 2:
-                    sistema.eliminaPaziente();
-                    break;
-                case 3:
-                    sistema.ModificaPazienteAmministratore();
-                    break;
-                case 4:
-                    return; // Torna al menu principale
-                default:
-                    System.out.println("Opzione non valida. Riprova.");
-            }
-        } while (true);
-    }
-
-
-    // Menu Paziente
-    private static void menuPaziente(Scanner scanner, Medlab sistema) {
-        int scelta;
-        do {
-            System.out.println("\n===== MENU PAZIENTE =====");
-            System.out.println("1. Registrazione nuova sede di laboratorio");
-            System.out.println("2. Prenotazione esame");
-            System.out.println("3. Visualizza il proprio referto");
-            System.out.println("4. Modifica i dati personali");
-            System.out.println("5. Inserisci recensione");
-            System.out.println("6. Visualizza prenotazioni attive");
-            System.out.println("7. Logout");
-            System.out.print("Scegli un'opzione: ");
-            scelta = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (scelta) {
-                case 1:
-                    sistema.RegistrazioneSede();
-                    break;
-                case 2:
-                    System.out.println("Prenotato");
-                    break;
-                case 3:
-                    System.out.println("Referto");
-                    break;
-                case 4:
-                    System.out.println("dati");
-                    break;
-                case 5:
-                    System.out.println("recensione");
-                    break;
-                case 6:
-                    System.out.println("prenotazioni attive");
-                    break;
-                case 7:
-                    sistema.logout();
-                    return;
-                default:
-                    System.out.println("Opzione non valida.");
-            }
-        } while (true);
-    }
-
-    // Menu Personale di Laboratorio
-   /* private static void menuPersonale(Scanner scanner){
-        int scelta;
-        do {
-            System.out.println("\n===== MENU PERSONALE DI LABORATORIO =====");
-            System.out.println("1. Registra nuovi esami");
-            System.out.println("2. Consulta report esami");
-            System.out.println("3. Logout");
-            System.out.print("Scegli un'opzione: ");
-            scelta = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (scelta) {
-                case 1:
-                    System.out.println("Registrazione nuovi esami");
-                    break;
-                case 2:
-                    System.out.println("Consultazione report esami");
-                    break;
-                case 3:
-                    System.out.println("Logout effettuato");
-                    System.exit(0);
-                break;
-                default:
-                    System.out.println("Opzione non valida.");
-            }
-        } while (true);
-    }  */
 }
