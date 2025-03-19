@@ -138,7 +138,7 @@ public class App {
                             sistema.RegistrazioneSede();
                             break;
                         case 2:
-                            sistema.PrenotazioneEsame(codiceFiscale);
+                            sistema.PrenotazioneEsame();
                             break;
                         case 3:
                             System.out.println("Visualizzazione referto...");

@@ -117,7 +117,6 @@ public class Medlab {
         confermaPaziente(); //2.conferma
     }
 
-
     public void nuovoPaziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso ) {
         Paziente paziente = new Paziente( nome, cognome, dataNascita, cf, sesso);
         this.pazienteCorrente = paziente;
@@ -136,7 +135,7 @@ public class Medlab {
     }
 
     // UC1 Eliminare il paziente
-    public void eliminaPaziente() {
+    public void eliminaPaziente() { //da fare estensione *b dove verifica se ci sono prenotazioni prenotate
         Scanner scanner = new Scanner(System.in);
         System.out.println("Pazienti disponibili: ");
         for (Paziente paziente : pazienti.values()) {
@@ -146,14 +145,26 @@ public class Medlab {
         String codiceFiscale = scanner.nextLine();
 
         if (pazienti.containsKey(codiceFiscale)) {
-            pazienti.remove(codiceFiscale);
-            System.out.println("Paziente con codice fiscale " + codiceFiscale + " eliminato con successo.");
-
+            Paziente p = pazienti.get(codiceFiscale);
+            boolean prenotazioneAttiva = false; //per il caso d uso estensione *b
+            for (Prenotazione prenotazione : prenotazioni.values()) {
+                if (prenotazione.getPaziente().equals(p)) {
+                    prenotazioneAttiva = true;
+                    break;
+                }
+            }
+            if (prenotazioneAttiva) {
+                System.out.println("Errore: Il paziente ha prenotazioni in corso e non può essere eliminato.");
+            } else {
+                pazienti.remove(codiceFiscale);
+                System.out.println("Paziente con codice fiscale " + codiceFiscale + " eliminato con successo.");
+            }
         } else {
             System.out.println("Errore: Nessun paziente trovato con il codice fiscale specificato.");
         }
-    }
 
+
+    }
     // UC1 modificare il paziente da amministratore
     public void modificaPazienteAmministratore(){
         Scanner scanner = new Scanner(System.in);
@@ -165,9 +176,8 @@ public class Medlab {
         String codiceFiscale = scanner.nextLine();
         modificaPaziente(codiceFiscale);
     }
-//il modificaPaziente che richiama quello del paziente per modificare ditettamente dalla classe
-    //ci puo servire per l'UC8
-    public void modificaPaziente( String cf){
+
+    public void modificaPaziente( String cf){  //ci puo servire per l'UC8
         Paziente paziente = selezionaPaziente(cf);
         if (paziente != null) {
             paziente.modificaPaziente();
@@ -230,8 +240,8 @@ public class Medlab {
     }
 
     //UC 3 prenotazione all'esame di una relativa sede
-    public void PrenotazioneEsame(String cf) {
-        if(pazienteCorrente==null){
+    public void PrenotazioneEsame() {
+        if (pazienteCorrente == null) {
             System.out.println("Errore: Nessun paziente attualmente autenticato!");
             return;
         }
@@ -251,51 +261,42 @@ public class Medlab {
 
         Sede sedeSelezionata = selezionaSedePaziente(codiceSede); //2. seleziona quella dove fare la prenotazione
 
-        if (sedeSelezionata != null) {
+        if (sedeSelezionata == null) {
+            System.out.println("Errore: Sede non trovata.");
+            return;
+        }
             if (!pazienteCorrente.getSedi().contains(sedeSelezionata)) {
                 System.out.println("Errore: La sede selezionata non è associata a questo paziente.");
                 return;
             }
             visualizzaEsamiDisponibili(sedeSelezionata); //3.visualizza gli esami disponibili di quella sede
 
-            System.out.print("Inserisci il nome dell'esame che desideri prenotare: ");
-            String nomeEsame = scanner.nextLine();
+            System.out.print("Inserisci il codice dell'esame che desideri prenotare: ");
+            String codiceEsame = scanner.nextLine().trim();
 
-            Esame esameSelezionato = SelezionaEsame(sedeSelezionata,nomeEsame); //4. seleziona l esame della lista
-
+            Esame esameSelezionato = SelezionaEsame(sedeSelezionata, codiceEsame); //4. seleziona l esame della lista
             if (esameSelezionato == null) {
-                System.out.println("Errore: Esame non trovato.");
                 return;
             }
-                try {
-                    System.out.print("Inserisci la data dell'esame (yyyy-MM-dd) che desideri prenotare: ");
-                    LocalDate dataEsame = LocalDate.parse(scanner.nextLine());
-                    if (!PrenotazioniMaxPerGiorno(pazienteCorrente, dataEsame)) { //per la regola di buisness R8
-                        System.out.println("Errore: Hai già 3 prenotazioni per questo giorno.");
-                        return;
-                    }
-                    System.out.print("Inserisci l'orario dell'esame (HH:mm) che desideri prenotare: ");
-                    LocalTime orarioEsame = LocalTime.parse(scanner.nextLine());
-                    confermaEsame(esameSelezionato,dataEsame,orarioEsame); //5. esame confermato
-                } catch (DateTimeParseException e) {
-                    System.out.println("Errore: La data o l'orario inserito non sono nel formato corretto. Prenotazione non effettuata.");
-                }
-            }
-        else {
-            System.out.println("Sede non trovata. Riprova.");
+        LocalDate dataEsame = esameSelezionato.getData();
+        if (!PrenotazioniMaxPerGiorno(pazienteCorrente, dataEsame)) {
+            System.out.println("Errore: Hai già raggiunto il limite massimo di 3 prenotazioni per il giorno " + dataEsame);
+            return;
         }
+        if (!EsameDisponibile(esameSelezionato.getCodice())) {
+            System.out.println("Errore: Questo esame è già stato prenotato.");
+            return;
+        }
+        confermaEsame(esameSelezionato); //5. esame confermato
     }
-    private void confermaEsame(Esame esameSelezionato, LocalDate dataEsame, LocalTime orarioEsame) {
+
+    private void confermaEsame(Esame esameSelezionato) {
         if (pazienteCorrente == null) {
             System.out.println("Errore: Nessun paziente attualmente autenticato.");
             return;
         }
-        if (!esameSelezionato.getData().equals(dataEsame) || !esameSelezionato.getOrario().equals(orarioEsame)) {
-            System.out.println("Errore: Esame o orario non trovato.");
-            return;
-        }
-        if (!EsameDisponibile(dataEsame, orarioEsame)) {
-            System.out.println("Errore: L'orario selezionato non è disponibile.");
+        if (!EsameDisponibile(esameSelezionato.getCodice())) {
+            System.out.println("Errore: Questo esame è già stato prenotato.");
             return;
         }
         Prenotazione prenotazione = new Prenotazione(esameSelezionato, pazienteCorrente);
@@ -304,7 +305,8 @@ public class Medlab {
         this.prenotazioneCorrente = prenotazione;
         esameSelezionato.prenotato();
         System.out.println("Prenotazione confermata per l'esame: " + esameSelezionato.getNome() +
-                " il " + dataEsame + " alle " + orarioEsame);
+                " il " + esameSelezionato.getData() + " alle " + esameSelezionato.getOrario() + " a nome di: "
+                + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome());
     }
 
     //metodo per la regola di buisness R8 di massimo 3 prenotazioni al giorno
@@ -319,12 +321,19 @@ public class Medlab {
         return prenotazioniGiornaliere < 3;
     }
 
-
-
-    private Esame SelezionaEsame(Sede sedeSelezionata, String nomeEsame) {
-        return sedeSelezionata.getEsami().get(nomeEsame);
+    private Esame SelezionaEsame(Sede sedeSelezionata, String codiceEsame) {
+        if (sedeSelezionata != null && sedeSelezionata.getEsami() != null) {
+            if (sedeSelezionata.getEsami().containsKey(codiceEsame)) {
+                return sedeSelezionata.getEsami().get(codiceEsame);
+            } else {
+                System.out.println("Errore: Codice esame non trovato.");
+                return null;
+            }
+        } else {
+            System.out.println("Errore: La sede o la mappa degli esami non è valida.");
+            return null;
+        }
     }
-
     // Metodo per visualizzare gli esami disponibili per una sede con date e orari
     public void visualizzaEsamiDisponibili(Sede sede) {
         System.out.println("Esami disponibili presso la sede " + sede.getNome() + ":");
@@ -333,13 +342,9 @@ public class Medlab {
                     " - Data: " + esame.getData() + " - Orario: " + esame.getOrario() + " - Stato: " + esame.statoEsame());
         }
     }
-
-    public boolean EsameDisponibile(LocalDate data, LocalTime orario) {
-        for (Prenotazione prenotazione : this.prenotazioni.values()) {
-            LocalTime orarioInizio = prenotazione.getEsame().getOrario();
-            LocalTime orarioFine = orarioInizio.plusMinutes(90);
-            if (prenotazione.getEsame().getData().equals(data) &&
-                    ((orario.isAfter(orarioInizio) && orario.isBefore(orarioFine)) || orario.equals(orarioInizio))) {
+    private boolean EsameDisponibile(String codiceEsame) {
+        for (Prenotazione prenotazione : prenotazioni.values()) {
+            if (prenotazione.getEsame().getCodice().equals(codiceEsame)) {
                 return false;
             }
         }
@@ -487,18 +492,19 @@ public void eliminaSede() {
 //UC4 modifica Sede
     public void modificaSedeAmministratore(){
     Scanner scanner = new Scanner(System.in);
+    Integer codice=null;
     System.out.println("Sedi disponibili: ");
     for (Sede sede : sedi) {
         System.out.println(sede.toString());
     }
     System.out.print("Inserisci il codice della sede da modificare: ");
-    Integer codice = Integer.parseInt(scanner.nextLine());
+    codice = Integer.parseInt(scanner.nextLine());
     modificaSede(codice);
 }
- public void modificaSede( Integer codice){
+ public void modificaSede(Integer codice){
         Sede sede = selezionaSedePaziente(codice);
         if (sede != null) {
-            sede.modificaSede();
+            sede.modificaSede(sedi);
             this.sedeCorrente = null;
         } else {
             System.out.println("Errore: Sede non trovata.");

@@ -11,7 +11,7 @@ public class Esame {
     private boolean prenotato;
     public Esame(LocalDate data, LocalTime orario, String nome) {
 
-        this.codice = UUID.randomUUID().toString().substring(0, 8);
+        this.codice = UUID.randomUUID().toString().substring(0, 4);
         this.data = data;
         this.orario = orario;
         this.nome = nome;
