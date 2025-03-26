@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Medlab {
     private static Medlab medlab;
@@ -308,7 +309,6 @@ public class Medlab {
         confermaPrenotazione(); //5
     }
 
-
     public void nuovaPrenotazione(Esame esameSelezionato) {
         if (pazienteCorrente == null) {
             System.out.println("Errore: Nessun paziente attualmente autenticato.");
@@ -328,15 +328,50 @@ public class Medlab {
             return;
         }
         this.prenotazioni.put(this.prenotazioneCorrente.getCodice(), this.prenotazioneCorrente);
+        this.pazienteCorrente.aggiungiPrenotazione(this.prenotazioneCorrente); //aggiunta nella mappa del paziente la prenotazione
         this.prenotazioneCorrente.getEsame().prenotato();
         System.out.println("Prenotazione confermata per l'esame: " + this.prenotazioneCorrente.getEsame().getNome() +
                 " il " + this.prenotazioneCorrente.getEsame().getData() + " alle " + this.prenotazioneCorrente.getEsame().getOrario() + " a nome di: "
                 + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome());
         this.prenotazioneCorrente = null;
     }
+    // Metodo per trovare la sede in base a un esame
+    private Sede trovaSedePerEsame(Esame esame) {
+        for (Sede sede : sedi) {
+            if (sede.getEsami().containsValue(esame)) {
+                return sede;
+            }
+        }
+        return null;
+    }
+    // Metodo per visualizzare le prnotazioni associate al paziente, quindi visualizzare la mappa all'interno del Paziente
+    public void visualizzaPrenotazioniPaziente() {
+        if (pazienteCorrente == null) {
+            System.out.println("Errore: Nessun paziente attualmente autenticato!");
+            return;
+        }
+        Map<String, Prenotazione> prenotazioniPaziente = pazienteCorrente.getPrenotazioni();
+        if (prenotazioniPaziente.isEmpty()) {
+            System.out.println("Nessuna prenotazione trovata per " + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome());
+            return;
+        }
+        TreeMap<String, Prenotazione> prenotazioniOrdinate = new TreeMap<>(new EsameComparator(
+                prenotazioniPaziente.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getEsame()))
+        ));
 
-
-    //metodo per la regola di buisness R8 di massimo 3 prenotazioni al giorno
+        prenotazioniOrdinate.putAll(prenotazioniPaziente);
+        System.out.println("\n📅 Prenotazioni di " + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome() + ":");
+        for (Prenotazione prenotazione : prenotazioniOrdinate.values()) {
+            Esame esame = prenotazione.getEsame();
+            Sede sede = trovaSedePerEsame(esame);
+            System.out.println("🔹 Esame: " + esame.getNome() +
+                    " - Data: " + esame.getData() +
+                    " - Orario: " + esame.getOrario()+
+                    " - Sede: " + (sede != null ? sede.getNome() : "Non trovata"));
+        }
+    }
+    //Metodo per la regola di buisness R8 di massimo 3 prenotazioni al giorno
     public boolean PrenotazioniMaxPerGiorno(Paziente paziente, LocalDate data) {
         int prenotazioniGiornaliere = 0;
         for (Prenotazione prenotazione : prenotazioni.values()) {
@@ -349,14 +384,25 @@ public class Medlab {
     }
 
 
-    // Metodo per visualizzare gli esami disponibili per una sede con date e orari
+//Visualizza gli Esami disponibili in maniera ordinata
     public void visualizzaEsamiDisponibili(Sede sede) {
-        System.out.println("Esami disponibili presso la sede " + sede.getNome() + ":");
-        for (Esame esame : sede.getEsami().values()) {
-            System.out.println("Codice: " + esame.getCodice() + " - nome: " + esame.getNome() +
-                    " - Data: " + esame.getData() + " - Orario: " + esame.getOrario() + " - Stato: " + esame.statoEsame());
+        if (sede.getEsami().isEmpty()) {
+            System.out.println("Nessun esame disponibile presso la sede " + sede.getNome());
+            return;
+        }
+        TreeMap<String, Esame> esamiOrdinati = new TreeMap<>(new EsameComparator(sede.getEsami()));
+        esamiOrdinati.putAll(sede.getEsami());
+
+        System.out.println("\n📅 Esami disponibili presso la sede " + sede.getNome() + ":");
+        for (Esame esame : esamiOrdinati.values()) {
+            System.out.println("Codice: " + esame.getCodice() +
+                    " - Nome: " + esame.getNome() +
+                    " - Data: " + esame.getData() +
+                    " - Orario: " + esame.getOrario()+
+                    " - Stato: " + esame.statoEsame());
         }
     }
+ // Check esame disponibile
     private boolean EsameDisponibile(String codiceEsame) {
         for (Prenotazione prenotazione : prenotazioni.values()) {
             if (prenotazione.getEsame().getCodice().equals(codiceEsame)) {
@@ -365,8 +411,8 @@ public class Medlab {
         }
         return true;
     }
-
-public boolean visualizzaSedePaziente(Paziente p){ //mi serve per vedere a quali sedi il paziente è associato
+    //Mi serve per vedere a quali sedi il paziente è associato
+public boolean visualizzaSedePaziente(Paziente p){
         if (p.getSedi().isEmpty()) {
             System.out.println("Non hai associato nessuna sede.");
             return false;
@@ -388,7 +434,7 @@ public boolean visualizzaSedePaziente(Paziente p){ //mi serve per vedere a quali
         }
     }
 
-    //metodo per verificare nel menu se sta accedendo un amministratore,paziente o personale di laboratorio
+    //Metodo per verificare nel menu se sta accedendo un amministratore,paziente o personale di laboratorio
     public String VerificaAccesso( String codice, String password) {
         if (verificaAmministratore(codice, password)) {
             return "amministratore";

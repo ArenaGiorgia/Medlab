@@ -151,6 +151,7 @@ public class App {
                             break;
                         case 6:
                             System.out.println("Visualizza prenotazioni...");
+                            sistema.visualizzaPrenotazioniPaziente();
                             break;
                     }
                 }
