@@ -14,7 +14,7 @@ public class Paziente {
     private Integer età;
     private Sede sede;
     private List<Sede> sedi;
-    private Map<String, Prenotazione> prenotazioni;
+    private Map<String, Prenotazione> prenotazioniPaziente;
 
     public Paziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso) {
 
@@ -25,7 +25,7 @@ public class Paziente {
         this.password=cf; //password settata automaticamente al codice fiscale
         this.sesso = sesso;
         this.età = calcolaEta(dataNascita);
-        this.prenotazioni = new HashMap<>();
+        this.prenotazioniPaziente = new HashMap<>();
         this.sedi = new ArrayList<>();
     }
 
@@ -34,7 +34,7 @@ public class Paziente {
     }
 
     public Map<String, Prenotazione> getPrenotazioni() {
-        return prenotazioni;
+        return prenotazioniPaziente;
     }
 
     private int calcolaEta(LocalDate dataNascita) {
@@ -75,7 +75,11 @@ public class Paziente {
     }
 
     public void setPrenotazioni(Map<String, Prenotazione> prenotazioni) {
-        this.prenotazioni = prenotazioni;
+        this.prenotazioniPaziente = prenotazioni;
+    }
+
+    public Map<String, Prenotazione> getPrenotazioniPaziente() {
+        return prenotazioniPaziente;
     }
 
     public void setCognome(String cognome) {
@@ -99,12 +103,6 @@ public class Paziente {
         this.sesso = sesso;
     }
 
-    public void setSede(Sede sede) {
-        if (this.sedi == null) {
-            this.sedi = new ArrayList<>();
-        }
-        this.sedi.add(sede);
-    }
     public void setPassword(String password) {
         this.password = password;
     }
