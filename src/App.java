@@ -150,8 +150,7 @@ public class App {
                             System.out.println("Inserisci recensione...");
                             break;
                         case 6:
-                            System.out.println("Visualizza prenotazioni...");
-                            sistema.visualizzaPrenotazioniPaziente();
+                          //  sistema.visualizzaPrenotazioniPaziente();
                             break;
                     }
                 }

@@ -46,12 +46,10 @@ public class Paziente {
     }
 
     public String getCognome() {
-
         return cognome;
     }
 
     public LocalDate getDataNascita() {
-
         return dataNascita;
     }
 
@@ -82,9 +80,6 @@ public class Paziente {
         return prenotazioniPaziente;
     }
 
-    public void aggiungiPrenotazione(Prenotazione prenotazione) { //aggiunta delle prenotazioni alla mappa di prenotazioni del paziente
-        this.prenotazioniPaziente.put(prenotazione.getCodice(), prenotazione);
-    }
     public void setCognome(String cognome) {
         this.cognome = cognome;
     }

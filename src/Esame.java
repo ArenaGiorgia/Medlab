@@ -69,10 +69,11 @@ public class Esame {
 
 
     public String toString() {
-        return "Codice: " + this.codice + "\n" +
-                "Data: " + this.data + "\n" +
-                "Orario: " + this.orario + "\n" +
-                "nome: " + this.nome + "\n";
+        return "Codice: " + this.codice + " " +
+                " Data: " + this.data + " " +
+                " Orario: " + this.orario + " " +
+                " nome: " + this.nome + " " +
+                " stato: " + this.statoEsame();
 
     }
 

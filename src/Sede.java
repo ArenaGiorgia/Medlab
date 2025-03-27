@@ -39,12 +39,14 @@ public class Sede {
 
     public void caricaEsami() {
 
-            Esame esame1 = new Esame(LocalDate.of(2025, 3, 20), LocalTime.of(9, 0), "Analisi del sangue");
-            Esame esame2 = new Esame(LocalDate.of(2025, 3, 20), LocalTime.of(10, 30), "Ecografia addome");
-            Esame esame3 = new Esame(LocalDate.of(2025, 3, 20), LocalTime.of(12, 0), "Radiografia torace");
+            Esame esame1 = new Esame(LocalDate.of(2026, 3, 20), LocalTime.of(9, 0), "Analisi del sangue");
+            Esame esame2 = new Esame(LocalDate.of(2026, 3, 20), LocalTime.of(10, 30), "Ecografia addome");
+            Esame esame3 = new Esame(LocalDate.of(2026, 3, 20), LocalTime.of(12, 0), "Radiografia torace");
+            Esame esame4 = new Esame(LocalDate.of(2026, 3, 19), LocalTime.of(7, 30), "Radiografia torace");
             esami.put(esame1.getCodice(), esame1);
             esami.put(esame2.getCodice(), esame2);
             esami.put(esame3.getCodice(),esame3);
+            esami.put(esame4.getCodice(),esame4);
 
 
     }
