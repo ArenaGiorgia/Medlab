@@ -1,9 +1,6 @@
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Sede {
     private Integer codice;
@@ -17,23 +14,29 @@ public class Sede {
         caricaEsami();
 
     }
+
     public Integer getCodice() {
+
         return codice;
     }
 
     public String getNome() {
+
         return nome;
     }
 
     public void setCodice(Integer codice) {
+
         this.codice = codice;
     }
 
     public void setNome(String nome) {
+
         this.nome = nome;
     }
 
     public Map<String, Esame> getEsami() {
+
         return esami;
     }
 
@@ -43,10 +46,12 @@ public class Sede {
             Esame esame2 = new Esame(LocalDate.of(2026, 3, 20), LocalTime.of(10, 30), "Ecografia addome");
             Esame esame3 = new Esame(LocalDate.of(2026, 3, 20), LocalTime.of(12, 0), "Radiografia torace");
             Esame esame4 = new Esame(LocalDate.of(2026, 3, 19), LocalTime.of(7, 30), "Radiografia torace");
+            Esame esame5 = new Esame(LocalDate.of(2026, 12, 25), LocalTime.of(10, 0), "Ecografia di Babbo Natale");
             esami.put(esame1.getCodice(), esame1);
             esami.put(esame2.getCodice(), esame2);
             esami.put(esame3.getCodice(),esame3);
             esami.put(esame4.getCodice(),esame4);
+            esami.put(esame5.getCodice(),esame5); //per verificare il decoratore
 
 
     }
@@ -88,8 +93,10 @@ public class Sede {
     }
 
     public void mostraEsamiDisponibili() {
-        for (Esame e : esami.values()) {
-            System.out.println(e);
+        for (Map.Entry<String, Esame> entry : esami.entrySet()) {
+            String codice = entry.getKey();
+            Esame esame = entry.getValue();
+            System.out.println("Codice: " + codice + " | Esame: " + esame);
         }
     }
 

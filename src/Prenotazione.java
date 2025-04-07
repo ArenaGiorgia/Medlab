@@ -2,56 +2,77 @@ import java.util.UUID;
 
 public class Prenotazione {
     private String codice;
-    private boolean conferma;  //se è effettuato è true e quindi generiamo il referto per le statistiche
+    private StatoPrenotazione stato;
     private Esame esame;
     private Paziente paziente;
+    private Referto referto;
 
     public Prenotazione(Esame esame, Paziente paziente) {
-        this.codice = UUID.randomUUID().toString().substring(0, 8);
+        this.codice = UUID.randomUUID().toString();
         this.esame= esame;
-        this.conferma=false;
         this.paziente = paziente;
+        this.referto = null;
+        this.stato = new StatoInAttesa();
     }
 
-    public String getCodice() {
-        return codice;
-    }
-
-    public boolean confermaPrenotazione() {
-        return conferma;
-    }
-
-    public Esame getEsame() {
-        return esame;
+    public StatoPrenotazione getStato() {
+        return stato;
     }
 
     public Paziente getPaziente() {
         return paziente;
     }
 
-    public void setPaziente(Paziente paziente) {
-        this.paziente = paziente;
+    public void completa() {
+        stato.completa(this);
     }
 
-    public void setCodice(String codice) {
-        this.codice = codice;
+    public void annulla() {
+        stato.annulla(this);
     }
 
-    public void setConferma(boolean conferma) {
-        this.conferma = conferma;
+    public void setStato(StatoPrenotazione stato) {
+        this.stato = stato;
+    }
+
+    public String getStatoCorrente() {
+        return stato.getNomeStato();
+
+    }
+
+    public void setReferto(Referto referto) {
+        this.referto = referto;
+    }
+
+    public Referto getReferto() {
+        return this.referto;
+    }
+
+    public String getCodice() {
+        return codice;
     }
 
     public void setEsame(Esame esame) {
         this.esame = esame;
     }
 
+    public Esame getEsame() {
+        return esame;
+    }
+
+    public void setCodice(String codice) {
+        this.codice = codice;
+    }
+
+
     @Override
     public String toString() {
         return "Prenotazione{" +
                 "codice='" + codice + '\'' +
-                ", conferma=" + conferma +
                 ", esame=" + esame +
                 ", paziente=" + paziente +
                 '}';
     }
+
+
 }

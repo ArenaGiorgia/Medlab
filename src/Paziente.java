@@ -11,12 +11,13 @@ public class Paziente {
     private String cf;
     private String password;
     private String sesso;
+    private boolean cronico;
     private Integer età;
     private Sede sede;
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioniPaziente;
-
-    public Paziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso) {
+    private Map<String, Referto> refertoCorrente;
+    public Paziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso, boolean cronico) {
 
         this.nome = nome;
         this.cognome = cognome;
@@ -27,17 +28,27 @@ public class Paziente {
         this.età = calcolaEta(dataNascita);
         this.prenotazioniPaziente = new HashMap<>();
         this.sedi = new ArrayList<>();
+        this.refertoCorrente = new HashMap<>();
+        this.cronico = cronico;
     }
 
     public List<Sede> getSedi() {
+
         return sedi;
     }
 
     public Map<String, Prenotazione> getPrenotazioni() {
+
         return prenotazioniPaziente;
     }
 
+    public Map<String, Referto> getRefertoCorrente() {
+        return refertoCorrente;
+
+    }
+
     private int calcolaEta(LocalDate dataNascita) {
+
         return Period.between(dataNascita, LocalDate.now()).getYears();
     }
     public String getNome() {
@@ -69,6 +80,7 @@ public class Paziente {
     }
 
     public void setSedi(List<Sede> sedi) {
+
         this.sedi = sedi;
     }
 
@@ -115,7 +127,16 @@ public class Paziente {
         }
         return false;
     }
-//metodo che mi servira per il caso duso 8 oltre che per l 1 per essere richiamato dall admin
+
+    public void setMalatoCronico(boolean cronico) {
+        this.cronico = cronico;
+    }
+
+    public boolean isCronico() {
+        return cronico;
+    }
+
+    //metodo che mi servira per il caso duso 8 oltre che per l 1 per essere richiamato dall admin
 public void modificaPaziente() {
     Scanner scanner = new Scanner(System.in);
     int scelta;
@@ -126,6 +147,7 @@ public void modificaPaziente() {
         System.out.println("3. Data di nascita");
         System.out.println("4. Sesso");
         System.out.println("5. Password");
+        System.out.println("6. Malato cronico");
         System.out.println("0. Esci");
         System.out.print("Inserisci il numero corrispondente: ");
         scelta = scanner.nextInt();
@@ -172,6 +194,17 @@ public void modificaPaziente() {
             case 5:
                 modificaPassword();
                 break;
+            case  6:
+                System.out.print("Il paziente è malato cronico? (SI/NO): ");
+                String risposta = scanner.nextLine().trim().toUpperCase();
+                if (risposta.equals("SI")) {
+                    setMalatoCronico(true);
+                } else if (risposta.equals("NO")) {
+                    setMalatoCronico(false);
+                } else {
+                    System.out.println("Risposta non valida. Il paziente non è stato aggiornato.");
+                }
+                break;
             case 0:
                 System.out.println("Modifica paziente terminata.");
                 break;
@@ -207,7 +240,8 @@ public void modificaPaziente() {
                 ", dataNascita=" + dataNascita +
                 ", cf='" + cf + '\'' +
                 ", sesso='" + sesso + '\'' +
-                ", età=" + età + '}';
+                ", età=" + età +
+                ", malatoCronico=" + cronico +'}';
     }
 
 

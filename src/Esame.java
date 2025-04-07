@@ -13,7 +13,7 @@ public class Esame {
 
         this.codice = UUID.randomUUID().toString().substring(0, 4);
         this.data = data;
-        this.orario = orario; //TODO: fare un check quando aggiungiamo nuovi esami stando attanti a fare 1h:30m di orario
+        this.orario = orario;
         this.nome = nome;
         this.prenotato = false;
 
@@ -76,6 +76,7 @@ public class Esame {
                 " stato: " + this.statoEsame();
 
     }
+
 
 
 }
