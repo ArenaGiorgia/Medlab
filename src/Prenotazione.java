@@ -8,11 +8,11 @@ public class Prenotazione {
     private Referto referto;
 
     public Prenotazione(Esame esame, Paziente paziente) {
-        this.codice = UUID.randomUUID().toString();
+        this.codice = esame.getCodice();
         this.esame= esame;
         this.paziente = paziente;
         this.referto = null;
-        this.stato = new StatoInAttesa();
+        this.stato = new StatoInAttesa(this);
     }
 
     public StatoPrenotazione getStato() {
@@ -35,10 +35,6 @@ public class Prenotazione {
         this.stato = stato;
     }
 
-    public String getStatoCorrente() {
-        return stato.getNomeStato();
-
-    }
 
     public void setReferto(Referto referto) {
         this.referto = referto;

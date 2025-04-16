@@ -7,14 +7,13 @@ private String cf;
 private String nome;
 private String cognome;
 private String password;
-private Map<String, Referto> referti;
 private Sede sede;
+
     public PersonaleLaboratorio(String cf, String nome, String cognome, Sede sede) {
         this.nome = nome;
         this.cognome = cognome;
         this.cf = cf;
         this.password=cf; //password settata automaticamente al codice fiscale
-        this.referti = new HashMap<String, Referto>();
         this.sede = sede;
     }
 
@@ -30,9 +29,6 @@ private Sede sede;
         return cf;
     }
 
-    public Map<String, Referto> getReferti() {
-        return referti;
-    }
 
     public void setCf(String cf) {
         this.cf = cf;
@@ -55,10 +51,6 @@ private Sede sede;
 
     public String getCognome() {
         return cognome;
-    }
-
-    public void aggiungiReferto(String codicePrenotazione, Referto referto) { //per aggiunger e il referto
-        this.referti.put(codicePrenotazione, referto);
     }
 
     public Boolean verificaPassword(String password) {

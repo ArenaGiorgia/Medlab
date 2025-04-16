@@ -16,7 +16,7 @@ public class Paziente {
     private Sede sede;
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioniPaziente;
-    private Map<String, Referto> refertoCorrente;
+    private Map<String, Referto> refertiCorrenti;
     public Paziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso, boolean cronico) {
 
         this.nome = nome;
@@ -28,7 +28,7 @@ public class Paziente {
         this.età = calcolaEta(dataNascita);
         this.prenotazioniPaziente = new HashMap<>();
         this.sedi = new ArrayList<>();
-        this.refertoCorrente = new HashMap<>();
+        this.refertiCorrenti = new HashMap<>();
         this.cronico = cronico;
     }
 
@@ -42,8 +42,8 @@ public class Paziente {
         return prenotazioniPaziente;
     }
 
-    public Map<String, Referto> getRefertoCorrente() {
-        return refertoCorrente;
+    public Map<String, Referto> getRefertiCorrenti() {
+        return refertiCorrenti;
 
     }
 

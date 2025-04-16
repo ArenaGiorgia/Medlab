@@ -1,5 +1,6 @@
 import com.sun.xml.internal.bind.v2.TODO;
-
+//TODO: controllare in generale se mettere l if (corrente==null) con tutti dopo il login nei vari metodi
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
@@ -17,6 +18,7 @@ public class Medlab {
     private Prenotazione prenotazioneCorrente;
     private PersonaleLaboratorio personaleLaboratorioCorrente;
     private Map<String,PersonaleLaboratorio> personaliLaboratori;
+    private Referto refertoCorrente;
 
     private Medlab() {
         this.pazienti = new HashMap<String,Paziente>();
@@ -28,6 +30,7 @@ public class Medlab {
         this.sedi = new ArrayList<>();
         this.personaleLaboratorioCorrente=null;
         this.personaliLaboratori=new HashMap<String,PersonaleLaboratorio>();
+        this.refertoCorrente=null;
         CaricamentoDati();  //per caricare dati persistenti
     }
 
@@ -37,6 +40,14 @@ public class Medlab {
         else
             System.out.println("Istanza già creata");
         return medlab;
+    }
+
+    public Referto getRefertoCorrente() {
+        return refertoCorrente;
+    }
+
+    public void setRefertoCorrente(Referto refertoCorrente) {
+        this.refertoCorrente = refertoCorrente;
     }
 
     public void setPersonaleLaboratorioCorrente(PersonaleLaboratorio personaleLaboratorioCorrente) {
@@ -333,14 +344,21 @@ public class Medlab {
             return;
         }
 
-        //iterazione 2 applicazione pattern decorator
+        //iterazione 2 applicazione pattern decorator quindi in seleziona ESame sarà modificato da ora in poi il flusso
         Esame esameDecorato = new EsameControlloFestivi(esameSelezionato,pazienteCorrente);
+//modifica del flussso del SelezionaEsame perche passa da questa classe
+        if (!((EsameControlloFestivi) esameDecorato).prenotabile()) {
+            DayOfWeek giorno = esameSelezionato.getData().getDayOfWeek();
 
-            if (!((EsameControlloFestivi) esameDecorato).prenotabile()) {
+            if (giorno == DayOfWeek.SATURDAY || giorno == DayOfWeek.SUNDAY) {
+                System.out.println("Errore: L'esame è prenotabile solo da pazienti cronici perché cade di " + giorno + ".");
+            } else {
                 System.out.println("Errore: Esame riservato ai malati cronici.");
-                return;
             }
-            System.out.println("Esame prenotabile: " + esameDecorato);
+            return;
+        }
+
+        System.out.println("Esame prenotabile: " + esameDecorato);
 
 
         LocalDate dataEsame = esameSelezionato.getData();
@@ -389,8 +407,8 @@ public class Medlab {
             System.out.println("Errore: Questo esame è già stato prenotato.");
             return;
         }
-        Prenotazione prenotazione = new Prenotazione(esameSelezionato,pazienteCorrente);
-        this.prenotazioneCorrente = prenotazione;
+        this.prenotazioneCorrente = new Prenotazione(esameSelezionato,pazienteCorrente);
+
     }
 
 
@@ -563,9 +581,9 @@ public boolean visualizzaSedePaziente(Paziente p){
 
     //caricamento dei dati inseriti da default come gli utenti e le prenotazioni e le sedi
     public void CaricamentoDati(){
-        Paziente paziente1 = new Paziente("Matteo","Milano",LocalDate.of(2000, 12, 11),"c","M",false);
+        Paziente paziente1 = new Paziente("Matteo","Milano",LocalDate.of(2000, 12, 11),"c","M",true);
         Paziente paziente2 = new Paziente("Maria","Salemi",LocalDate.of(1986, 9, 2),"SLMWG349P33G342LP","F",false);
-        Paziente paziente3= new Paziente("Giuseppe","Paci",LocalDate.of(1958, 2, 9),"GPPPAI11R44Z573H","M",true);
+        Paziente paziente3= new Paziente("Giuseppe","Paci",LocalDate.of(1958, 2, 9),"GPPPAI11R44Z573H","M",false);
         Sede sede1 = new Sede(0,"Catania");
         Sede sede2 = new Sede(1,"Messina");
         Sede sede3 = new Sede(2,"Palermo");
@@ -581,6 +599,7 @@ public boolean visualizzaSedePaziente(Paziente p){
         this.pazienti.put(paziente1.getCf(), paziente1);
         this.pazienti.put(paziente2.getCf(), paziente2);
         this.pazienti.put(paziente3.getCf(), paziente3);
+      //   this.amministratore=new Amministratore();
 
     }
 
@@ -678,95 +697,109 @@ public void eliminaSede() {
 
 
 //UC5 Gestione referti (inserimento)
-    public void aggiungiReferto(){
-        if (personaleLaboratorioCorrente == null) {
-            System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato!");
-            return;
-        }
-        Map<String, Esame> esamiSede = personaleLaboratorioCorrente.getSede().getEsami(); //1 vedo gli esami nella sede associata al paziente
+public void aggiungiReferto() {
+    if (personaleLaboratorioCorrente == null) {
+        System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato!");
+        return;
+    }
 
-        if (esamiSede.isEmpty()) {
-            System.out.println("Nessun esame disponibile nella sede corrente.");
-            return;
-        }
-        Map<String, Esame> esamiPrenotati = new HashMap<>();
-        for (Map.Entry<String, Esame> entry : esamiSede.entrySet()) {
-            Esame esame = entry.getValue();
-            if (esame.isPrenotato()) {
-                esamiPrenotati.put(entry.getKey(), esame);
+    Scanner scanner = new Scanner(System.in);
+
+    while (true) {
+        System.out.println("Esami prenotati in attesa di referto:");
+        boolean esameTrovato = false;
+
+        Map<String, Esame> esamiSede = personaleLaboratorioCorrente.getSede().getEsami(); //collegamento flusso 2
+
+        for (Map.Entry<String, Esame> entryEsame : esamiSede.entrySet()) {
+            Esame esame = entryEsame.getValue();
+            if (esame.isPrenotato() && esame.getData().equals(LocalDate.now())) {
+                for (Map.Entry<String, Prenotazione> entryPren : prenotazioni.entrySet()) { //collegamento al 4
+                    Prenotazione pren = entryPren.getValue();
+                    if (pren.getEsame().equals(esame) && pren.getStato() instanceof StatoInAttesa) {
+                        System.out.println(esame.toString());
+                        esameTrovato = true;
+                        break;
+                    }
+                }
             }
         }
-
-        if (esamiPrenotati.isEmpty()) {
-            System.out.println("Nessun esame prenotato nella sede corrente.");
-            return;
+        if (!esameTrovato) {
+            System.out.println("Non ci sono esami in attesa di referto.");
+            break;
         }
 
-        System.out.println("Esami prenotati nella sede:");
-        for (Esame esame : esamiPrenotati.values()) {
-            System.out.println(esame.toString());
-        }
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Inserisci il codice dell'esame da completare: ");
+        System.out.print("Inserisci il codice dell'esame da selezionare, o 'STOP' per terminare: ");
         String codiceEsame = scanner.nextLine().trim();
 
-        Esame esameSelezionato = esamiPrenotati.get(codiceEsame);
-        //questo glielo passo come parametro a SelezioneEsameSede cosi per ricorsione facciamo il flusso
+        if (codiceEsame.equalsIgnoreCase("STOP")) {
+            break;
+        }
 
-        if (esameSelezionato == null) {
-                System.out.println("Errore: Esame non trovato con il codice inserito.");
-                return;
-            }
-        SelezionaEsameSede(esameSelezionato); //2.Flussi di selezionaEsameSede passando l esame come parametro
+        Esame esameSelezionato = SelezionaEsameSede(codiceEsame); //flusso 2.
+        if (esameSelezionato == null || !esameSelezionato.isPrenotato()) {
+            System.out.println("Errore: Esame non trovato o non valido.");
+            continue;
+        }
 
         Prenotazione prenotazioneSelezionata = null;
-        for (Map.Entry<String, Prenotazione> entry : prenotazioni.entrySet()) { //3
-            Prenotazione prenotazione = entry.getValue();
-            if (prenotazione.getEsame().getCodice().equals(codiceEsame)) {
-                prenotazioneSelezionata = prenotazione;
+
+        for (Map.Entry<String, Prenotazione> entry : prenotazioni.entrySet()) {
+            Prenotazione pren = entry.getValue();
+            if (pren.getCodice().equals(codiceEsame) && pren.getStato() instanceof StatoInAttesa) {
+                prenotazioneSelezionata = pren;
                 break;
             }
         }
 
         if (prenotazioneSelezionata == null) {
-            System.out.println("Errore: Nessuna prenotazione trovata per l'esame selezionato.");
-            return;
-        }
-        System.out.println("Paziente associato alla prenotazione: " + prenotazioneSelezionata.getPaziente().getNome()
-                + " " + prenotazioneSelezionata.getPaziente().getCognome());
-
-
-        StatoPrenotazione statoCorrente = prenotazioneSelezionata.getStato();
-
-        while (statoCorrente instanceof StatoInAttesa) {
-            inserisciStato(prenotazioneSelezionata); // 4
-
-           statoCorrente = prenotazioneSelezionata.getStato();
-
-           if (!(statoCorrente instanceof StatoInAttesa))
-                prenotazioni.remove(prenotazioneSelezionata.getCodice());
-                esamiSede.remove(esameSelezionato.getCodice());
-
+            System.out.println("Errore: Nessuna prenotazione trovata per questo esame.");
+            continue;
         }
 
-        System.out.println("Le prenotazioni sono state aggiornate.");
+        Paziente paziente = prenotazioneSelezionata.getPaziente(); // collegamento flusso 4
+        System.out.println("Paziente: " + paziente.getNome() + " " + paziente.getCognome());
 
+        System.out.print("Vuoi completare o annullare questa prenotazione? (SI/NO): ");
+        String scelta = scanner.nextLine().trim().toUpperCase();
 
+        if (scelta.equals("SI")) {
+            inserisciStato(prenotazioneSelezionata); //4. flusso dello stato
+        } else if (scelta.equals("NO")) {
+            esamiSede.remove(codiceEsame);
+            System.out.println("Prenotazione annullata.");
+        } else {
+            System.out.println("Azione non valida. Scegli 'SI' o 'NO'.");
+            continue;
+        }
+
+        if (prenotazioneSelezionata.getStato() instanceof StatoCompletato) {
+            esamiSede.remove(codiceEsame);
+        }
+
+        System.out.print("Vuoi selezionare un altro esame? (SI/NO): ");
+        String risposta = scanner.nextLine().trim().toUpperCase();
+        if (risposta.equals("NO")) break;
     }
 
+    System.out.println("Gestione referti completata.");
+}
 
-    public void SelezionaEsameSede(Esame esame) {
-        if (personaleLaboratorioCorrente == null) {
-            System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato.");
-            return;
-        }
-        if (esame == null) {
-            System.out.println("Errore: Esame non valido.");
-            return;
-        }
-        System.out.println("Esame selezionato: " + esame.getNome());
+
+    public Esame SelezionaEsameSede(String codiceEsame) {
+
+    Map<String, Esame> esamiSede = personaleLaboratorioCorrente.getSede().getEsami();
+    Esame esame = esamiSede.get(codiceEsame);
+
+    if (esame == null) {
+        System.out.println("Errore: Esame non trovato.");
+        return null;
     }
+
+    System.out.println("Esame selezionato: " + esame.getNome());
+    return esame;
+}
+
 
     public void inserisciStato(Prenotazione prenotazione) {
         if (prenotazione == null) {
@@ -775,23 +808,144 @@ public void eliminaSede() {
         }
 
         StatoPrenotazione statoCorrente = prenotazione.getStato();
-        System.out.println("Lo stato attuale della prenotazione è: " + statoCorrente.getNomeStato());
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Vuoi completare o annullare la prenotazione? (SI/NO): ");
-        String azione = scanner.nextLine().trim().toUpperCase();
-
-        if (azione.equalsIgnoreCase("SI")) {
-            statoCorrente.completa(prenotazione); // Completa la prenotazione
-        } else if (azione.equalsIgnoreCase("NO")) {
-            statoCorrente.annulla(prenotazione); // Annulla la prenotazione
-        } else {
-            System.out.println("Azione non valida. Scegli 'SI' o 'NO'.");
+        if (statoCorrente instanceof StatoInAttesa) {
+            statoCorrente.completa(prenotazione);
+        } else if (statoCorrente instanceof StatoCompletato) {
+            System.out.println("La prenotazione è già completata.");
+        } else if (statoCorrente instanceof StatoAnnullato) {
+            System.out.println("La prenotazione è già annullata.");
         }
-        System.out.println("Lo stato aggiornato della prenotazione è: " + prenotazione.getStato().getNomeStato());
     }
 
+//UC6
+//Aggiorna referto, dove il personale accede vede i pazienti della sua sede e poi ne seleziona uno e gli mette la descrizione del referto
 
+    public void aggiornaReferto(){
+        if (personaleLaboratorioCorrente == null) {
+            System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato!");
+            return;
+        }
+        Scanner scanner = new Scanner(System.in);
+        Map<String, Paziente> pazienti = personaleLaboratorioCorrente.getSede().getPazienti();
+
+        if (pazienti.isEmpty()) {
+            System.out.println("Nessun paziente registrato in questa sede.");
+            return;
+        }
+
+        System.out.println("Pazienti associati alla sede:");
+        for (Map.Entry<String, Paziente> entry : pazienti.entrySet()) {  // 1. Visualizza i pazienti
+            System.out.println(entry.getValue().toString());
+        }
+
+        System.out.print("Inserisci il codice fiscale del paziente a cui aggiornare il referto: ");
+        String cf = scanner.nextLine().trim();
+
+        Paziente pazienteSelezionato = SelezionaPaziente(cf); //2 flusso di seleziona
+        if (pazienteSelezionato == null) {
+            System.out.println("Errore: paziente non trovato.");
+            return;
+        }
+
+        boolean trovato = false;
+        Map<String, Prenotazione> prenotazioni = pazienteSelezionato.getPrenotazioniPaziente();
+
+        for (Map.Entry<String, Prenotazione> entry : prenotazioni.entrySet()) {
+            Prenotazione pren = entry.getValue();
+            Referto referto = pren.getReferto();
+
+            if (pren.getStato() instanceof StatoCompletato) { //3.vedi le prenotazioni completate
+                if (referto != null && (referto.getRisultato() == null || referto.getRisultato().isEmpty())) {
+                    System.out.println(pren.toString());
+                    trovato = true;
+                }
+            }
+        }
+
+            if (!trovato) {
+                System.out.println("Nessun referto vuoto trovato per questo paziente.");
+                return;
+            }
+
+            System.out.print("Inserisci il codice della prenotazione da aggiornare: ");
+            String codicePren = scanner.nextLine().trim();
+
+            Prenotazione prenotazioneSelezionata = selezionaPrenotazione(codicePren); //4. seleziona la prenotazione completata
+
+            if (prenotazioneSelezionata == null) {
+                System.out.println("Errore: codice prenotazione non valido.");
+                return;
+            }
+
+            prenotazioneCorrente = prenotazioneSelezionata;
+            refertoCorrente = prenotazioneCorrente.getReferto();
+            inserisciReferto(); //flusso 5.
+            confermaReferto(); //flusso 6.
+        }
+
+
+
+
+
+    public Paziente SelezionaPaziente(String cf) {
+        if (personaleLaboratorioCorrente == null) {
+            System.out.println("Errore: nessun personale di laboratorio autenticato.");
+            return null;
+        }
+
+        Map<String, Paziente> pazientiSede = personaleLaboratorioCorrente.getSede().getPazienti();
+
+        return pazientiSede.get(cf);
+    }
+
+    public Prenotazione selezionaPrenotazione(String codicePrenotazione) {
+        Prenotazione prenotazione = prenotazioni.get(codicePrenotazione);
+
+        if (prenotazione == null) {
+            System.out.println("Prenotazione non trovata.");
+            return null;
+        }//ci vuole per forza perche se sbaglio e metto un codice che non è confermato me lo troverebbe
+        if (!(prenotazione.getStato() instanceof StatoCompletato)) {
+            System.out.println("La prenotazione non è nello stato 'Completato'.");
+            return null;
+        }
+        return prenotazione;
+    }
+
+    public void inserisciReferto() {
+        if (refertoCorrente == null) {
+            System.out.println("Errore: nessun referto selezionato.");
+            return;
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Inserisci la descrizione del referto: ");
+        String descrizione = scanner.nextLine().trim();
+
+        refertoCorrente.setReferto(descrizione);
+        System.out.println("Descrizione inserita con successo.");
+    }
+
+    public void confermaReferto() {
+        if (refertoCorrente == null || prenotazioneCorrente == null) {
+            System.out.println("Errore: referto o prenotazione non impostati.");
+            return;
+        }
+
+        Paziente paziente = prenotazioneCorrente.getPaziente();
+
+        if (paziente == null) {
+            System.out.println("Errore: paziente non trovato.");
+            return;
+        }
+
+        paziente.getRefertiCorrenti().put(refertoCorrente.getId(), refertoCorrente);
+        System.out.println("Referto confermato e salvato nel profilo del paziente.");
+
+        refertoCorrente = null;
+        prenotazioneCorrente = null;
+    }
 
 
 

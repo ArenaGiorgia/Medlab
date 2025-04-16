@@ -21,9 +21,10 @@ public class Referto
         this.data = data;
     }
 
-    public void setRisultato(String risultato) {
+    public void setReferto(String risultato) {
         this.risultato = risultato;
     }
+
 
     public String getId() {
         return Id;
@@ -37,5 +38,13 @@ public class Referto
         return risultato;
     }
 
+    @Override
+    public String toString() {
+        return "Referto{" +
+                "Id='" + Id + '\'' +
+                ", data=" + data +
+                ", risultato='" + risultato + '\'' +
+                '}';
+    }
 }
 

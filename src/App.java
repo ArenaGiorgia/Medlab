@@ -187,7 +187,8 @@ public class App {
                         switch (scelta) {
                             case 1: sistema.aggiungiReferto();
                                 break;
-                            case 2:
+
+                            case 2: sistema.aggiornaReferto();
                                 break;
                             case 3:
                                 break;

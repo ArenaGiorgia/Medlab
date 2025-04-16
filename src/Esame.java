@@ -15,7 +15,6 @@ public class Esame {
         this.data = data;
         this.orario = orario;
         this.nome = nome;
-        this.prenotato = false;
 
     }
 
@@ -67,16 +66,13 @@ public class Esame {
         return this.orario;
     }
 
-
+    @Override
     public String toString() {
-        return "Codice: " + this.codice + " " +
-                " Data: " + this.data + " " +
-                " Orario: " + this.orario + " " +
-                " nome: " + this.nome + " " +
-                " stato: " + this.statoEsame();
-
+        return
+                " codice=" + codice +
+                ", data=" + data +
+                ", orario=" + orario +
+                ", nome=" + nome  +
+                ", stato=" + this.statoEsame();
     }
-
-
-
 }

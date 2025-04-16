@@ -1,7 +1,19 @@
-public interface StatoPrenotazione {
-    void completa(Prenotazione prenotazione);
-    void annulla(Prenotazione prenotazione);
-    String getNomeStato();
+public abstract class StatoPrenotazione {
+protected  Prenotazione prenotazione ;
+
+    public StatoPrenotazione(Prenotazione prenotazione) {
+        this.prenotazione = prenotazione;
+    }
+
+    public void completa(Prenotazione prenotazione) {
+            System.out.println("Operazione non consentita nello stato attuale.");
+        }
+
+        public void annulla(Prenotazione prenotazione) {
+            System.out.println("Operazione non consentita nello stato attuale.");
+        }
+
+        public abstract String getNomeStato();
 }
 
 /*l interfaccia che ci permette di gestire lo stato con il pattern state, dove sarà il personale di laboratorio ad
