@@ -949,9 +949,41 @@ public void aggiungiReferto() {
 
 
 
+//UC11 - aggiunge un personale di laboratorio al sistema
+    public void aggiungiPersonale(){
+        Scanner scanner = new Scanner(System.in);
+        Sede sedesel=null;
+        System.out.print("Inserisci il nome del personale di laboratorio: ");
+        String nome = scanner.nextLine();
+        System.out.print("Inserisci il cognome del personale di laboratoio: ");
+        String cognome = scanner.nextLine();
+        System.out.print("Inserisci il cf del personale di laboratoio: ");
+        String cf = scanner.nextLine();
+        System.out.print("Inserisci il codice della sede in cui lavorerà: ");
+        int codSede = Integer.parseInt(scanner.nextLine());
+        for (Sede sede : sedi){
+            if (sede.getCodice()==codSede) sedesel=sede;
+        }
 
+        inserisciPersonaleLab(cf,nome, cognome,sedesel);
+        confermaPersonaleLab();
+    }
 
+    public void inserisciPersonaleLab(String cf, String nome, String cognome, Sede sede){
+        PersonaleLaboratorio personale = new PersonaleLaboratorio( cf, nome, cognome,sede);
+        this.personaleLaboratorioCorrente = personale;
 
+    }
+    public void confermaPersonaleLab()
+    {
+        if (this.personaleLaboratorioCorrente == null) {
+            System.out.println("Errore: Nessun personale ha eseguito l'accesso!");
+            return;
+        }
+        System.out.println("Riepilogo informazioni inserite: ");
+        System.out.print(this.personaleLaboratorioCorrente.toString());
+        this.personaleLaboratorioCorrente = null;
+    }
 
 
     @Override
