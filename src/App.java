@@ -49,14 +49,15 @@ public class App {
                     System.out.println("7. Gestisci esami");
                     System.out.println("8. Gestisci personale laboratorio");
                     System.out.println("9. Generazione report");
-                    System.out.println("10. Logout");
+                    System.out.println("10. Vedi recensioni");
+                    System.out.println("11. Logout");
                     System.out.print("Scegli un'opzione: ");
 
                     scelta = 0;
-                    while (scelta < 1 || scelta > 10) {
+                    while (scelta < 1 || scelta > 11) {
                         try {
                             scelta = Integer.parseInt(scanner.nextLine());
-                            if (scelta < 1 || scelta > 10) {
+                            if (scelta < 1 || scelta > 11) {
                                 System.out.println("Opzione non valida. Inserisci un numero tra 1 e 10.");
                             }
                         } catch (NumberFormatException e) {
@@ -65,7 +66,7 @@ public class App {
                         }
                     }
 
-                    if (scelta == 10) {
+                    if (scelta == 11) {
                         System.out.println("Logout amministratore...");
                         sistema.logout();
                         break;
@@ -92,6 +93,7 @@ public class App {
                             break;
                         case 7:
                             System.out.println("Gestione esami...");
+                            sistema.aggiungiNuovoEsame();
                             break;
                         case 8:
                             System.out.println("Gestione personale laboratorio...");
@@ -99,6 +101,13 @@ public class App {
                             break;
                         case 9:
                             System.out.println("Generazione report...");
+                            break;
+                        case 10:
+
+                            sistema.getAmministratore().visualizzaRecensioniNonLette();
+                            System.out.println("TUTTE LE RECENSIONI..");
+                            sistema.visualizzaRecensioni();
+
                             break;
                     }
                 }
@@ -149,6 +158,7 @@ public class App {
                             break;
                         case 5:
                             System.out.println("Inserisci recensione...");
+                            sistema.lasciaRecensione();
                             break;
                         case 6:
                             //  sistema.visualizzaPrenotazioniPaziente();

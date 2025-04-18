@@ -54,7 +54,7 @@ public class Sede {
 
             Esame esame1 = new Esame(LocalDate.now(), LocalTime.of(9, 0), "Analisi del sangue");
             Esame esame2 = new Esame(LocalDate.now(), LocalTime.of(10, 30), "Ecografia addome");
-            Esame esame3 = new Esame(LocalDate.now(), LocalTime.of(12, 0), "Radiografia torace");
+            Esame esame3 = new Esame(LocalDate.now(), LocalTime.of(13, 30), "Radiografia torace");
             Esame esame4 = new Esame(LocalDate.of(2026, 3, 19), LocalTime.of(7, 30), "Radiografia torace");
             Esame esame5 = new Esame(LocalDate.of(2026, 12, 25), LocalTime.of(10, 0), "Ecografia di Babbo Natale");
             esami.put(esame1.getCodice(), esame1);
