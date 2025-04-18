@@ -1,3 +1,5 @@
+package main;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
@@ -234,7 +236,7 @@ public void modificaPaziente() {
 
     @Override
     public String toString() {
-        return "Paziente{" +
+        return "main.Paziente{" +
                 "nome='" + nome + '\'' +
                 ", cognome='" + cognome + '\'' +
                 ", dataNascita=" + dataNascita +

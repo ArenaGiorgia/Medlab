@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.Map;
+package main;
 
 public class PersonaleLaboratorio
 {
@@ -62,7 +61,7 @@ private Sede sede;
 
     @Override
     public String toString() {
-        return "PersonaleLaboratorio{" +
+        return "main.PersonaleLaboratorio{" +
                 "cf='" + cf + '\'' +
                 ", nome='" + nome + '\'' +
                 ", cognome='" + cognome + '\'' +

@@ -1,3 +1,5 @@
+package main;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -29,7 +31,7 @@ public class Recensione {
     @Override
     public String toString() {
         return String.format(
-                "★ %s/5 | Sede: %s | Autore: %s %s\nCommento: %s",
+                "★ %s/5 | main.Sede: %s | Autore: %s %s\nCommento: %s",
                 valutazione, sede.getNome(), paziente.getNome(), paziente.getCognome(), commento
         );
     }

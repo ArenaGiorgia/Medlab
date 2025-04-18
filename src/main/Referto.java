@@ -1,3 +1,5 @@
+package main;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -40,7 +42,7 @@ public class Referto
 
     @Override
     public String toString() {
-        return "Referto{" +
+        return "main.Referto{" +
                 "Id='" + Id + '\'' +
                 ", data=" + data +
                 ", risultato='" + risultato + '\'' +

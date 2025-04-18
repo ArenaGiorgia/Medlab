@@ -1,3 +1,5 @@
+package main;
+
 public class StatoAnnullato extends StatoPrenotazione {
     public StatoAnnullato(Prenotazione prenotazione) {
         super(prenotazione);

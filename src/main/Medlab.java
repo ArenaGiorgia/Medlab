@@ -1,3 +1,5 @@
+package main;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,6 +22,8 @@ public class Medlab {
     private Map<String, PersonaleLaboratorio> personaliLaboratori;
     private Map<String, Recensione> recensioni;
     private List<RecensioneObserver> observers;
+
+
 
     private Medlab() {
         this.pazienti = new HashMap<String, Paziente>();
@@ -61,7 +65,13 @@ public class Medlab {
     public void setPazienteCorrente(Paziente pazienteCorrente) {
         this.pazienteCorrente = pazienteCorrente;
     }
+    public void setPrenotazioni(Map<String, Prenotazione> prenotazioni) {
+        this.prenotazioni = prenotazioni;
+    }
 
+    public void setPersonaliLaboratori(Map<String, PersonaleLaboratorio> personaliLaboratori) {
+        this.personaliLaboratori = personaliLaboratori;
+    }
     public void setPazienti(Map<String, Paziente> pazienti) {
         this.pazienti = pazienti;
     }
@@ -122,7 +132,7 @@ public class Medlab {
         }
     }
 
-    //UC1 Gestione pazienti Medlab (inserimento paziente)
+    //UC1 Gestione pazienti main.Medlab (inserimento paziente)
     public void aggiungiPaziente() {
         Scanner scanner = new Scanner(System.in);
         LocalDate dataNascita = null;
@@ -238,7 +248,7 @@ public class Medlab {
             Map.Entry<String, Paziente> entry = iterator.next();
             if (entry.getKey().equals(codiceFiscale)) {
                 iterator.remove();
-                System.out.println("Paziente eliminato con successo.");
+                System.out.println("main.Paziente eliminato con successo.");
                 return;
             }
         }
@@ -263,7 +273,7 @@ public class Medlab {
             paziente.modificaPaziente();
             this.pazienteCorrente = null;
         } else {
-            System.out.println("Errore: Paziente non trovato.");
+            System.out.println("Errore: main.Paziente non trovato.");
         }
     }
 
@@ -295,7 +305,7 @@ public class Medlab {
         if (sedeSelezionata != null) {
             confermaSede(sedeSelezionata); //3. conferma sede
         } else {
-            System.out.println("Sede non trovata. Riprova.");
+            System.out.println("main.Sede non trovata. Riprova.");
         }
 
     }
@@ -305,7 +315,7 @@ public class Medlab {
             System.out.println("Il paziente ha già questa sede.");
         } else {
             pazienteCorrente.getSedi().add(sedeSelezionata);
-            System.out.println("Sede " + sedeSelezionata.getNome() + " Codice: " + sedeSelezionata.getCodice() + " assegnata a: " + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome());
+            System.out.println("main.Sede " + sedeSelezionata.getNome() + " Codice: " + sedeSelezionata.getCodice() + " assegnata a: " + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome());
         }
     }
 
@@ -354,7 +364,7 @@ public class Medlab {
 
         Sede sedeSelezionata = selezionaSedePaziente(codiceSede); // 2
         if (sedeSelezionata == null) {
-            System.out.println("Errore: Sede non trovata.");
+            System.out.println("Errore: main.Sede non trovata.");
             return;
         }
 
@@ -369,7 +379,7 @@ public class Medlab {
 
         Esame esameSelezionato = sedeSelezionata.getEsami().get(codiceEsame);
         if (esameSelezionato == null) {
-            System.out.println("Errore: Esame non trovato.");
+            System.out.println("Errore: main.Esame non trovato.");
             return;
         }
 
@@ -381,12 +391,12 @@ public class Medlab {
             if (giorno == DayOfWeek.SATURDAY || giorno == DayOfWeek.SUNDAY) {
                 System.out.println("Errore: L'esame è prenotabile solo da pazienti cronici perché cade di " + giorno + ".");
             } else {
-                System.out.println("Errore: Esame riservato ai malati cronici.");
+                System.out.println("Errore: main.Esame riservato ai malati cronici.");
             }
             return;
         }
 
-        System.out.println("Esame prenotabile: " + esameDecorato);
+        System.out.println("main.Esame prenotabile: " + esameDecorato);
 
 
         LocalDate dataEsame = esameSelezionato.getData();
@@ -447,7 +457,7 @@ public class Medlab {
         this.prenotazioni.put(this.prenotazioneCorrente.getCodice(), this.prenotazioneCorrente);
         this.pazienteCorrente.getPrenotazioni().put(this.prenotazioneCorrente.getCodice(), this.prenotazioneCorrente);
         this.prenotazioneCorrente.getEsame().prenotato();
-        System.out.println("Prenotazione confermata per l'esame " + this.prenotazioneCorrente.getEsame().getNome() +
+        System.out.println("main.Prenotazione confermata per l'esame " + this.prenotazioneCorrente.getEsame().getNome() +
                 " il " + this.prenotazioneCorrente.getEsame().getData() + " alle " + this.prenotazioneCorrente.getEsame().getOrario() + " a nome di: "
                 + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome());
         this.prenotazioneCorrente = null;
@@ -486,47 +496,47 @@ public class Medlab {
         return true;
     }
 
-    // Metodo per visualizzare le prnotazioni associate al paziente, quindi visualizzare la mappa all'interno del Paziente
+    // Metodo per visualizzare le prnotazioni associate al paziente, quindi visualizzare la mappa all'interno del main.Paziente
  /* public void visualizzaPrenotazioniPaziente() {
         if (pazienteCorrente == null) {
             System.out.println("Errore: Nessun paziente attualmente autenticato!");
             return;
         }
-        Map<String, Prenotazione> prenotazioniPaziente = pazienteCorrente.getPrenotazioni();
+        Map<String, main.Prenotazione> prenotazioniPaziente = pazienteCorrente.getPrenotazioni();
         if (prenotazioniPaziente.isEmpty()) {
             System.out.println("Nessuna prenotazione trovata per " + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome());
             return;
         }
-        TreeMap<String, Prenotazione> prenotazioniOrdinate = new TreeMap<>(new EsameComparator(
+        TreeMap<String, main.Prenotazione> prenotazioniOrdinate = new TreeMap<>(new EsameComparator(
                 prenotazioniPaziente.entrySet().stream()
                         .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getEsame()))
         ));
 
         prenotazioniOrdinate.putAll(prenotazioniPaziente);
         System.out.println("Prenotazioni di " + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome() + ":");
-        for (Prenotazione prenotazione : prenotazioniOrdinate.values()) {
-            Esame esame = prenotazione.getEsame();
-            Sede sede = trovaSedePerEsame(esame);
-            System.out.println("Esame: " + esame.getNome() +
+        for (main.Prenotazione prenotazione : prenotazioniOrdinate.values()) {
+            main.Esame esame = prenotazione.getEsame();
+            main.Sede sede = trovaSedePerEsame(esame);
+            System.out.println("main.Esame: " + esame.getNome() +
                     " - Data: " + esame.getData() +
                     " - Orario: " + esame.getOrario()+
-                    " - Sede: " + (sede != null ? sede.getNome() : "Non trovata"));
+                    " - main.Sede: " + (sede != null ? sede.getNome() : "Non trovata"));
         }
     }
 */
 
 
 //Visualizza gli Esami disponibili in maniera ordinata
-  /*  public void visualizzaEsamiDisponibili(Sede sede) {
+  /*  public void visualizzaEsamiDisponibili(main.Sede sede) {
         if (sede.getEsami().isEmpty()) {
             System.out.println("Nessun esame disponibile presso la sede " + sede.getNome());
             return;
         }
-        TreeMap<String, Esame> esamiOrdinati = new TreeMap<>(new EsameComparator(sede.getEsami()));
+        TreeMap<String, main.Esame> esamiOrdinati = new TreeMap<>(new EsameComparator(sede.getEsami()));
         esamiOrdinati.putAll(sede.getEsami());
 
         System.out.println("\n Esami disponibili presso la sede " + sede.getNome() + ":");
-        for (Esame esame : esamiOrdinati.values()) {
+        for (main.Esame esame : esamiOrdinati.values()) {
             System.out.println("Codice: " + esame.getCodice() +
                     " - Nome: " + esame.getNome() +
                     " - Data: " + esame.getData() +
@@ -624,7 +634,7 @@ public class Medlab {
         this.pazienti.put(paziente1.getCf(), paziente1);
         this.pazienti.put(paziente2.getCf(), paziente2);
         this.pazienti.put(paziente3.getCf(), paziente3);
-        //   this.amministratore=new Amministratore();
+        //   this.amministratore=new main.Amministratore();
 
     }
 
@@ -702,7 +712,7 @@ public class Medlab {
         System.out.println("Errore: Nessuna sede trovata con il codice specificato.");
     }
 
-    //UC4 modifica Sede
+    //UC4 modifica main.Sede
     public void modificaSedeAmministratore() {
         Scanner scanner = new Scanner(System.in);
         Integer codice = null;
@@ -721,7 +731,7 @@ public class Medlab {
             sede.modificaSede();
             this.sedeCorrente = null;
         } else {
-            System.out.println("Errore: Sede non trovata.");
+            System.out.println("Errore: main.Sede non trovata.");
         }
     }
 
@@ -767,7 +777,7 @@ public class Medlab {
 
             Esame esameSelezionato = SelezionaEsameSede(codiceEsame); //flusso 2.
             if (esameSelezionato == null || !esameSelezionato.isPrenotato()) {
-                System.out.println("Errore: Esame non trovato o non valido.");
+                System.out.println("Errore: main.Esame non trovato o non valido.");
                 continue;
             }
 
@@ -787,7 +797,7 @@ public class Medlab {
             }
 
             Paziente paziente = prenotazioneSelezionata.getPaziente(); // collegamento flusso 4
-            System.out.println("Paziente: " + paziente.getNome() + " " + paziente.getCognome());
+            System.out.println("main.Paziente: " + paziente.getNome() + " " + paziente.getCognome());
 
             System.out.print("Vuoi completare o annullare questa prenotazione? (SI/NO): ");
             String scelta = scanner.nextLine().trim().toUpperCase();
@@ -796,7 +806,7 @@ public class Medlab {
                 inserisciStato(prenotazioneSelezionata); //4. flusso dello stato
             } else if (scelta.equals("NO")) {
                 esamiSede.remove(codiceEsame);
-                System.out.println("Prenotazione annullata.");
+                System.out.println("main.Prenotazione annullata.");
             } else {
                 System.out.println("Azione non valida. Scegli 'SI' o 'NO'.");
                 continue;
@@ -820,11 +830,11 @@ public class Medlab {
         Esame esame = esamiSede.get(codiceEsame);
 
         if (esame == null) {
-            System.out.println("Errore: Esame non trovato.");
+            System.out.println("Errore: main.Esame non trovato.");
             return null;
         }
 
-        System.out.println("Esame selezionato: " + esame.getNome());
+        System.out.println("main.Esame selezionato: " + esame.getNome());
         return esame;
     }
 
@@ -924,7 +934,7 @@ public class Medlab {
         Prenotazione prenotazione = prenotazioni.get(codicePrenotazione);
 
         if (prenotazione == null) {
-            System.out.println("Prenotazione non trovata.");
+            System.out.println("main.Prenotazione non trovata.");
             return null;
         }//ci vuole per forza perche se sbaglio e metto un codice che non è confermato me lo troverebbe
         if (!(prenotazione.getStato() instanceof StatoCompletato)) {
@@ -962,7 +972,7 @@ public class Medlab {
         }
 
         paziente.getRefertiCorrenti().put(refertoCorrente.getId(), refertoCorrente);
-        System.out.println("Referto confermato e salvato nel profilo del paziente.");
+        System.out.println("main.Referto confermato e salvato nel profilo del paziente.");
 
         refertoCorrente = null;
         prenotazioneCorrente = null;
@@ -1139,9 +1149,9 @@ public class Medlab {
         Recensione recensione = new Recensione(pazienteCorrente, sedeScelta, stelle, commento);
         recensioni.put(recensione.getId(), recensione);
 
-        // Notifica gli observer (es. Amministratore)
+        // Notifica gli observer (es. main.Amministratore)
         notifyObservers(recensione);
-        System.out.println("✅ Recensione inviata con successo!");
+        System.out.println("✅ main.Recensione inviata con successo!");
     }
 
     public void visualizzaRecensioni() {
@@ -1155,7 +1165,7 @@ public class Medlab {
             System.out.println(
                     "★ " + r.getValutazione() +
                             "/5" +
-                            "\nSede: " + r.getSede().getNome() +
+                            "\nmain.Sede: " + r.getSede().getNome() +
                             "\nAutore: " + r.getPaziente().getNome() + " " + r.getPaziente().getCognome() +
                             "\nCommento: " + r.getCommento() +
                             "\n----------------------"
@@ -1165,7 +1175,7 @@ public class Medlab {
 
     @Override
     public String toString() {
-        return "Medlab{" +
+        return "main.Medlab{" +
                 "pazienti=" + pazienti +
                 ", pazienteCorrente=" + pazienteCorrente +
                 ", sedeCorrente=" + sedeCorrente +
@@ -1176,6 +1186,8 @@ public class Medlab {
                 ", personaleLaboratorioCorrente=" + personaleLaboratorioCorrente +
                 '}';
     }
+
+
 }
 
 

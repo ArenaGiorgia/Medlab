@@ -1,4 +1,4 @@
-import java.util.UUID;
+package main;
 
 public class Prenotazione {
     private String codice;
@@ -63,7 +63,7 @@ public class Prenotazione {
 
     @Override
     public String toString() {
-        return "Prenotazione{" +
+        return "main.Prenotazione{" +
                 "codice='" + codice + '\'' +
                 ", esame=" + esame +
                 ", paziente=" + paziente +

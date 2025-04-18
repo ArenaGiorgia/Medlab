@@ -1,3 +1,5 @@
+package main;
+
 import java.time.LocalDate;
 
 public class StatoInAttesa extends StatoPrenotazione {
@@ -10,13 +12,13 @@ public class StatoInAttesa extends StatoPrenotazione {
         Referto referto = new Referto(prenotazione.getCodice(), LocalDate.now()); //coidce uguale alla prenotazione
         prenotazione.setReferto(referto); //da vedere
         prenotazione.setStato(new StatoCompletato(prenotazione));
-        System.out.println("Prenotazione completata e referto generato.");
+        System.out.println("main.Prenotazione completata e referto generato.");
     }
 
     @Override
     public void annulla(Prenotazione prenotazione) {
         prenotazione.setStato(new StatoAnnullato(prenotazione));
-        System.out.println("Prenotazione annullata.");
+        System.out.println("main.Prenotazione annullata.");
 
     }
 

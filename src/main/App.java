@@ -1,3 +1,5 @@
+package main;
+
 import java.util.Scanner;
 public class App {
     public static void main(String[] args) {
@@ -117,7 +119,7 @@ public class App {
                 while (true) {
                     System.out.println("\n===== MENU PAZIENTE =====");
                     System.out.println("1. Registrazione nuova sede");
-                    System.out.println("2. Prenotazione esame");
+                    System.out.println("2. main.Prenotazione esame");
                     System.out.println("3. Visualizza referto");
                     System.out.println("4. Modifica dati personali");
                     System.out.println("5. Inserisci recensione");
