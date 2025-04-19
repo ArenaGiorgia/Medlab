@@ -6,24 +6,16 @@ public class Sede {
     private Integer codice;
     private String nome;
     private Map<String, Esame> esami; //di default deve avere una serie di esami che poi associero alle prenotazioni
-    private Map<String,Paziente> pazienti;
 
     public Sede(Integer codice,String nome) {
         this.nome = nome;
         this.codice = codice;
         this.esami = new HashMap<>();
-      //  this.pazienti=new HashMap<>();
+
         caricaEsami();
 
     }
 
-    public Map<String, Paziente> getPazienti() {
-        return pazienti;
-    }
-
-   public void setPazienti(Map<String, Paziente> pazienti) {
-        this.pazienti = pazienti;
-    }
 
     public Integer getCodice() {
 
@@ -35,10 +27,6 @@ public class Sede {
         return nome;
     }
 
-    public void setCodice(Integer codice) {
-
-        this.codice = codice;
-    }
 
     public void setNome(String nome) {
 
@@ -54,7 +42,7 @@ public class Sede {
 
             Esame esame1 = new Esame(LocalDate.now(), LocalTime.of(9, 0), "Analisi del sangue");
             Esame esame2 = new Esame(LocalDate.now(), LocalTime.of(10, 30), "Ecografia addome");
-            Esame esame3 = new Esame(LocalDate.now(), LocalTime.of(12, 0), "Radiografia torace");
+            Esame esame3 = new Esame(LocalDate.now(), LocalTime.of(13, 30), "Radiografia torace");
             Esame esame4 = new Esame(LocalDate.of(2026, 3, 19), LocalTime.of(7, 30), "Radiografia torace");
             Esame esame5 = new Esame(LocalDate.of(2026, 12, 25), LocalTime.of(10, 0), "Ecografia di Babbo Natale");
             esami.put(esame1.getCodice(), esame1);
@@ -65,7 +53,6 @@ public class Sede {
 
 
     }
-
 
     //metodi per aggiungere un esame mi servirà per l'UC10 dell amministratore anche
     public void aggiungiEsame(Esame esame) {
@@ -114,7 +101,7 @@ public class Sede {
     @Override
     public String toString() {
         return
-                "codice=" + codice +
-                ", nome=" + nome;
+                "Codice: " + this.codice +
+                "  Nome: " + this.nome;
     }
 }

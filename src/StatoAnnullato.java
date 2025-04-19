@@ -3,6 +3,7 @@ public class StatoAnnullato extends StatoPrenotazione {
         super(prenotazione);
     }
 
+
     @Override
     public void completa( Prenotazione prenotazione) {
         System.out.println("Impossibile completare: la prenotazione è stata annullata.");

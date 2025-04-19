@@ -62,11 +62,9 @@ private Sede sede;
 
     @Override
     public String toString() {
-        return "PersonaleLaboratorio{" +
-                "cf='" + cf + '\'' +
-                ", nome='" + nome + '\'' +
-                ", cognome='" + cognome + '\'' +
-                ", sede=" + sede +
-                '}';
+        return  "Cf= " + this.cf +
+                " Nome= " + this.nome +
+                " Cognome= " + this.cognome +
+                " Sede= " + this.sede ;
     }
 }

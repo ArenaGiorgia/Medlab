@@ -40,11 +40,9 @@ public class Referto
 
     @Override
     public String toString() {
-        return "Referto{" +
-                "Id='" + Id + '\'' +
-                ", data=" + data +
-                ", risultato='" + risultato + '\'' +
-                '}';
+        return  "Id=" + Id +
+                "  Data=" + data +
+                "  Risultato=" + risultato;
     }
 }
 

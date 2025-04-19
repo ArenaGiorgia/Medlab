@@ -69,10 +69,9 @@ public class Esame {
     @Override
     public String toString() {
         return
-                " codice=" + codice +
-                ", data=" + data +
-                ", orario=" + orario +
-                ", nome=" + nome  +
-                ", stato=" + this.statoEsame();
+                "Codice= " + this.codice +
+                "  Data= " + this.data +
+                "  Orario= " + this.orario +
+                "  Stato= " + this.statoEsame();
     }
 }

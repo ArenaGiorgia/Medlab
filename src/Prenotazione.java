@@ -63,11 +63,11 @@ public class Prenotazione {
 
     @Override
     public String toString() {
-        return "Prenotazione{" +
-                "codice='" + codice + '\'' +
-                ", esame=" + esame +
-                ", paziente=" + paziente +
-                '}';
+        return  "Codice: " + this.codice +
+                "  Stato: " + this.stato +
+                "  Esame: " + this.esame +
+                "  Paziente: " + this.paziente +
+                "  Referto: " + this.referto;
     }
 
 

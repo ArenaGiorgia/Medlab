@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class EsameControlloFestivi extends EsameDecorator {
+public class  EsameControlloFestivi extends EsameDecorator {
 
     protected Paziente paziente;
     protected Set<DayOfWeek> weekend;
@@ -45,6 +45,6 @@ public class EsameControlloFestivi extends EsameDecorator {
 
     @Override
     public String toString() {
-        return esame.toString(); // Mantieni il comportamento originale se non vuoi aggiunte
+        return esame.toString();
     }
 }

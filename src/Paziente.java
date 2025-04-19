@@ -13,7 +13,6 @@ public class Paziente {
     private String sesso;
     private boolean cronico;
     private Integer età;
-    private Sede sede;
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioniPaziente;
     private Map<String, Referto> refertiCorrenti;
@@ -31,6 +30,11 @@ public class Paziente {
         this.refertiCorrenti = new HashMap<>();
         this.cronico = cronico;
     }
+
+    public void aggiungiSede( Sede s){
+        this.sedi.add(s);
+    }
+
 
     public List<Sede> getSedi() {
 
@@ -74,15 +78,7 @@ public class Paziente {
         return sesso;
     }
 
-    public Sede getSede() {
 
-        return sede;
-    }
-
-    public void setSedi(List<Sede> sedi) {
-
-        this.sedi = sedi;
-    }
 
     public void setPrenotazioni(Map<String, Prenotazione> prenotazioni) {
         this.prenotazioniPaziente = prenotazioni;
@@ -234,14 +230,14 @@ public void modificaPaziente() {
 
     @Override
     public String toString() {
-        return "Paziente{" +
-                "nome='" + nome + '\'' +
-                ", cognome='" + cognome + '\'' +
-                ", dataNascita=" + dataNascita +
-                ", cf='" + cf + '\'' +
-                ", sesso='" + sesso + '\'' +
-                ", età=" + età +
-                ", malatoCronico=" + cronico +'}';
+        return
+                "Nome= " + this.nome +
+                "  Cognome= " + this.cognome +
+                "  DataNascita= " + this.dataNascita +
+                "  Cf= " + this.cf +
+                "  Sesso= " + this.sesso +
+                "  Età= " + this.età +
+                "  MalatoCronico= " + this.cronico ;
     }
 
 
