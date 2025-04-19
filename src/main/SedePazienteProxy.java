@@ -1,8 +1,10 @@
+package main;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class SedePazienteProxy implements PazienteProvider {
-    private Medlab medlab;
+    private final Medlab medlab;
 
     public SedePazienteProxy(Medlab medlab) {
         this.medlab = medlab;

@@ -49,7 +49,7 @@ public class App {
                     System.out.println("5. Modifica sede");
                     System.out.println("6. Elimina sede");
                     System.out.println("7. Gestisci esami");
-                    System.out.println("8. Gestisci personale laboratorio");
+                    System.out.println("8. Aggiungi personale laboratorio");
                     System.out.println("9. Generazione report");
                     System.out.println("10. Vedi recensioni");
                     System.out.println("11. Logout");
@@ -95,17 +95,15 @@ public class App {
                             break;
                         case 7:
                             System.out.println("Gestione esami...");
-                            sistema.aggiungiNuovoEsame();
+                           // sistema.aggiungiNuovoEsame();
                             break;
                         case 8:
-                            System.out.println("Gestione personale laboratorio...");
                             sistema.aggiungiPersonale();
                             break;
                         case 9:
                             System.out.println("Generazione report...");
                             break;
                         case 10:
-
                             sistema.getAmministratore().visualizzaRecensioniNonLette();
                             System.out.println("TUTTE LE RECENSIONI..");
                             sistema.visualizzaRecensioni();
@@ -119,7 +117,7 @@ public class App {
                 while (true) {
                     System.out.println("\n===== MENU PAZIENTE =====");
                     System.out.println("1. Registrazione nuova sede");
-                    System.out.println("2. main.Prenotazione esame");
+                    System.out.println("2. Prenotazione esame");
                     System.out.println("3. Visualizza referto");
                     System.out.println("4. Modifica dati personali");
                     System.out.println("5. Inserisci recensione");
@@ -163,7 +161,7 @@ public class App {
                             sistema.lasciaRecensione();
                             break;
                         case 6:
-                            //  sistema.visualizzaPrenotazioniPaziente();
+                            //sistema.visualizzaPrenotazioniPaziente();
                             break;
                     }
                 }

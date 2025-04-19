@@ -5,9 +5,9 @@ import java.time.LocalTime;
 import java.util.*;
 
 public class Sede {
-    private Integer codice;
+    private final Integer codice;
     private String nome;
-    private Map<String, Esame> esami; //di default deve avere una serie di esami che poi associero alle prenotazioni
+    private final Map<String, Esame> esami; //di default deve avere una serie di esami che poi associero alle prenotazioni
 
     public Sede(Integer codice,String nome) {
         this.nome = nome;

@@ -1,3 +1,5 @@
+package main;
+
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeParseException;
@@ -13,9 +15,9 @@ public class Paziente {
     private String sesso;
     private boolean cronico;
     private Integer età;
-    private List<Sede> sedi;
+    private final List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioniPaziente;
-    private Map<String, Referto> refertiCorrenti;
+    private final Map<String, Referto> refertiCorrenti;
     public Paziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso, boolean cronico) {
 
         this.nome = nome;
@@ -29,10 +31,6 @@ public class Paziente {
         this.sedi = new ArrayList<>();
         this.refertiCorrenti = new HashMap<>();
         this.cronico = cronico;
-    }
-
-    public void aggiungiSede( Sede s){
-        this.sedi.add(s);
     }
 
 
@@ -118,10 +116,7 @@ public class Paziente {
     }
 
     public Boolean verificaPassword(String password) {
-        if (this.password.equals(password)) {
-            return true;
-        }
-        return false;
+        return this.password.equals(password);
     }
 
     public void setMalatoCronico(boolean cronico) {

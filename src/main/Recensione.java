@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public class Recensione {
-    private String id;
-    private Paziente paziente;
-    private Sede sede;
-    private int valutazione; // 1-5 stelle
-    private String commento;
-    private LocalDate data;
+    private final String id;
+    private final Paziente paziente;
+    private final Sede sede;
+    private final int valutazione; // 1-5 stelle
+    private final String commento;
+    private final LocalDate data;
 
     public Recensione(Paziente paziente, Sede sede, int valutazione, String commento) {
         this.id = UUID.randomUUID().toString();

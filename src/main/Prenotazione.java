@@ -1,10 +1,12 @@
+package main;
+
 import java.util.UUID;
 
 public class Prenotazione {
     private String codice;
     private StatoPrenotazione stato;
     private Esame esame;
-    private Paziente paziente;
+    private final Paziente paziente;
     private Referto referto;
 
     public Prenotazione(Esame esame, Paziente paziente) {

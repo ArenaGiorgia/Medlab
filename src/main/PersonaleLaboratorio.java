@@ -1,3 +1,5 @@
+package main;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -6,7 +8,7 @@ public class PersonaleLaboratorio
 private String cf;
 private String nome;
 private String cognome;
-private String password;
+private final String password;
 private Sede sede;
 
     public PersonaleLaboratorio(String cf, String nome, String cognome, Sede sede) {
@@ -54,10 +56,7 @@ private Sede sede;
     }
 
     public Boolean verificaPassword(String password) {
-        if (this.password.equals(password)) {
-            return true;
-        }
-        return false;
+        return this.password.equals(password);
     }
 
     @Override

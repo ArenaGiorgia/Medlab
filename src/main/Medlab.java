@@ -12,7 +12,7 @@ public class Medlab {
     private Map < String, Paziente> pazienti;
     private Paziente pazienteCorrente;
     private Sede sedeCorrente;
-    private Amministratore amministratore;
+    private final Amministratore amministratore;
     private Prenotazione prenotazioneCorrente;
     private PersonaleLaboratorio personaleLaboratorioCorrente;
     private Referto refertoCorrente;
@@ -20,8 +20,8 @@ public class Medlab {
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioni;
     private Map<String, PersonaleLaboratorio> personaliLaboratori;
-    private Map<String, Recensione> recensioni;
-    private List<RecensioneObserver> observers;
+    private final Map<String, Recensione> recensioni;
+    private final List<RecensioneObserver> observers;
 
 
 
@@ -151,17 +151,24 @@ public class Medlab {
                 System.out.println("Data non valida. Inserisci una data valida.");
             }
         } while (true);
-        System.out.print("Inserisci il codice fiscale del paziente: ");
-        String cf = scanner.nextLine();
-        if (cf.isEmpty()) {
-            System.out.println("Errore: Il codice fiscale non può essere vuoto!");
-            return;
+
+        String cf = null;
+        boolean codiceFiscaleValido = false;
+
+        while (!codiceFiscaleValido) {
+            System.out.print("Inserisci il codice fiscale del paziente: ");
+            cf = scanner.nextLine().trim();
+
+            if (cf.isEmpty()) {
+                System.out.println("Errore: Il codice fiscale non può essere vuoto!");
+            } else if (pazienti.containsKey(cf) || personaliLaboratori.containsKey(cf)
+                    || amministratore.getCodiceFiscale().equals(cf)) {
+                System.out.println("Errore: Esiste già una persona con questo codice fiscale!");
+            } else {
+                codiceFiscaleValido = true;
+            }
         }
-        if (pazienti.containsKey(cf) || personaliLaboratori.containsKey(cf)
-                || amministratore.getCodiceFiscale().equals(cf)) {
-            System.out.println("Errore: Esiste già una persona con questo codice fiscale!");
-            return;
-        }
+
         String sesso;
         do {
             try {
@@ -172,7 +179,6 @@ public class Medlab {
                     throw new IllegalArgumentException("Errore: Devi inserire solo 'M' per maschio o 'F' per femmina.");
                 }
                 break;
-
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
@@ -196,7 +202,9 @@ public class Medlab {
                 System.out.println(e.getMessage());
             }
         } while (true);
-        nuovoPaziente(nome,cognome,dataNascita,cf,sesso,malatoCronico); //1.aggiungi tutti i dati del paziente
+
+        nuovoPaziente(nome, cognome, dataNascita, cf, sesso, malatoCronico); //flusso 1.
+
         if (this.pazienteCorrente == null) {
             System.out.println("Errore: Nessun paziente da confermare!");
             return;
@@ -204,9 +212,10 @@ public class Medlab {
 
         System.out.println("Riepilogo informazioni inserite: ");
         System.out.println(this.pazienteCorrente.toString());
-        confermaPaziente(); //2.conferma
+        confermaPaziente();  // flusso 2.
         System.out.println("Paziente aggiunto con successo!");
-        }
+    }
+
 
     public void nuovoPaziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso,boolean malatoCronico ) {
         Paziente paziente = new Paziente( nome, cognome, dataNascita, cf, sesso,malatoCronico);
@@ -316,7 +325,7 @@ public class Medlab {
     }
 
     public void confermaSede(Sede sedeSelezionata) {
-         pazienteCorrente.aggiungiSede(sedeSelezionata);
+         pazienteCorrente.getSedi().add(sedeSelezionata);
     }
 
     public boolean pazienteSedeAssociata(Sede sede) {
@@ -577,28 +586,19 @@ public class Medlab {
         }
     }
     public boolean verificaAmministratore( String codice, String password) {
-        if (this.amministratore != null &&
-                this.amministratore.getCodiceFiscale().equals(codice) && this.amministratore.verificaPassword(password)) {
-            return true;
-        }
-        return false;
+        return this.amministratore != null &&
+                this.amministratore.getCodiceFiscale().equals(codice) && this.amministratore.verificaPassword(password);
     }
 
     public boolean verificaPaziente( String codice, String password) {
         Paziente paziente = this.pazienti.get(codice);
-        if (paziente != null && paziente.verificaPassword(password)) {
-            return true;
-        }
-        return false;
+        return paziente != null && paziente.verificaPassword(password);
     }
 
     public boolean verificaPersonaleLaboratorio(String codice, String password) {
             PersonaleLaboratorio personaleLaboratorio = this.personaliLaboratori.get(codice);
-                if (personaleLaboratorio != null && personaleLaboratorio.verificaPassword(password)) {
-                    return true;
-                }
-            return false;
-        }
+        return personaleLaboratorio != null && personaleLaboratorio.verificaPassword(password);
+    }
 
     public void logout() {
         this.pazienteCorrente = null;
@@ -660,7 +660,7 @@ public class Medlab {
             return;
         }
         System.out.println("Riepilogo informazioni inserite: ");
-        System.out.println(this.sedeCorrente.toString());
+        System.out.println(this.sedeCorrente);
         confermaSede(); //2. conferma
         System.out.println("Sede aggiunta con successo!");
     }
@@ -728,17 +728,20 @@ public void eliminaSede() {
     }
 
 
-//UC5 Gestione referti (inserimento)
+//UC5 Gestione referti
 public void aggiungiReferto() {
     if (personaleLaboratorioCorrente == null) {
         System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato!");
         return;
     }
 
+    if (!visualizzaListaEsamiPrenotati()) { // Flusso 1.
+        return;
+    }
+
     Scanner scanner = new Scanner(System.in);
 
     while (true) {
-        visualizzaListaEsamiPrenotati(); // Flusso 1
 
         System.out.print("Inserisci il codice dell'esame da selezionare oppure 'STOP' per terminare: ");
         String codiceEsame = scanner.nextLine().trim();
@@ -782,13 +785,12 @@ public void aggiungiReferto() {
     System.out.println("Gestione referti completata.");
 }
 
-    public void visualizzaListaEsamiPrenotati() {
+    public boolean visualizzaListaEsamiPrenotati() {
         if (personaleLaboratorioCorrente == null || personaleLaboratorioCorrente.getSede() == null) {
             System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato o sede non assegnata.");
-            return;
+            return false;
         }
 
-        //utilizzo il proxy pattern per vedere solo quelli del personale di laboratorio
         PazienteProvider pazienteProvider = new SedePazienteProxy(medlab);
         List<Paziente> pazientiSede = pazienteProvider.getAllPazienti();
 
@@ -813,7 +815,11 @@ public void aggiungiReferto() {
         if (!esameTrovato) {
             System.out.println("Non ci sono esami in attesa di referto per oggi.");
         }
+
+        return esameTrovato;
     }
+
+
 
     private Prenotazione selezionaPrenotazione(String codice) {
 
@@ -858,15 +864,18 @@ public void aggiungiReferto() {
         }
         Scanner scanner = new Scanner(System.in);
 
-        visualizzaPazientiAssociatiAllaSede(); //flusso 1.
+        if (!visualizzaPazientiAssociatiAllaSede()) { //flusso 1
+            return;
+        }
 
-        PazienteProvider pazienteProvider = getPazienteAccessProxy();
         System.out.print("Inserisci il codice fiscale del paziente a cui aggiornare il referto: ");
         String cf = scanner.nextLine().trim();
 
-        Paziente pazienteSelezionato = pazienteProvider.getPazienteByCF(cf); //flusso 2.
+        Paziente pazienteSelezionato = selezionaPazienteProxy(cf); //flusso 2.
 
-        visualizzaPrenotazioniConfermate(pazienteSelezionato);  //flusso 3.
+        if (!visualizzaPrenotazioniConfermate(pazienteSelezionato)) {     //flusso 3.
+            return;
+        }
 
             System.out.print("Inserisci il codice della prenotazione da aggiornare: ");
             String codicePren = scanner.nextLine().trim();
@@ -884,19 +893,24 @@ public void aggiungiReferto() {
             confermaReferto(); //flusso 6.
         }
 
+        public Paziente selezionaPazienteProxy(String cf) {
+        PazienteProvider pazienteProvider = getPazienteAccessProxy();
+        Paziente pazienteSelezionato = pazienteProvider.getPazienteByCF(cf);
 
-    public void visualizzaPazientiAssociatiAllaSede() {
-        if (personaleLaboratorioCorrente == null) {
-            System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato!");
-            return;
+        if (pazienteSelezionato == null) {
+            System.out.println("Errore: Paziente non trovato con il codice fiscale " + cf);
         }
 
+        return pazienteSelezionato;
+    }
+
+    private boolean visualizzaPazientiAssociatiAllaSede() {
         PazienteProvider pazienteProvider = getPazienteAccessProxy();
         List<Paziente> pazientiSede = pazienteProvider.getAllPazienti();
 
         if (pazientiSede.isEmpty()) {
             System.out.println("Nessun paziente associato alla tua sede.");
-            return;
+            return false;
         }
 
         System.out.println("Pazienti associati alla tua sede:");
@@ -905,11 +919,14 @@ public void aggiungiReferto() {
                     " Cognome: " + paziente.getCognome() +
                     " Codice Fiscale: " + paziente.getCf());
         }
+
+        return true; // Se ci sono pazienti, ritorna true
     }
-    public void visualizzaPrenotazioniConfermate(Paziente paziente) {
+
+    public boolean visualizzaPrenotazioniConfermate(Paziente paziente) {
         if (paziente == null) {
             System.out.println("Errore: Paziente non valido.");
-            return;
+            return false;
         }
 
         boolean trovato = false;
@@ -935,6 +952,7 @@ public void aggiungiReferto() {
         if (!trovato) {
             System.out.println("Nessuna prenotazione confermata trovata per questo paziente.");
         }
+        return trovato;
     }
 
 
@@ -982,45 +1000,6 @@ public void aggiungiReferto() {
 
         refertoCorrente = null;
         prenotazioneCorrente = null;
-    }
-
-
-
-//UC11 - aggiunge un personale di laboratorio al sistema
-    public void aggiungiPersonale(){
-        Scanner scanner = new Scanner(System.in);
-        Sede sedesel=null;
-        System.out.print("Inserisci il nome del personale di laboratorio: ");
-        String nome = scanner.nextLine();
-        System.out.print("Inserisci il cognome del personale di laboratoio: ");
-        String cognome = scanner.nextLine();
-        System.out.print("Inserisci il cf del personale di laboratoio: ");
-        String cf = scanner.nextLine();
-        System.out.print("Inserisci il codice della sede in cui lavorerà: ");
-        int codSede = Integer.parseInt(scanner.nextLine());
-        for (Sede sede : sedi){
-            if (sede.getCodice()==codSede) sedesel=sede;
-        }
-
-        inserisciPersonaleLab(cf,nome, cognome,sedesel);
-        confermaPersonaleLab();
-    }
-
-    public void inserisciPersonaleLab(String cf, String nome, String cognome, Sede sede){
-        PersonaleLaboratorio personale = new PersonaleLaboratorio( cf, nome, cognome,sede);
-        this.personaleLaboratorioCorrente = personale;
-
-    }
-    public void confermaPersonaleLab()
-    {
-        if (this.personaleLaboratorioCorrente == null) {
-            System.out.println("Errore: Nessun personale ha eseguito l'accesso!");
-            return;
-        }
-        this.personaliLaboratori.put(this.personaleLaboratorioCorrente.getCf(), this.personaleLaboratorioCorrente);
-        System.out.println("Riepilogo informazioni inserite: ");
-        System.out.print(this.personaleLaboratorioCorrente.toString());
-        this.personaleLaboratorioCorrente = null;
     }
 
     //UC9- PATTERN OBSERVER
@@ -1086,7 +1065,7 @@ public void aggiungiReferto() {
 
         // Notifica gli observer (es. main.Amministratore)
         notifyObservers(recensione);
-        System.out.println("✅ main.Recensione inviata con successo!");
+        System.out.println("Recensione inviata con successo!");
     }
 
     public void visualizzaRecensioni() {
@@ -1097,16 +1076,123 @@ public void aggiungiReferto() {
 
         System.out.println("==== RECENSIONI ====");
         for (Recensione r : recensioni.values()) {  // Itera sui valori della mappa
-            System.out.println(
-                    "★ " + r.getValutazione() +
+            System.out.println(r.getValutazione() +
                             "/5" +
-                            "\nmain.Sede: " + r.getSede().getNome() +
-                            "\nAutore: " + r.getPaziente().getNome() + " " + r.getPaziente().getCognome() +
-                            "\nCommento: " + r.getCommento() +
-                            "\n----------------------"
+                            "Sede: " + r.getSede().getNome() +
+                            "Autore: " + r.getPaziente().getNome() + " " + r.getPaziente().getCognome() +
+                            "Commento: " + r.getCommento() +
+                            "----------------------"
             );
         }
     }
+
+    //UC11 - aggiunge un personale di laboratorio al sistema
+    public void aggiungiPersonale() {
+        Scanner scanner = new Scanner(System.in);
+
+        visualizzaSediDisponibili(); // flusso 1.
+
+        System.out.print("Inserisci il codice della sede in cui lavorerà: ");
+        int codiceSede = -1;
+        while (codiceSede < 0) {
+            try {
+                codiceSede = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Errore: Devi inserire un codice (intero) valido.");
+            }
+        }
+
+        Sede sedeSelezionata = selezionaSedePersonaleLab(codiceSede); // flusso 2.
+
+        if (sedeSelezionata == null) {
+            System.out.println("Errore: Codice sede non valido o sede già occupata.");
+            return;
+        }
+
+        System.out.print("Inserisci il nome del personale di laboratorio: ");
+        String nome = scanner.nextLine();
+        System.out.print("Inserisci il cognome del personale di laboratorio: ");
+        String cognome = scanner.nextLine();
+        String cf = null;
+        boolean codiceFiscaleValido = false;
+
+        while (!codiceFiscaleValido) {
+
+            System.out.print("Inserisci il codice fiscale del personale di laboratorio: ");
+            cf = scanner.nextLine().trim();
+
+            if (cf.isEmpty()) {
+                System.out.println("Errore: Il codice fiscale non può essere vuoto!");
+            } else if (pazienti.containsKey(cf) || personaliLaboratori.containsKey(cf)
+                    || amministratore.getCodiceFiscale().equals(cf)) {
+                System.out.println("Errore: Esiste già una persona con questo codice fiscale!");
+            } else {
+                codiceFiscaleValido = true;
+            }
+        }
+
+        inserisciPersonaleLab(cf, nome, cognome, sedeSelezionata);  // flusso 3.
+
+        if (this.personaleLaboratorioCorrente == null) {
+            System.out.println("Errore: Nessun personale da confermare!");
+            return;
+        }
+
+        System.out.println("Riepilogo informazioni inserite: ");
+        System.out.println(this.personaleLaboratorioCorrente);
+        confermaPersonaleLab(); // flusso 4.
+        System.out.println("Personale di laboratorio aggiunto con successo!");
+    }
+
+
+    public void visualizzaSediDisponibili() {
+        boolean almenoUnaDisponibile = false;
+        System.out.println("Sedi disponibili:");
+        for (Sede sede : sedi) {
+            boolean occupata = false;
+            for (PersonaleLaboratorio p : personaliLaboratori.values()) {
+                if (p.getSede().equals(sede)) {
+                    occupata = true;
+                    break;
+                }
+            }
+            if (!occupata) {
+                System.out.println(sede.toString());
+                almenoUnaDisponibile = true;
+            }
+        }
+
+        if (!almenoUnaDisponibile) {
+            System.out.println("Nessuna sede disponibile per aggiungere personale.");
+
+        }
+    }
+    public Sede selezionaSedePersonaleLab(Integer codSede) {
+        for (Sede sede : this.sedi) {
+            if (sede.getCodice().equals(codSede)) {
+                for (PersonaleLaboratorio personale : personaliLaboratori.values()) {
+                    if (personale.getSede().equals(sede)) {
+                        return null;
+                    }
+                }
+                return sede;
+            }
+        }
+        return null;
+    }
+
+    public void inserisciPersonaleLab(String cf, String nome, String cognome, Sede sede){
+        PersonaleLaboratorio personale = new PersonaleLaboratorio( cf, nome, cognome,sede);
+        this.personaleLaboratorioCorrente = personale;
+
+    }
+
+    public void confermaPersonaleLab()
+    {
+        this.personaliLaboratori.put(this.personaleLaboratorioCorrente.getCf(), this.personaleLaboratorioCorrente);
+        this.personaleLaboratorioCorrente = null;
+    }
+
 
     @Override
     public String toString() {
