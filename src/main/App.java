@@ -1,3 +1,5 @@
+package main;
+
 import java.util.Scanner;
 public class App {
     public static void main(String[] args) {
@@ -93,7 +95,7 @@ public class App {
                             break;
                         case 7:
                             System.out.println("Gestione esami...");
-                           // sistema.aggiungiNuovoEsame();
+                            sistema.aggiungiNuovoEsame();
                             break;
                         case 8:
                             System.out.println("Gestione personale laboratorio...");
@@ -104,9 +106,9 @@ public class App {
                             break;
                         case 10:
 
-                      //      sistema.getAmministratore().visualizzaRecensioniNonLette();
+                            sistema.getAmministratore().visualizzaRecensioniNonLette();
                             System.out.println("TUTTE LE RECENSIONI..");
-                        //    sistema.visualizzaRecensioni();
+                            sistema.visualizzaRecensioni();
 
                             break;
                     }
@@ -117,7 +119,7 @@ public class App {
                 while (true) {
                     System.out.println("\n===== MENU PAZIENTE =====");
                     System.out.println("1. Registrazione nuova sede");
-                    System.out.println("2. Prenotazione esame");
+                    System.out.println("2. main.Prenotazione esame");
                     System.out.println("3. Visualizza referto");
                     System.out.println("4. Modifica dati personali");
                     System.out.println("5. Inserisci recensione");
@@ -158,7 +160,7 @@ public class App {
                             break;
                         case 5:
                             System.out.println("Inserisci recensione...");
-                         //   sistema.lasciaRecensione();
+                            sistema.lasciaRecensione();
                             break;
                         case 6:
                             //  sistema.visualizzaPrenotazioniPaziente();
@@ -166,47 +168,47 @@ public class App {
                     }
                 }
             } else if (ruolo.equals("personale")) {
-                System.out.println("Accesso personale di laboratorio effettuato!");
+                 System.out.println("Accesso personale di laboratorio effettuato!");
 
-                while (true) {
-                    System.out.println("\n===== MENU PERSONALE LABORATORIO =====");
-                    System.out.println("1. Aggiungi nuovo referto");
-                    System.out.println("2. Modifica referto");
-                    System.out.println("3. Elimina referto");
-                    System.out.println("4. Visualizza pazienti prenotati di un esame");
-                    System.out.println("5. Logout");
-                    System.out.print("Scegli un'opzione: ");
+                    while (true) {
+                        System.out.println("\n===== MENU PERSONALE LABORATORIO =====");
+                        System.out.println("1. Aggiungi nuovo referto");
+                        System.out.println("2. Modifica referto");
+                        System.out.println("3. Elimina referto");
+                        System.out.println("4. Visualizza pazienti prenotati di un esame");
+                        System.out.println("5. Logout");
+                        System.out.print("Scegli un'opzione: ");
 
-                    scelta = 0;
-                    while (scelta < 1 || scelta > 5) {
-                        try {
-                            scelta = Integer.parseInt(scanner.nextLine());
-                            if (scelta < 1 || scelta > 5) {
-                                System.out.println("Opzione non valida. Inserisci un numero tra 1 e 5.");
+                        scelta = 0;
+                        while (scelta < 1 || scelta > 5) {
+                            try {
+                                scelta = Integer.parseInt(scanner.nextLine());
+                                if (scelta < 1 || scelta > 5) {
+                                    System.out.println("Opzione non valida. Inserisci un numero tra 1 e 5.");
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Errore: Devi inserire un numero intero!");
+                                scelta = 0;
                             }
-                        } catch (NumberFormatException e) {
-                            System.out.println("Errore: Devi inserire un numero intero!");
-                            scelta = 0;
+                        }
+                        if (scelta == 5) {
+                            System.out.println("Logout paziente...");
+                            sistema.logout();
+                            break;
+                        }
+
+                        switch (scelta) {
+                            case 1: sistema.aggiungiReferto();
+                                break;
+
+                            case 2: sistema.aggiornaReferto();
+                                break;
+                            case 3:
+                                break;
+                            case 4:
+                                break;
                         }
                     }
-                    if (scelta == 5) {
-                        System.out.println("Logout paziente...");
-                        sistema.logout();
-                        break;
-                    }
-
-                    switch (scelta) {
-                        case 1: sistema.aggiungiReferto();
-                            break;
-
-                        case 2: sistema.aggiornaReferto();
-                            break;
-                        case 3:
-                            break;
-                        case 4:
-                            break;
-                    }
-                }
             } else System.out.println("Errore: Credenziali errate");
         }
     }

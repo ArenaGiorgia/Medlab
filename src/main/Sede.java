@@ -1,3 +1,5 @@
+package main;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -59,7 +61,7 @@ public class Sede {
         if (!this.esami.containsKey(esame.getCodice())) {
             this.esami.put(esame.getCodice(), esame);
         } else {
-            System.out.println("Esame con il codice: " + esame.getCodice() + " già presente.");
+            System.out.println("main.Esame con il codice: " + esame.getCodice() + " già presente.");
         }
     }
     public void modificaSede() {
@@ -93,7 +95,7 @@ public class Sede {
         for (Map.Entry<String, Esame> entry : esami.entrySet()) {
             String codice = entry.getKey();
             Esame esame = entry.getValue();
-            System.out.println("Codice: " + codice + " | Esame: " + esame);
+            System.out.println("Codice: " + codice + " | main.Esame: " + esame);
         }
     }
 
