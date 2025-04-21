@@ -12,7 +12,7 @@ public class Medlab {
     private Map < String, Paziente> pazienti;
     private Paziente pazienteCorrente;
     private Sede sedeCorrente;
-    private final Amministratore amministratore;
+    private Amministratore amministratore;
     private Prenotazione prenotazioneCorrente;
     private PersonaleLaboratorio personaleLaboratorioCorrente;
     private Referto refertoCorrente;
@@ -20,8 +20,8 @@ public class Medlab {
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioni;
     private Map<String, PersonaleLaboratorio> personaliLaboratori;
-    private final Map<String, Recensione> recensioni;
-    private final List<RecensioneObserver> observers;
+    private Map<String, Recensione> recensioni;
+    private List<RecensioneObserver> observers;
 
 
 
@@ -950,7 +950,7 @@ public void aggiungiReferto() {
         }
 
         if (!trovato) {
-            System.out.println("Nessuna prenotazione confermata trovata per questo paziente.");
+            System.out.println("Nessuna prenotazione confermata trovata.");
         }
         return trovato;
     }
@@ -973,13 +973,12 @@ public void aggiungiReferto() {
             System.out.println("Errore: nessun referto selezionato.");
             return;
         }
-
         Scanner scanner = new Scanner(System.in);
         System.out.print("Inserisci la descrizione del referto: ");
         String descrizione = scanner.nextLine().trim();
 
         refertoCorrente.setReferto(descrizione);
-        System.out.println("Descrizione inserita con successo.");
+
     }
 
     public void confermaReferto() {
@@ -995,12 +994,37 @@ public void aggiungiReferto() {
             return;
         }
 
-        paziente.getRefertiCorrenti().put(refertoCorrente.getId(), refertoCorrente);
-        System.out.println("Referto confermato e salvato nel profilo del paziente.");
+        String refertoId = refertoCorrente.getId();
+        Map<String, Referto> referti = paziente.getRefertiCorrenti();
+
+        if (referti.containsKey(refertoId)) {
+            System.out.println("Errore: esiste già un referto con questo ID");
+        } else {
+            referti.put(refertoId, refertoCorrente);
+            System.out.println("Referto confermato e salvato nel profilo del paziente.");
+        }
 
         refertoCorrente = null;
         prenotazioneCorrente = null;
     }
+
+    //UC7 visualizza referti
+    public void visualizzaRefertiPaziente() {
+        if (pazienteCorrente != null) {
+            pazienteCorrente.visualizzaRefertiAssociatiEsami();
+        } else {
+            System.out.println("Errore: Paziente non autenticato.");
+        }
+    }
+
+//UC8 Modifica dati personali paziente
+public void modificaPaziente() {
+    if (pazienteCorrente != null) {
+        pazienteCorrente.modificaPaziente();
+    } else {
+        System.out.println("Errore: Paziente non autenticato.");
+    }
+}
 
     //UC9- PATTERN OBSERVER
     public List<Sede> getSediRecensibili(Paziente paziente) {

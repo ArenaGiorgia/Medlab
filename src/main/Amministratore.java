@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Amministratore implements RecensioneObserver {
-    private final String codiceFiscale;
-    private final String password;
-    private final List<Recensione> recensioniNonLette;
+    private  String codiceFiscale;
+    private  String password;
+    private  List<Recensione> recensioniNonLette;
 
 public Amministratore(){
     this.codiceFiscale ="a"; //settato al codice fiscale di alessio

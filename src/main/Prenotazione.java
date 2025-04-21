@@ -6,7 +6,7 @@ public class Prenotazione {
     private String codice;
     private StatoPrenotazione stato;
     private Esame esame;
-    private final Paziente paziente;
+    private Paziente paziente;
     private Referto referto;
 
     public Prenotazione(Esame esame, Paziente paziente) {

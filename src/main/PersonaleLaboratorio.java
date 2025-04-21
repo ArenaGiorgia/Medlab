@@ -8,7 +8,7 @@ public class PersonaleLaboratorio
 private String cf;
 private String nome;
 private String cognome;
-private final String password;
+private String password;
 private Sede sede;
 
     public PersonaleLaboratorio(String cf, String nome, String cognome, Sede sede) {

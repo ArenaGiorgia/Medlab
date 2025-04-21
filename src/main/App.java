@@ -138,7 +138,7 @@ public class App {
                         }
                     }
                     if (scelta == 7) {
-                        System.out.println("Logout paziente...");
+                        System.out.println("Logout paziente");
                         sistema.logout();
                         break;
                     }
@@ -151,10 +151,10 @@ public class App {
                             sistema.PrenotazioneEsame();
                             break;
                         case 3:
-                            System.out.println("Visualizzazione referto...");
+                            sistema.visualizzaRefertiPaziente();
                             break;
                         case 4:
-                            System.out.println("Modifica dati personali...");
+                            sistema.modificaPaziente();
                             break;
                         case 5:
                             System.out.println("Inserisci recensione...");

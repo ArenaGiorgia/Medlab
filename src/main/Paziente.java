@@ -15,9 +15,9 @@ public class Paziente {
     private String sesso;
     private boolean cronico;
     private Integer età;
-    private final List<Sede> sedi;
+    private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioniPaziente;
-    private final Map<String, Referto> refertiCorrenti;
+    private Map<String, Referto> refertiCorrenti;
     public Paziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso, boolean cronico) {
 
         this.nome = nome;
@@ -127,8 +127,8 @@ public class Paziente {
         return cronico;
     }
 
-    //metodo che mi servira per il caso duso 8 oltre che per l 1 per essere richiamato dall admin
-public void modificaPaziente() {
+    //metodo sia UC1 che UC8
+    public void modificaPaziente() {
     Scanner scanner = new Scanner(System.in);
     int scelta;
     do {
@@ -149,11 +149,13 @@ public void modificaPaziente() {
                 System.out.print("Inserisci il nuovo nome del paziente: ");
                 String nome = scanner.nextLine();
                 setNome(nome);
+                System.out.println("Nome modificato con successo. ");
                 break;
             case 2:
                 System.out.print("Inserisci il nuovo cognome del paziente: ");
                 String cognome = scanner.nextLine();
                 setCognome(cognome);
+                System.out.println("Cognome modificato con successo. ");
                 break;
             case 3:
                 LocalDate dataNascita = null;
@@ -163,6 +165,7 @@ public void modificaPaziente() {
                         String dataNascitaInput = scanner.nextLine();
                         dataNascita = LocalDate.parse(dataNascitaInput);
                         setDataNascita(dataNascita);
+                        System.out.println("Data modificata con successo. ");
                         break;
                     } catch (DateTimeParseException e) {
                         System.out.println("Data non valida. Inserisci una data valida.");
@@ -176,6 +179,7 @@ public void modificaPaziente() {
                     sesso = scanner.nextLine();
                     if (sesso.equals("M") || sesso.equals("F")) {
                         setSesso(sesso);
+                        System.out.println("Sesso modificato con successo. ");
                         break;
                     } else {
                         System.out.println("Errore: Devi inserire solo 'M' per maschio o 'F' per femmina.");
@@ -190,10 +194,12 @@ public void modificaPaziente() {
                 String risposta = scanner.nextLine().trim().toUpperCase();
                 if (risposta.equals("SI")) {
                     setMalatoCronico(true);
+                    System.out.println("campo modificato con successo. ");
                 } else if (risposta.equals("NO")) {
                     setMalatoCronico(false);
+                    System.out.println("campo modificato con successo. ");
                 } else {
-                    System.out.println("Risposta non valida. Il paziente non è stato aggiornato.");
+                    System.out.println("Risposta non valida. ");
                 }
                 break;
             case 0:
@@ -207,7 +213,9 @@ public void modificaPaziente() {
 
     System.out.println("Dati del paziente aggiornati con successo.");
 }
-    public void modificaPassword(){ //ci servirà piu avanti per il caso d'uso 8 di modifica nostro
+
+//metodo sia per Uc1 che Uc8
+    public void modificaPassword(){
         Scanner scanner = new Scanner(System.in);
         System.out.print("Inserire la vecchia password: ");
         String oldPassword = scanner.nextLine();
@@ -221,6 +229,38 @@ public void modificaPaziente() {
             System.out.println("Password errata.");
         }
     }
+
+    //metodo per l UC7
+    public void visualizzaRefertiAssociatiEsami() {
+        if (this.refertiCorrenti.isEmpty()) {
+            System.out.println("Nessun referto disponibile per questo paziente.");
+            return;
+        }
+
+        boolean refertiTrovati = false;
+        System.out.println("Referti associati agli esami per il paziente " + this.nome + " " + this.cognome + ":");
+
+        for (Prenotazione prenotazione : this.prenotazioniPaziente.values()) {
+            Referto referto = prenotazione.getReferto();
+
+            if (referto != null && referto.getRisultato() != null && !referto.getRisultato().isEmpty()) {
+                System.out.println("---------------------------------------------");
+                System.out.println("➤ Esame: " + prenotazione.getEsame().getNome());
+                System.out.println("   Data: " + prenotazione.getEsame().getData());
+                System.out.println("   Ora: " + prenotazione.getEsame().getOrario());
+                System.out.println("   Referto ID: " + referto.getId());
+                System.out.println("   Data Referto: " + referto.getData());
+                System.out.println("   Risultato: " + referto.getRisultato());
+                refertiTrovati = true;
+            }
+        }
+
+        if (!refertiTrovati) {
+            System.out.println("Nessun referto associato a esami trovati per questo paziente.");
+        }
+    }
+
+
 
 
     @Override
