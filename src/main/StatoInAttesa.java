@@ -10,7 +10,7 @@ public class StatoInAttesa extends StatoPrenotazione {
     @Override
     public void completa(Prenotazione prenotazione) {
         Referto referto = new Referto(prenotazione.getCodice(), LocalDate.now()); //coidce uguale alla prenotazione
-        prenotazione.setReferto(referto); //da vedere
+        prenotazione.setReferto(referto);
         prenotazione.setStato(new StatoCompletato(prenotazione));
     }
 

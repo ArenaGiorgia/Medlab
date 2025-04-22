@@ -48,7 +48,7 @@ public class App {
                     System.out.println("4. Inserimento nuova sede");
                     System.out.println("5. Modifica sede");
                     System.out.println("6. Elimina sede");
-                    System.out.println("7. Gestisci esami");
+                    System.out.println("7. Aggiungi esame");
                     System.out.println("8. Aggiungi personale laboratorio");
                     System.out.println("9. Generazione report");
                     System.out.println("10. Vedi recensioni");
@@ -94,8 +94,7 @@ public class App {
                             sistema.eliminaSede();
                             break;
                         case 7:
-                            System.out.println("Gestione esami...");
-                           // sistema.aggiungiNuovoEsame();
+                            sistema.aggiungiNuovoEsame();
                             break;
                         case 8:
                             sistema.aggiungiPersonale();
@@ -157,11 +156,11 @@ public class App {
                             sistema.modificaPaziente();
                             break;
                         case 5:
-                            System.out.println("Inserisci recensione...");
+                            System.out.println("Inserisci recensione:");
                             sistema.lasciaRecensione();
                             break;
                         case 6:
-                            //sistema.visualizzaPrenotazioniPaziente();
+                            sistema.visualizzaPrenotazioniAttive();
                             break;
                     }
                 }

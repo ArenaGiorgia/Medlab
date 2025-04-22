@@ -240,7 +240,8 @@ public class Paziente {
         boolean refertiTrovati = false;
         System.out.println("Referti associati agli esami per il paziente " + this.nome + " " + this.cognome + ":");
 
-        for (Prenotazione prenotazione : this.prenotazioniPaziente.values()) {
+        for (Map.Entry<String, Prenotazione> entry : this.prenotazioniPaziente.entrySet()) {
+            Prenotazione prenotazione = entry.getValue();
             Referto referto = prenotazione.getReferto();
 
             if (referto != null && referto.getRisultato() != null && !referto.getRisultato().isEmpty()) {
@@ -248,8 +249,8 @@ public class Paziente {
                 System.out.println("➤ Esame: " + prenotazione.getEsame().getNome());
                 System.out.println("   Data: " + prenotazione.getEsame().getData());
                 System.out.println("   Ora: " + prenotazione.getEsame().getOrario());
-                System.out.println("   Referto ID: " + referto.getId());
-                System.out.println("   Data Referto: " + referto.getData());
+                System.out.println("   Referto Id: " + referto.getId());
+                System.out.println("   Data referto: " + referto.getData());
                 System.out.println("   Risultato: " + referto.getRisultato());
                 refertiTrovati = true;
             }
@@ -259,6 +260,28 @@ public class Paziente {
             System.out.println("Nessun referto associato a esami trovati per questo paziente.");
         }
     }
+
+//metodo per l UC13
+    public void stampaPrenotazioniAttive() {
+        System.out.println("Prenotazioni attive per il paziente: " + nome + " " + cognome);
+
+        boolean trovato = false;
+        for (Map.Entry<String, Prenotazione> entry : prenotazioniPaziente.entrySet()) {
+            Prenotazione prenotazione = entry.getValue();
+            Esame esame = prenotazione.getEsame();
+
+            if (esame.isPrenotato()) {
+                System.out.println("Codice prenotazione: " + entry.getKey() + " Esame: " + esame.getNome()
+                        + " Data: " + esame.getData() + " Orario: " + esame.getOrario());
+                trovato = true;
+            }
+        }
+
+        if (!trovato) {
+            System.out.println("Nessuna prenotazione attiva.");
+        }
+    }
+
 
 
 

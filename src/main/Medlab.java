@@ -16,7 +16,6 @@ public class Medlab {
     private Prenotazione prenotazioneCorrente;
     private PersonaleLaboratorio personaleLaboratorioCorrente;
     private Referto refertoCorrente;
-    private Esame esameCorrente;
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioni;
     private Map<String, PersonaleLaboratorio> personaliLaboratori;
@@ -307,7 +306,7 @@ public class Medlab {
                 System.out.println("Errore: Devi inserire un codice(intero) valido.");
             }
         }
-        Sede sedeSelezionata=selezionaSedePaziente(codiceSede); //2. seleziona la sede (da vedere se fallo globale)
+        Sede sedeSelezionata=selezionaSede(codiceSede); //2. seleziona la sede (da vedere se fallo globale)
         if (sedeSelezionata !=null) {
         if (!pazienteSedeAssociata(sedeSelezionata)) {
             confermaSede(sedeSelezionata);
@@ -332,7 +331,7 @@ public class Medlab {
         return pazienteCorrente.getSedi().contains(sede);
     }
 
-    public Sede selezionaSedePaziente(Integer codSede) {
+    public Sede selezionaSede(Integer codSede) {
         for (Sede sede : this.sedi){
             if (sede.getCodice().equals(codSede)) {
                 return sede;
@@ -374,7 +373,7 @@ public class Medlab {
             }
         }
 
-        Sede sedeSelezionata = selezionaSedePaziente(codiceSede); // 2
+        Sede sedeSelezionata = selezionaSede(codiceSede); // 2
         if (sedeSelezionata == null) {
             System.out.println("Errore: Sede non trovata.");
             return;
@@ -421,6 +420,7 @@ public class Medlab {
 
         SelezionaEsame(esameSelezionato); //4
         ConfermaEsame(); // 5
+        System.out.println("Prenotazione confermata");
 
     }
 
@@ -468,18 +468,7 @@ public class Medlab {
         this.prenotazioni.put(this.prenotazioneCorrente.getCodice(), this.prenotazioneCorrente);
         this.pazienteCorrente.getPrenotazioni().put(this.prenotazioneCorrente.getCodice(), this.prenotazioneCorrente);
         this.prenotazioneCorrente.getEsame().prenotato();
-        System.out.println("Prenotazione confermata");
         this.prenotazioneCorrente = null;
-    }
-
-    // Metodo per trovare la sede in base a un esame
-    private Sede trovaSedePerEsame(Esame esame) {
-        for (Sede sede : sedi) {
-            if (sede.getEsami().containsValue(esame)) {
-                return sede;
-            }
-        }
-        return null;
     }
 
     //Metodo per la regola di buisness R8 di massimo 3 prenotazioni al giorno
@@ -504,60 +493,6 @@ public class Medlab {
         }
         return true;
     }
-
-
-
-    // Metodo per visualizzare le prnotazioni associate al paziente, quindi visualizzare la mappa all'interno del Paziente
- /* public void visualizzaPrenotazioniPaziente() {
-        if (pazienteCorrente == null) {
-            System.out.println("Errore: Nessun paziente attualmente autenticato!");
-            return;
-        }
-        Map<String, Prenotazione> prenotazioniPaziente = pazienteCorrente.getPrenotazioni();
-        if (prenotazioniPaziente.isEmpty()) {
-            System.out.println("Nessuna prenotazione trovata per " + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome());
-            return;
-        }
-        TreeMap<String, Prenotazione> prenotazioniOrdinate = new TreeMap<>(new EsameComparator(
-                prenotazioniPaziente.entrySet().stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getEsame()))
-        ));
-
-        prenotazioniOrdinate.putAll(prenotazioniPaziente);
-        System.out.println("Prenotazioni di " + pazienteCorrente.getNome() + " " + pazienteCorrente.getCognome() + ":");
-        for (Prenotazione prenotazione : prenotazioniOrdinate.values()) {
-            Esame esame = prenotazione.getEsame();
-            Sede sede = trovaSedePerEsame(esame);
-            System.out.println("Esame: " + esame.getNome() +
-                    " - Data: " + esame.getData() +
-                    " - Orario: " + esame.getOrario()+
-                    " - Sede: " + (sede != null ? sede.getNome() : "Non trovata"));
-        }
-    }
-*/
-
-
-//Visualizza gli Esami disponibili in maniera ordinata
-  /*  public void visualizzaEsamiDisponibili(Sede sede) {
-        if (sede.getEsami().isEmpty()) {
-            System.out.println("Nessun esame disponibile presso la sede " + sede.getNome());
-            return;
-        }
-        TreeMap<String, Esame> esamiOrdinati = new TreeMap<>(new EsameComparator(sede.getEsami()));
-        esamiOrdinati.putAll(sede.getEsami());
-
-        System.out.println("\n Esami disponibili presso la sede " + sede.getNome() + ":");
-        for (Esame esame : esamiOrdinati.values()) {
-            System.out.println("Codice: " + esame.getCodice() +
-                    " - Nome: " + esame.getNome() +
-                    " - Data: " + esame.getData() +
-                    " - Orario: " + esame.getOrario()+
-                    " - Stato: " + esame.statoEsame());
-        }
-    }*/
-
- // Check esame disponibile
-
 
     //Mi serve per vedere a quali sedi il paziente è associato
     public void visualizzaSedePaziente(Paziente paziente) {
@@ -718,7 +653,7 @@ public void eliminaSede() {
     modificaSede(codice);
 }
  public void modificaSede(Integer codice){
-        Sede sede = selezionaSedePaziente(codice);
+        Sede sede = selezionaSede(codice);
         if (sede != null) {
             sede.modificaSede();
             this.sedeCorrente = null;
@@ -1110,6 +1045,84 @@ public void modificaPaziente() {
         }
     }
 
+    //UC10 gestione degli esami :
+    public void aggiungiNuovoEsame() {
+        Scanner scanner = new Scanner(System.in);
+
+        visualizzaSedi(); // Flusso 1
+
+        System.out.print("Inserisci il codice della sede dove aggiungere l'esame: ");
+        int codiceSede = -1;
+        while (codiceSede < 0) {
+            try {
+                codiceSede = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Errore: Devi inserire un codice (intero) valido.");
+            }
+        }
+
+        sedeCorrente = selezionaSede(codiceSede); // Flusso 2
+
+        if (sedeCorrente == null) {
+            System.out.println("Errore: Codice sede non trovato.");
+            return;
+        }
+
+        VisualizzaEsamiDisponibili(sedeCorrente); // Flusso 3
+
+        System.out.print("Inserisci il nome dell'esame: ");
+        String nomeEsame = scanner.nextLine().trim();
+
+        LocalDate dataEsame = null;
+        LocalTime orarioEsame = null;
+
+        while (true) {
+            try {
+                System.out.print("Inserisci la data dell'esame (YYYY-MM-DD): ");
+                dataEsame = LocalDate.parse(scanner.nextLine());
+
+                System.out.print("Inserisci l'orario dell'esame (HH:mm): ");
+                orarioEsame = LocalTime.parse(scanner.nextLine());
+
+                if (!isOrarioDisponibile(dataEsame, orarioEsame, sedeCorrente)) {
+                    System.out.println("Errore: Orario non disponibile, deve esserci almeno 1 ora e 30 minuti di distanza.");
+                    continue;
+                }
+
+                break;
+
+            } catch (Exception e) {
+                System.out.println("Errore: Data o orario non validi.");
+            }
+        }
+        nuovoEsame(dataEsame,orarioEsame,nomeEsame); //flusso 4. 
+        System.out.println("Esame aggiunto con successo.");
+
+    }
+    public void nuovoEsame( LocalDate data, LocalTime orario, String nome ) {
+        Esame esame = new Esame(data, orario, nome);
+        Esame esameDecorato = new EsameControlloFestivi(esame, null);
+        this.sedeCorrente.getEsami().put(esameDecorato.getCodice(),esameDecorato);
+        this.sedeCorrente=null;
+    }
+
+
+    public boolean isOrarioDisponibile(LocalDate dataEsame, LocalTime orarioEsame, Sede s) {
+        for (Esame esame : s.getEsami().values()) {
+            if (esame.getData().equals(dataEsame)) {
+                // Calcola la differenza in secondi tra gli orari
+                long differenzaSecondi = Math.abs(esame.getOrario().toSecondOfDay() -
+                        orarioEsame.toSecondOfDay());
+                // Se la differenza è inferiore a 1 ora e 30 minuti (5400 secondi), non è disponibile
+                if (Math.abs(differenzaSecondi) < 5400) {
+                    return false; // Orario sovrapposto
+                }
+            }
+        }
+        return true;
+    }
+
+
     //UC11 - aggiunge un personale di laboratorio al sistema
     public void aggiungiPersonale() {
         Scanner scanner = new Scanner(System.in);
@@ -1216,6 +1229,23 @@ public void modificaPaziente() {
         this.personaliLaboratori.put(this.personaleLaboratorioCorrente.getCf(), this.personaleLaboratorioCorrente);
         this.personaleLaboratorioCorrente = null;
     }
+
+    //UC12
+
+
+
+
+
+
+    //UC13
+    public void visualizzaPrenotazioniAttive() {
+        if (pazienteCorrente != null) {
+            pazienteCorrente.stampaPrenotazioniAttive();
+        } else {
+            System.out.println("Errore: Paziente non autenticato.");
+        }
+    }
+
 
 
     @Override

@@ -72,6 +72,7 @@ public class Esame {
     public String toString() {
         return
                 "Codice= " + this.codice +
+                "  Nome= " + this.nome +
                 "  Data= " + this.data +
                 "  Orario= " + this.orario +
                 "  Stato= " + this.statoEsame();

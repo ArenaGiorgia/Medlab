@@ -13,7 +13,6 @@ public class Sede {
         this.nome = nome;
         this.codice = codice;
         this.esami = new HashMap<>();
-
         caricaEsami();
 
     }
