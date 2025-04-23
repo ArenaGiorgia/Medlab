@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Medlab {
     private static Medlab medlab;
@@ -1018,7 +1019,7 @@ public void modificaPaziente() {
 }
 
     //UC9- PATTERN OBSERVER
-    public List<Sede> getSediRecensibili(Paziente paziente) {
+    public List<Sede> visualizzaSediRecensibili(Paziente paziente) {
         // 1. Ottieni tutte le prenotazioni completate del paziente
         List<Prenotazione> prenotazioniCompletate = paziente.getPrenotazioni().values().stream()
                 .filter(p -> p.getStato() instanceof StatoCompletato)
@@ -1046,41 +1047,83 @@ public void modificaPaziente() {
         return sediRecensibili;
     }
 
+    public Sede selezionaSedeRecensibile(Paziente paziente) {
+        if (paziente == null) {
+            System.out.println("Paziente non valido!");
+            return null;
+        }
+
+        List<Sede> sediRecensibili = visualizzaSediRecensibili(paziente);
+        if (sediRecensibili.isEmpty()) {
+            System.out.println("Non hai ancora completato esami in nessuna sede.");
+            return null;
+        }
+
+        System.out.println("Scegli una sede da recensire:");
+        IntStream.range(0, sediRecensibili.size())
+                .forEach(i -> System.out.printf("%d. %s\n", i + 1, sediRecensibili.get(i).getNome()));
+
+        Scanner scanner = new Scanner(System.in);
+        try {
+            int scelta = scanner.nextInt() - 1;
+            scanner.nextLine(); // Consuma il newline
+
+            if (scelta >= 0 && scelta < sediRecensibili.size()) {
+                return sediRecensibili.get(scelta);
+            }
+        } catch (InputMismatchException e) {
+            scanner.nextLine(); // Pulisci buffer input
+        }
+
+        System.out.println("Scelta non valida!");
+        return null;
+    }
+
+    public Recensione creaRecensione(Paziente paziente, Sede sede) {
+        if (paziente == null || sede == null) {
+            System.out.println("Dati insufficienti per creare la recensione");
+            return null;
+        }
+        Scanner scanner = new Scanner(System.in);
+        // Validazione valutazione
+        int stelle = 0;
+        while (stelle < 1 || stelle > 5) {
+            System.out.print("Valutazione (1-5 stelle): ");
+            try {
+                stelle = scanner.nextInt();
+                scanner.nextLine(); // Consuma il newline
+            } catch (InputMismatchException e) {
+                scanner.nextLine(); // Pulisci buffer input
+                System.out.println("Inserisci un numero valido!");
+            }
+        }
+
+        System.out.print("Commento (opzionale): ");
+        String commento = scanner.nextLine();
+
+        return new Recensione(paziente, sede, stelle, commento);
+    }
+
     public void lasciaRecensione() {
         if (pazienteCorrente == null) {
             System.out.println("Devi essere loggato come paziente!");
             return;
         }
-        Scanner scanner = new Scanner(System.in);
-        // Mostra solo sedi dove il paziente ha completato esami
-        List<Sede> sediRecensibili = getSediRecensibili(pazienteCorrente);
-        if (sediRecensibili.isEmpty()) {
-            System.out.println("Non hai ancora completato esami in nessuna sede.");
+
+        Sede sedeScelta = selezionaSedeRecensibile(pazienteCorrente);
+        if (sedeScelta == null) {
             return;
         }
-        System.out.println("Scegli una sede da recensire:");
-        for (int i = 0; i < sediRecensibili.size(); i++) {
-            System.out.printf("%d. %s\n", i + 1, sediRecensibili.get(i).getNome());
-        }
-        int sceltaSede = scanner.nextInt() - 1;
-        scanner.nextLine(); // Consuma il newline
 
-        if (sceltaSede < 0 || sceltaSede >= sediRecensibili.size()) {
-            System.out.println("Scelta non valida!");
-            return;
+        Recensione recensione = creaRecensione(pazienteCorrente, sedeScelta);
+       confermaRecensione(recensione);
+    }
+    public void confermaRecensione(Recensione recensione){
+        if (recensione != null) {
+            recensioni.put(recensione.getId(), recensione);
+            notifyObservers(recensione);
+            System.out.println("Recensione inviata con successo!");
         }
-        Sede sedeScelta = sediRecensibili.get(sceltaSede);
-        System.out.print("Valutazione (1-5 stelle): ");
-        int stelle = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Commento (opzionale): ");
-        String commento = scanner.nextLine();
-        Recensione recensione = new Recensione(pazienteCorrente, sedeScelta, stelle, commento);
-        recensioni.put(recensione.getId(), recensione);
-
-        // Notifica gli observer (es. main.Amministratore)
-        notifyObservers(recensione);
-        System.out.println("Recensione inviata con successo!");
     }
 
     public void visualizzaRecensioni() {
