@@ -41,28 +41,47 @@ public class Sede {
 
     public void caricaEsami() {
 
-            Esame esame1 = new Esame(LocalDate.now(), LocalTime.of(9, 0), "Analisi del sangue");
-            Esame esame2 = new Esame(LocalDate.now(), LocalTime.of(10, 30), "Ecografia addome");
-            Esame esame3 = new Esame(LocalDate.now(), LocalTime.of(13, 30), "Radiografia torace");
-            Esame esame4 = new Esame(LocalDate.of(2026, 3, 19), LocalTime.of(7, 30), "Radiografia torace");
-            Esame esame5 = new Esame(LocalDate.of(2026, 12, 25), LocalTime.of(10, 0), "Ecografia di Babbo Natale");
-            esami.put(esame1.getCodice(), esame1);
-            esami.put(esame2.getCodice(), esame2);
-            esami.put(esame3.getCodice(),esame3);
-            esami.put(esame4.getCodice(),esame4);
-            esami.put(esame5.getCodice(),esame5); //per verificare il decoratore
+        Esame esame1 = new Esame(LocalDate.now(), LocalTime.of(9, 0), "Analisi del sangue");
+        Esame esame2 = new Esame(LocalDate.now(), LocalTime.of(10, 30), "Ecografia addome");
+        Esame esame3 = new Esame(LocalDate.now(), LocalTime.of(13, 30), "Radiografia torace");
+        Esame esame4 = new Esame(LocalDate.of(2026, 3, 19), LocalTime.of(7, 30), "Radiografia torace");
+        Esame esame5 = new Esame(LocalDate.of(2026, 12, 25), LocalTime.of(10, 0), "Ecografia di Babbo Natale");
+        Esame esame6 = new Esame(LocalDate.now(), LocalTime.of(8, 0), "Visita cardiologica");
+        Esame esame7 = new Esame(LocalDate.now(), LocalTime.of(11, 0), "Test allergie");
+        Esame esame8 = new Esame(LocalDate.now(), LocalTime.of(12, 30), "Elettrocardiogramma");
+        Esame esame9 = new Esame(LocalDate.now(), LocalTime.of(15, 0), "Visita oculistica");
 
-
+        esami.put(esame1.getCodice(), esame1);
+        esami.put(esame2.getCodice(), esame2);
+        esami.put(esame3.getCodice(), esame3);
+        esami.put(esame4.getCodice(), esame4);
+        esami.put(esame5.getCodice(), esame5);
+        esami.put(esame6.getCodice(), esame6);
+        esami.put(esame7.getCodice(), esame7);
+        esami.put(esame8.getCodice(), esame8);
+        esami.put(esame9.getCodice(), esame9);
     }
 
-    //metodi per aggiungere un esame mi servirà per l'UC10 dell amministratore anche
-    public void aggiungiEsame(Esame esame) {
-        if (!this.esami.containsKey(esame.getCodice())) {
-            this.esami.put(esame.getCodice(), esame);
-        } else {
-            System.out.println("main.Esame con il codice: " + esame.getCodice() + " già presente.");
+    //metodi per aggiungere un esame mi servirà per l'UC10 dell amministratore
+    public void aggiungiEsame(LocalDate data, LocalTime orario, String nome) {
+        Esame nuovoEsame = new Esame(data, orario, nome);
+        Esame esameDecorato = new EsameControlloFestivi(nuovoEsame, null);
+        this.esami.put(esameDecorato.getCodice(), nuovoEsame);
+    }
+
+    public boolean isOrarioDisponibile(LocalDate dataEsame, LocalTime orarioEsame) {
+        for (Esame esame : this.esami.values()) {
+            if (esame.getData().equals(dataEsame)) {
+                long differenzaSecondi = Math.abs(esame.getOrario().toSecondOfDay() - orarioEsame.toSecondOfDay());
+                if (differenzaSecondi < 5400) { // meno di 1h e 30m
+                    return false;
+                }
+            }
         }
+        return true;
     }
+
+
     public void modificaSede() {
         Scanner scanner = new Scanner(System.in);
         int scelta;
@@ -90,13 +109,6 @@ public class Sede {
         } while (scelta != 0);
     }
 
-    public void mostraEsamiDisponibili() {
-        for (Map.Entry<String, Esame> entry : esami.entrySet()) {
-            String codice = entry.getKey();
-            Esame esame = entry.getValue();
-            System.out.println("Codice: " + codice + " | main.Esame: " + esame);
-        }
-    }
 
 
     @Override

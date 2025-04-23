@@ -37,7 +37,7 @@ public Amministratore(){
             return;
         }
 
-        System.out.println("📩 RECENSIONI NON LETTE:");
+        System.out.println("RECENSIONI NON LETTE:");
         recensioniNonLette.forEach(r -> {
             System.out.println("──────");
             System.out.println(r);

@@ -1,7 +1,5 @@
 package main;
 
-import java.util.UUID;
-
 public class Prenotazione {
     private String codice;
     private StatoPrenotazione stato;

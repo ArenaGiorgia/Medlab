@@ -14,7 +14,7 @@ public class Paziente {
     private String password;
     private String sesso;
     private boolean cronico;
-    private Integer età;
+    private Integer eta;
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioniPaziente;
     private Map<String, Referto> refertiCorrenti;
@@ -26,7 +26,7 @@ public class Paziente {
         this.cf = cf;
         this.password=cf; //password settata automaticamente al codice fiscale
         this.sesso = sesso;
-        this.età = calcolaEta(dataNascita);
+        this.eta = calcolaEta(dataNascita);
         this.prenotazioniPaziente = new HashMap<>();
         this.sedi = new ArrayList<>();
         this.refertiCorrenti = new HashMap<>();
@@ -76,7 +76,9 @@ public class Paziente {
         return sesso;
     }
 
-
+    public Integer getEta() {
+        return eta;
+    }
 
     public void setPrenotazioni(Map<String, Prenotazione> prenotazioni) {
         this.prenotazioniPaziente = prenotazioni;
@@ -96,7 +98,7 @@ public class Paziente {
 
     public void setDataNascita(LocalDate dataNascita) {
         this.dataNascita = dataNascita;
-        this.età = calcolaEta(dataNascita); // Aggiorna l'età
+        this.eta = calcolaEta(dataNascita); // Aggiorna l'età
     }
 
     public void setCf(String cf) {
@@ -158,7 +160,7 @@ public class Paziente {
                 System.out.println("Cognome modificato con successo. ");
                 break;
             case 3:
-                LocalDate dataNascita = null;
+                LocalDate dataNascita;
                 do {
                     try {
                         System.out.print("Inserisci la nuova data di nascita (yyyy-MM-dd): ");
@@ -282,10 +284,6 @@ public class Paziente {
         }
     }
 
-
-
-
-
     @Override
     public String toString() {
         return
@@ -294,7 +292,7 @@ public class Paziente {
                 "  DataNascita= " + this.dataNascita +
                 "  Cf= " + this.cf +
                 "  Sesso= " + this.sesso +
-                "  Età= " + this.età +
+                "  Età= " + this.eta +
                 "  MalatoCronico= " + this.cronico ;
     }
 

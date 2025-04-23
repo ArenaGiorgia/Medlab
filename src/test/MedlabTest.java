@@ -58,8 +58,11 @@ public class MedlabTest {
         medlab.nuovaSede("Sede Roma", 1);
         medlab.confermaSede();
         // Aggiungi esame
-        Esame esame = new Esame(LocalDate.now().plusDays(1), LocalTime.of(10, 0), "Esame sangue");
-        medlab.getSedi().get(0).aggiungiEsame(esame);
+        LocalDate dataEsame = LocalDate.of(1990, 1, 1);
+        LocalTime orarioEsame = LocalTime.of(0, 0);
+        String nomeEsame = "Esame sangue";
+        Esame esame = new Esame(dataEsame, orarioEsame, nomeEsame);
+        medlab.getSedi().get(0).aggiungiEsame(dataEsame, orarioEsame, nomeEsame);
         // Seleziona paziente
         medlab.setPazienteCorrente(medlab.getPazienti().get("MRORSS90A01H501R"));
         // Prova a prenotare

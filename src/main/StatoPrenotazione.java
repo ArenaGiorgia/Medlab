@@ -1,7 +1,7 @@
 package main;
 
 public abstract class StatoPrenotazione {
-protected  Prenotazione prenotazione ;
+private   Prenotazione prenotazione ;
 
     public StatoPrenotazione(Prenotazione prenotazione) {
         this.prenotazione = prenotazione;

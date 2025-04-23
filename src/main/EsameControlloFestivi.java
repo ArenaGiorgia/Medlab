@@ -47,6 +47,6 @@ public class  EsameControlloFestivi extends EsameDecorator {
 
     @Override
     public String toString() {
-        return esame.toString();
+        return super.toString();
     }
 }

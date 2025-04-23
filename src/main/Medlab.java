@@ -21,11 +21,11 @@ public class Medlab {
     private Map<String, PersonaleLaboratorio> personaliLaboratori;
     private Map<String, Recensione> recensioni;
     private List<RecensioneObserver> observers;
-
+    private Report reportCorrente;
 
 
     private Medlab() {
-        this.pazienti = new HashMap<String, Paziente>();
+        this.pazienti = new HashMap< String, Paziente>();
         this.prenotazioni = new HashMap<String, Prenotazione>();
         this.amministratore = new Amministratore();
         this.pazienteCorrente = null;
@@ -37,8 +37,9 @@ public class Medlab {
         this.refertoCorrente = null;
         this.recensioni = new HashMap<>();
         this.observers = new ArrayList<>();
+        this.reportCorrente=null;
         registerObserver(this.amministratore);
-        CaricamentoDati();  //per caricare dati persistenti
+        caricamentoDati();
     }
 
     public static Medlab getInstance() {
@@ -47,6 +48,15 @@ public class Medlab {
         else
             System.out.println("Istanza già creata");
         return medlab;
+    }
+
+
+    public void setReportCorrente(Report reportCorrente) {
+        this.reportCorrente = reportCorrente;
+    }
+
+    public Report getReportCorrente() {
+        return reportCorrente;
     }
 
     public Referto getRefertoCorrente() {
@@ -494,7 +504,6 @@ public class Medlab {
         return true;
     }
 
-    //Mi serve per vedere a quali sedi il paziente è associato
     public void visualizzaSedePaziente(Paziente paziente) {
         if (paziente.getSedi().isEmpty()) {
             System.out.println("Il paziente non ha sedi associate.");
@@ -541,7 +550,7 @@ public class Medlab {
     }
 
     //caricamento dei dati inseriti da default come gli utenti e le prenotazioni e le sedi
-    public void CaricamentoDati(){
+    public void caricamentoDati(){
         Paziente paziente1 = new Paziente("Matteo","Milano",LocalDate.of(2000, 12, 11),"c","M",true);
         Paziente paziente2 = new Paziente("Maria","Salemi",LocalDate.of(1986, 9, 2),"SLMWG349P33G342LP","F",false);
         Paziente paziente3= new Paziente("Giuseppe","Paci",LocalDate.of(1958, 2, 9),"GPPPAI11R44Z573H","M",false);
@@ -560,7 +569,7 @@ public class Medlab {
         this.pazienti.put(paziente1.getCf(), paziente1);
         this.pazienti.put(paziente2.getCf(), paziente2);
         this.pazienti.put(paziente3.getCf(), paziente3);
-      //   this.amministratore=new Amministratore();
+        this.amministratore=new Amministratore();
 
     }
 
@@ -790,8 +799,7 @@ public void aggiungiReferto() {
         }
     }
 
-//UC6
-//Aggiorna referto, dove il personale accede vede i pazienti della sua sede e poi ne seleziona uno e gli mette la descrizione del referto
+//UC6 Aggiorna referto, il personale accede vede i pazienti della sua sede e poi ne seleziona uno e gli mette la descrizione del referto
     public void aggiornaReferto(){
         if (personaleLaboratorioCorrente == null) {
             System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato!");
@@ -943,6 +951,54 @@ public void aggiungiReferto() {
         prenotazioneCorrente = null;
     }
 
+    //UC6 elimina Referto
+    public void eliminaReferto() {
+        if (personaleLaboratorioCorrente == null) {
+            System.out.println("Errore: Nessun personale di laboratorio autenticato!");
+            return;
+        }
+
+        Scanner scanner = new Scanner(System.in);
+
+        if (!visualizzaPazientiAssociatiAllaSede()) {
+            return;
+        }
+
+        System.out.print("Inserisci il codice fiscale del paziente: ");
+        String cf = scanner.nextLine().trim();
+        Paziente paziente = selezionaPazienteProxy(cf);
+        if (paziente == null) {
+            return;
+        }
+
+        if (!visualizzaPrenotazioniConfermate(paziente)) {
+            return;
+        }
+
+        System.out.print("Inserisci il codice della prenotazione da cui eliminare il referto: ");
+        String codicePren = scanner.nextLine().trim();
+        Prenotazione prenotazione = selezionaPrenotazione(codicePren);
+        if (prenotazione == null) {
+            System.out.println("Errore: Prenotazione non valida.");
+            return;
+        }
+
+        Referto referto = prenotazione.getReferto();
+        if (referto == null) {
+            System.out.println("Errore: Nessun referto associato a questa prenotazione.");
+            return;
+        }
+        System.out.print("Sei sicuro di voler eliminare il referto? (SI/NO)");
+        String conferma = scanner.nextLine().trim().toUpperCase();
+        if (conferma.equals("SI")) {
+            prenotazione.setReferto(null);
+            paziente.getRefertiCorrenti().remove(referto.getId());
+            System.out.println("Referto eliminato con successo.");
+        } else {
+            System.out.println("Operazione annullata.");
+        }
+    }
+
     //UC7 visualizza referti
     public void visualizzaRefertiPaziente() {
         if (pazienteCorrente != null) {
@@ -1045,7 +1101,7 @@ public void modificaPaziente() {
         }
     }
 
-    //UC10 gestione degli esami :
+    //UC10 Aggiunta di un nuovo esame
     public void aggiungiNuovoEsame() {
         Scanner scanner = new Scanner(System.in);
 
@@ -1061,7 +1117,7 @@ public void modificaPaziente() {
             }
         }
 
-        sedeCorrente = selezionaSede(codiceSede); // Flusso 2
+        this.sedeCorrente = selezionaSede(codiceSede); // Flusso 2
 
         if (sedeCorrente == null) {
             System.out.println("Errore: Codice sede non trovato.");
@@ -1070,7 +1126,7 @@ public void modificaPaziente() {
 
         VisualizzaEsamiDisponibili(sedeCorrente); // Flusso 3
 
-        System.out.print("Inserisci il nome dell'esame: ");
+        System.out.print("Inserisci il nome dell'esame da aggiungere: ");
         String nomeEsame = scanner.nextLine().trim();
 
         LocalDate dataEsame = null;
@@ -1084,7 +1140,7 @@ public void modificaPaziente() {
                 System.out.print("Inserisci l'orario dell'esame (HH:mm): ");
                 orarioEsame = LocalTime.parse(scanner.nextLine());
 
-                if (!isOrarioDisponibile(dataEsame, orarioEsame, sedeCorrente)) {
+                if (!sedeCorrente.isOrarioDisponibile(dataEsame, orarioEsame)) {
                     System.out.println("Errore: Orario non disponibile, deve esserci almeno 1 ora e 30 minuti di distanza.");
                     continue;
                 }
@@ -1095,39 +1151,25 @@ public void modificaPaziente() {
                 System.out.println("Errore: Data o orario non validi.");
             }
         }
-        nuovoEsame(dataEsame,orarioEsame,nomeEsame); //flusso 4. 
+        nuovoEsame(dataEsame,orarioEsame,nomeEsame); //flusso 4.
         System.out.println("Esame aggiunto con successo.");
 
     }
-    public void nuovoEsame( LocalDate data, LocalTime orario, String nome ) {
-        Esame esame = new Esame(data, orario, nome);
-        Esame esameDecorato = new EsameControlloFestivi(esame, null);
-        this.sedeCorrente.getEsami().put(esameDecorato.getCodice(),esameDecorato);
-        this.sedeCorrente=null;
-    }
 
-
-    public boolean isOrarioDisponibile(LocalDate dataEsame, LocalTime orarioEsame, Sede s) {
-        for (Esame esame : s.getEsami().values()) {
-            if (esame.getData().equals(dataEsame)) {
-                // Calcola la differenza in secondi tra gli orari
-                long differenzaSecondi = Math.abs(esame.getOrario().toSecondOfDay() -
-                        orarioEsame.toSecondOfDay());
-                // Se la differenza è inferiore a 1 ora e 30 minuti (5400 secondi), non è disponibile
-                if (Math.abs(differenzaSecondi) < 5400) {
-                    return false; // Orario sovrapposto
-                }
-            }
+    public void nuovoEsame(LocalDate data, LocalTime orario, String nome) {
+        if (this.sedeCorrente != null) {
+            this.sedeCorrente.aggiungiEsame(data, orario, nome);
         }
-        return true;
+        this.sedeCorrente = null;
     }
-
 
     //UC11 - aggiunge un personale di laboratorio al sistema
     public void aggiungiPersonale() {
         Scanner scanner = new Scanner(System.in);
 
-        visualizzaSediDisponibili(); // flusso 1.
+        if (!visualizzaSediDisponibili()) { //flusso 1.
+            return;
+        }
 
         System.out.print("Inserisci il codice della sede in cui lavorerà: ");
         int codiceSede = -1;
@@ -1182,7 +1224,7 @@ public void modificaPaziente() {
     }
 
 
-    public void visualizzaSediDisponibili() {
+    public boolean visualizzaSediDisponibili() {
         boolean almenoUnaDisponibile = false;
         System.out.println("Sedi disponibili:");
         for (Sede sede : sedi) {
@@ -1203,7 +1245,10 @@ public void modificaPaziente() {
             System.out.println("Nessuna sede disponibile per aggiungere personale.");
 
         }
+        return almenoUnaDisponibile;
     }
+
+
     public Sede selezionaSedePersonaleLab(Integer codSede) {
         for (Sede sede : this.sedi) {
             if (sede.getCodice().equals(codSede)) {
@@ -1221,7 +1266,6 @@ public void modificaPaziente() {
     public void inserisciPersonaleLab(String cf, String nome, String cognome, Sede sede){
         PersonaleLaboratorio personale = new PersonaleLaboratorio( cf, nome, cognome,sede);
         this.personaleLaboratorioCorrente = personale;
-
     }
 
     public void confermaPersonaleLab()
@@ -1230,14 +1274,43 @@ public void modificaPaziente() {
         this.personaleLaboratorioCorrente = null;
     }
 
-    //UC12
+    //UC12 Generazione del report
+    public void generaReportDemografico() {
+        if (this.amministratore == null) {
+            System.out.println("Accesso negato: Amministratore non autenticato.");
+            return;
+        }
 
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Inserisci il tipo di report (mensile, semestrale, annuale): ");
+        String tipo = scanner.nextLine().toLowerCase();
 
+        switch (tipo) {
+            case "mensile":
+                ReportMensileFactory factoryMensile = new ReportMensileFactory();
+                ReportMensile reportMensile = factoryMensile.createReport();
+                this.setReportCorrente(reportMensile);
+                break;
+            case "semestrale":
+                ReportSemestraleFactory factorySemestrale = new ReportSemestraleFactory();
+                ReportSemestrale reportSemestrale = factorySemestrale.createReport();
+                this.setReportCorrente(reportSemestrale);
+                break;
+            case "annuale":
+                ReportAnnualeFactory factoryAnnuale = new ReportAnnualeFactory();
+                ReportAnnuale reportAnnuale = factoryAnnuale.createReport();
+                this.setReportCorrente(reportAnnuale);
+                break;
+            default:
+                System.out.println("Tipo di report non valido.");
+                return;
+        }
+        reportCorrente.genera(prenotazioni);
+        System.out.println(reportCorrente);
 
+    }
 
-
-
-    //UC13
+    //UC13 visualizza le prenotazioni attive
     public void visualizzaPrenotazioniAttive() {
         if (pazienteCorrente != null) {
             pazienteCorrente.stampaPrenotazioniAttive();
@@ -1247,7 +1320,6 @@ public void modificaPaziente() {
     }
 
 
-
     @Override
     public String toString() {
         return "Medlab{" +
@@ -1255,14 +1327,16 @@ public void modificaPaziente() {
                 ", pazienteCorrente=" + pazienteCorrente +
                 ", sedeCorrente=" + sedeCorrente +
                 ", amministratore=" + amministratore +
-                ", sedi=" + sedi +
-                ", prenotazioni=" + prenotazioni +
                 ", prenotazioneCorrente=" + prenotazioneCorrente +
                 ", personaleLaboratorioCorrente=" + personaleLaboratorioCorrente +
+                ", refertoCorrente=" + refertoCorrente +
+                ", sedi=" + sedi +
+                ", prenotazioni=" + prenotazioni +
+                ", personaliLaboratori=" + personaliLaboratori +
+                ", recensioni=" + recensioni +
+                ", observers=" + observers +
                 '}';
     }
-
-
 }
 
 
