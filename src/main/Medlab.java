@@ -1060,6 +1060,9 @@ public void modificaPaziente() {
         }
 
         Recensione recensione = creaRecensione(pazienteCorrente, sedeScelta);
+       confermaRecensione(recensione);
+    }
+    public void confermaRecensione(Recensione recensione){
         if (recensione != null) {
             recensioni.put(recensione.getId(), recensione);
             notifyObservers(recensione);
