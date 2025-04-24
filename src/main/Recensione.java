@@ -10,6 +10,7 @@ public class Recensione {
     private  int valutazione; // 1-5 stelle
     private  String commento;
     private  LocalDate data;
+    private boolean letta;
 
     public Recensione(Paziente paziente, Sede sede, int valutazione, String commento) {
         this.id = UUID.randomUUID().toString();
@@ -18,6 +19,7 @@ public class Recensione {
         this.valutazione = Math.max(1, Math.min(5, valutazione)); // Forza tra 1 e 5
         this.commento = commento;
         this.data = LocalDate.now();
+        this.letta= false;
     }
 
     // Getters
@@ -28,11 +30,16 @@ public class Recensione {
     public String getCommento() { return commento; }
     public LocalDate getData() { return data; }
 
+    public void marcaComeLetta() {
+        this.letta = true;
+    }
+
+
     @Override
     public String toString() {
-        return String.format(
-                "★ %s/5 | main.Sede: %s | Autore: %s %s\nCommento: %s",
-                valutazione, sede.getNome(), paziente.getNome(), paziente.getCognome(), commento
-        );
+        return (letta ? "[VISTA] " : "[NUOVA] ") +
+                this.valutazione + "/5 | Sede: " + this.sede.getNome() +
+                " | Autore: " + this.paziente.getNome() + " " + this.paziente.getCognome() +
+                " | Commento: " + this.commento;
     }
 }

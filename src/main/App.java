@@ -104,10 +104,8 @@ public class App {
                               sistema.generaReportDemografico();
                                 break;
                             case 10:
-                                sistema.getAmministratore().visualizzaRecensioniNonLette();
-                                System.out.println("TUTTE LE RECENSIONI..");
-                                sistema.visualizzaRecensioni();
 
+                                sistema.getAmministratore().visualizzaRecensioniNonLette();
                                 break;
                         }
                     }
