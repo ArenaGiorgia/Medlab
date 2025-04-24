@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Medlab {
+public class Medlab extends Observable{
     private static Medlab medlab;
     private Map < String, Paziente> pazienti;
     private Paziente pazienteCorrente;
@@ -19,8 +19,7 @@ public class Medlab {
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioni;
     private Map<String, PersonaleLaboratorio> personaliLaboratori;
-    private Map<String, Recensione> recensioni;
-    private List<RecensioneObserver> observers;
+    private Recensione recensioneCorrente;
     private Report reportCorrente;
 
     private Medlab() {
@@ -33,10 +32,8 @@ public class Medlab {
         this.sedi = new ArrayList<>();
         this.personaleLaboratorioCorrente = null;
         this.personaliLaboratori = new HashMap<String, PersonaleLaboratorio>();
-        this.recensioni = new HashMap<>();
-        this.observers = new ArrayList<>();
         this.reportCorrente=null;
-        registerObserver(this.amministratore);
+        addObserver(this.amministratore);
         caricamentoDati();
     }
 
@@ -112,23 +109,7 @@ public class Medlab {
     }
 
     public Amministratore getAmministratore() {
-        return amministratore;
-    }
-
-    public void registerObserver(RecensioneObserver observer) {
-        observers.add(observer);
-    }
-
-    // Rimuove un observer
-    public void removeObserver(RecensioneObserver observer) {
-        observers.remove(observer);
-    }
-
-    // Notifica tutti gli observer
-    private void notifyObservers(Recensione recensione) {
-        for (RecensioneObserver observer : observers) {
-            observer.update(recensione);
-        }
+        return this.amministratore;
     }
 
     //UC1 Gestione pazienti Medlab (inserimento paziente)
@@ -810,34 +791,22 @@ public void modificaPaziente() {
             return;
         }
 
-        Recensione recensione = creaRecensione(pazienteCorrente, sedeScelta);
-       confermaRecensione(recensione);
+        Recensione recensioneCorrente = creaRecensione(pazienteCorrente, sedeScelta);
+       confermaRecensione(recensioneCorrente);
     }
-    public void confermaRecensione(Recensione recensione){
-        if (recensione != null) {
-            recensioni.put(recensione.getId(), recensione);
-            notifyObservers(recensione);
-            System.out.println("Recensione inviata con successo!");
-        }
-    }
-
-    public void visualizzaRecensioni() {
-        if (recensioni.isEmpty()) {
-            System.out.println("Nessuna recensione presente.");
+    public void confermaRecensione(Recensione recensione) {
+        if (recensione == null) {
+            System.out.println("Errore: Recensione nulla non può essere aggiunta.");
             return;
         }
+        this.amministratore.aggiungiRecensioneNonLetta(recensione);
 
-        System.out.println("==== RECENSIONI ====");
-        for (Recensione r : recensioni.values()) {  // Itera sui valori della mappa
-            System.out.println(r.getValutazione() +
-                            "/5" +
-                            "Sede: " + r.getSede().getNome() +
-                            "Autore: " + r.getPaziente().getNome() + " " + r.getPaziente().getCognome() +
-                            "Commento: " + r.getCommento() +
-                            "----------------------"
-            );
-        }
+        setChanged();
+        notifyObservers(recensione);
+
+        System.out.println("Recensione inviata con successo!");
     }
+
 
     //UC10 Aggiunta di un nuovo esame
     public void aggiungiNuovoEsame() {
@@ -1074,8 +1043,7 @@ public void modificaPaziente() {
                 ", sedi=" + sedi +
                 ", prenotazioni=" + prenotazioni +
                 ", personaliLaboratori=" + personaliLaboratori +
-                ", recensioni=" + recensioni +
-                ", observers=" + observers +
+                ", recensioneCorrente=" + recensioneCorrente +
                 ", reportCorrente=" + reportCorrente +
                 '}';
     }
