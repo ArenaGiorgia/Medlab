@@ -16,14 +16,12 @@ public class Medlab {
     private Amministratore amministratore;
     private Prenotazione prenotazioneCorrente;
     private PersonaleLaboratorio personaleLaboratorioCorrente;
-    private Referto refertoCorrente;
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioni;
     private Map<String, PersonaleLaboratorio> personaliLaboratori;
     private Map<String, Recensione> recensioni;
     private List<RecensioneObserver> observers;
     private Report reportCorrente;
-
 
     private Medlab() {
         this.pazienti = new HashMap< String, Paziente>();
@@ -35,7 +33,6 @@ public class Medlab {
         this.sedi = new ArrayList<>();
         this.personaleLaboratorioCorrente = null;
         this.personaliLaboratori = new HashMap<String, PersonaleLaboratorio>();
-        this.refertoCorrente = null;
         this.recensioni = new HashMap<>();
         this.observers = new ArrayList<>();
         this.reportCorrente=null;
@@ -58,14 +55,6 @@ public class Medlab {
 
     public Report getReportCorrente() {
         return reportCorrente;
-    }
-
-    public Referto getRefertoCorrente() {
-        return refertoCorrente;
-    }
-
-    public void setRefertoCorrente(Referto refertoCorrente) {
-        this.refertoCorrente = refertoCorrente;
     }
 
     public void setPersonaleLaboratorioCorrente(PersonaleLaboratorio personaleLaboratorioCorrente) {
@@ -572,6 +561,10 @@ public class Medlab {
         this.pazienti.put(paziente3.getCf(), paziente3);
         this.amministratore=new Amministratore();
 
+        SedePazienteProxy proxy = new SedePazienteProxy(this);
+        personaleLaboratorio1.setPazienteProvider(proxy);
+        personaleLaboratorio2.setPazienteProvider(proxy);
+        personaleLaboratorio3.setPazienteProvider(proxy);
     }
 
     // UC4 Inserimento nuova sede di laboratorio
@@ -671,334 +664,36 @@ public void eliminaSede() {
             System.out.println("Errore: Sede non trovata.");
         }
     }
-
-
-//UC5 Gestione referti
-public void aggiungiReferto() {
-    if (personaleLaboratorioCorrente == null) {
-        System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato!");
-        return;
-    }
-
-    if (!visualizzaListaEsamiPrenotati()) { // Flusso 1.
-        return;
-    }
-
-    Scanner scanner = new Scanner(System.in);
-
-    while (true) {
-
-        System.out.print("Inserisci il codice dell'esame da selezionare oppure 'STOP' per terminare: ");
-        String codiceEsame = scanner.nextLine().trim();
-
-        if (codiceEsame.equalsIgnoreCase("STOP")) {
-            break;
+    // UC5
+    public void aggiungiReferto(){
+        if(personaleLaboratorioCorrente!=null){
+            personaleLaboratorioCorrente.aggiungiReferto();
         }
-
-        Prenotazione prenotazioneSelezionata = selezionaPrenotazione(codiceEsame); // Flusso 2
-
-        if (prenotazioneSelezionata == null) {
-            System.out.println("Errore: Nessuna prenotazione trovata per questo esame.");
-            continue;
-        }
-
-        System.out.print("Vuoi completare o annullare questa prenotazione? (SI/NO): ");
-        String scelta = scanner.nextLine().trim().toUpperCase();
-
-        if (scelta.equals("SI")) {
-            inserisciStato(prenotazioneSelezionata); // Flusso 3
-
-            // Se l'esame è stato completato, rimuovilo dalla lista delle prenotazioni
-            if (prenotazioneSelezionata.getStato() instanceof StatoCompletato) {
-                personaleLaboratorioCorrente.getSede().getEsami().remove(codiceEsame);
-                System.out.println("Prenotazione completata con successo.");
-            }
-        } else if (scelta.equals("NO")) {
-            prenotazioneSelezionata.setStato(new StatoAnnullato(prenotazioneSelezionata));
-            personaleLaboratorioCorrente.getSede().getEsami().remove(codiceEsame);
-            System.out.println("Prenotazione annullata.");
-        } else {
-            System.out.println("Azione non valida. Scegli 'SI' o 'NO'.");
-            continue;
-        }
-
-        System.out.print("Vuoi selezionare un altro esame? (SI/NO): ");
-        String risposta = scanner.nextLine().trim().toUpperCase();
-        if (risposta.equals("NO")) break;
-    }
-
-    System.out.println("Gestione referti completata.");
-}
-
-    public boolean visualizzaListaEsamiPrenotati() {
-        if (personaleLaboratorioCorrente == null || personaleLaboratorioCorrente.getSede() == null) {
-            System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato o sede non assegnata.");
-            return false;
-        }
-
-        PazienteProvider pazienteProvider = new SedePazienteProxy(medlab);
-        List<Paziente> pazientiSede = pazienteProvider.getAllPazienti();
-
-        boolean esameTrovato = false;
-        System.out.println("Esami in attesa di referto per oggi:");
-        for (Paziente paziente : pazientiSede) {
-            for (Prenotazione prenotazione : prenotazioni.values()) {
-                if (prenotazione.getPaziente().equals(paziente) && prenotazione.getStato() instanceof StatoInAttesa) {
-                    Esame esame = prenotazione.getEsame();
-                    if (esame.isPrenotato() && esame.getData().equals(LocalDate.now())) {
-                        System.out.println("Codice: " + prenotazione.getCodice() +
-                                " Esame: " + esame.getNome() +
-                                " Data: " + esame.getData() +
-                                " Ora: " + esame.getOrario() +
-                                " Paziente: " + paziente.getNome() + " " + paziente.getCognome());
-                        esameTrovato = true;
-                    }
-                }
-            }
-        }
-
-        if (!esameTrovato) {
-            System.out.println("Non ci sono esami in attesa di referto per oggi.");
-        }
-
-        return esameTrovato;
-    }
-
-
-
-    private Prenotazione selezionaPrenotazione(String codice) {
-
-        // Utilizza il Proxy per ottenere i pazienti della sede corrente
-        PazienteProvider pazienteProvider = new SedePazienteProxy(medlab);
-        List<Paziente> pazientiSede = pazienteProvider.getAllPazienti();
-
-        for (Paziente paziente : pazientiSede) {
-            for (Prenotazione prenotazione : paziente.getPrenotazioniPaziente().values()) {
-                if (prenotazione.getCodice().equals(codice)) {
-                    return prenotazione;
-                }
-            }
-        }
-        return null;
-    }
-
-
-    public void inserisciStato(Prenotazione prenotazione) {
-        if (prenotazione == null) {
-            System.out.println("Errore: La prenotazione non esiste.");
-            return;
-        }
-
-        StatoPrenotazione statoCorrente = prenotazione.getStato();
-
-        if (statoCorrente instanceof StatoInAttesa) {
-            statoCorrente.completa(prenotazione);
-        } else if (statoCorrente instanceof StatoCompletato) {
-            System.out.println("La prenotazione è già completata.");
-        } else if (statoCorrente instanceof StatoAnnullato) {
-            System.out.println("La prenotazione è già annullata.");
+        else{
+            System.out.println("Errore: Personale non autenticato.");
         }
     }
+
 
 //UC6 Aggiorna referto, il personale accede vede i pazienti della sua sede e poi ne seleziona uno e gli mette la descrizione del referto
-    public void aggiornaReferto(){
-        if (personaleLaboratorioCorrente == null) {
-            System.out.println("Errore: Nessun personale di laboratorio attualmente autenticato!");
-            return;
+public void aggiornaReferto(){
+        if(personaleLaboratorioCorrente!=null){
+            personaleLaboratorioCorrente.aggiornaReferto();
         }
-        Scanner scanner = new Scanner(System.in);
-
-        if (!visualizzaPazientiAssociatiAllaSede()) { //flusso 1
-            return;
+        else{
+            System.out.println("Errore: Personale non autenticato.");
         }
+}
+   //UC6 elimina referto
+   public void eliminaReferto(){
+       if(personaleLaboratorioCorrente!=null){
+           personaleLaboratorioCorrente.eliminaReferto();
+       }
+       else{
+           System.out.println("Errore: Personale non autenticato.");
+       }
+   }
 
-        System.out.print("Inserisci il codice fiscale del paziente a cui aggiornare il referto: ");
-        String cf = scanner.nextLine().trim();
-
-        Paziente pazienteSelezionato = selezionaPazienteProxy(cf); //flusso 2.
-
-        if (!visualizzaPrenotazioniConfermate(pazienteSelezionato)) {     //flusso 3.
-            return;
-        }
-
-            System.out.print("Inserisci il codice della prenotazione da aggiornare: ");
-            String codicePren = scanner.nextLine().trim();
-
-            Prenotazione prenotazioneSelezionata = selezionaPrenotazione(codicePren); // flusso 4.
-
-            if (prenotazioneSelezionata == null) {
-                System.out.println("Errore: codice prenotazione non valido.");
-                return;
-            }
-
-            prenotazioneCorrente = prenotazioneSelezionata;
-            refertoCorrente = prenotazioneCorrente.getReferto();
-            inserisciReferto(); //flusso 5.
-            confermaReferto(); //flusso 6.
-        }
-
-        public Paziente selezionaPazienteProxy(String cf) {
-        PazienteProvider pazienteProvider = getPazienteAccessProxy();
-        Paziente pazienteSelezionato = pazienteProvider.getPazienteByCF(cf);
-
-        if (pazienteSelezionato == null) {
-            System.out.println("Errore: Paziente non trovato con il codice fiscale " + cf);
-        }
-
-        return pazienteSelezionato;
-    }
-
-    private boolean visualizzaPazientiAssociatiAllaSede() {
-        PazienteProvider pazienteProvider = getPazienteAccessProxy();
-        List<Paziente> pazientiSede = pazienteProvider.getAllPazienti();
-
-        if (pazientiSede.isEmpty()) {
-            System.out.println("Nessun paziente associato alla tua sede.");
-            return false;
-        }
-
-        System.out.println("Pazienti associati alla tua sede:");
-        for (Paziente paziente : pazientiSede) {
-            System.out.println("Nome: " + paziente.getNome() +
-                    " Cognome: " + paziente.getCognome() +
-                    " Codice Fiscale: " + paziente.getCf());
-        }
-
-        return true; // Se ci sono pazienti, ritorna true
-    }
-
-    public boolean visualizzaPrenotazioniConfermate(Paziente paziente) {
-        if (paziente == null) {
-            System.out.println("Errore: Paziente non valido.");
-            return false;
-        }
-
-        boolean trovato = false;
-        Map<String, Prenotazione> prenotazioni = paziente.getPrenotazioniPaziente();
-
-        System.out.println("Prenotazioni confermate per il paziente " + paziente.getNome() + " " + paziente.getCognome() + ":");
-
-        for (Map.Entry<String, Prenotazione> entry : prenotazioni.entrySet()) {
-            Prenotazione prenotazione = entry.getValue();
-            Referto referto = prenotazione.getReferto();
-
-            if (prenotazione.getStato() instanceof StatoCompletato) {
-                if (referto != null && (referto.getRisultato() == null || referto.getRisultato().isEmpty())) {
-                    System.out.println("Codice: " + prenotazione.getCodice() +
-                            " Esame: " + prenotazione.getEsame().getNome() +
-                            " Data: " + prenotazione.getEsame().getData() +
-                            " Ora: " + prenotazione.getEsame().getOrario());
-                    trovato = true;
-                }
-            }
-        }
-
-        if (!trovato) {
-            System.out.println("Nessuna prenotazione confermata trovata.");
-        }
-        return trovato;
-    }
-
-
-
-    //mi serve per il proxy
-    public PazienteProvider getPazienteAccessProxy() {
-        return new SedePazienteProxy(this);
-    }
-
-    //mi serve per il proxy
-    public Paziente getPazienteByCF(String cf) {
-        return pazienti.get(cf);
-    }
-
-
-    public void inserisciReferto() {
-        if (refertoCorrente == null) {
-            System.out.println("Errore: nessun referto selezionato.");
-            return;
-        }
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Inserisci la descrizione del referto: ");
-        String descrizione = scanner.nextLine().trim();
-
-        refertoCorrente.setReferto(descrizione);
-
-    }
-
-    public void confermaReferto() {
-        if (refertoCorrente == null || prenotazioneCorrente == null) {
-            System.out.println("Errore: referto o prenotazione non impostati.");
-            return;
-        }
-
-        Paziente paziente = prenotazioneCorrente.getPaziente();
-
-        if (paziente == null) {
-            System.out.println("Errore: paziente non trovato.");
-            return;
-        }
-
-        String refertoId = refertoCorrente.getId();
-        Map<String, Referto> referti = paziente.getRefertiCorrenti();
-
-        if (referti.containsKey(refertoId)) {
-            System.out.println("Errore: esiste già un referto con questo ID");
-        } else {
-            referti.put(refertoId, refertoCorrente);
-            System.out.println("Referto confermato e salvato nel profilo del paziente.");
-        }
-
-        refertoCorrente = null;
-        prenotazioneCorrente = null;
-    }
-
-    //UC6 elimina Referto
-    public void eliminaReferto() {
-        if (personaleLaboratorioCorrente == null) {
-            System.out.println("Errore: Nessun personale di laboratorio autenticato!");
-            return;
-        }
-
-        Scanner scanner = new Scanner(System.in);
-
-        if (!visualizzaPazientiAssociatiAllaSede()) {
-            return;
-        }
-
-        System.out.print("Inserisci il codice fiscale del paziente: ");
-        String cf = scanner.nextLine().trim();
-        Paziente paziente = selezionaPazienteProxy(cf);
-        if (paziente == null) {
-            return;
-        }
-
-        if (!visualizzaPrenotazioniConfermate(paziente)) {
-            return;
-        }
-
-        System.out.print("Inserisci il codice della prenotazione da cui eliminare il referto: ");
-        String codicePren = scanner.nextLine().trim();
-        Prenotazione prenotazione = selezionaPrenotazione(codicePren);
-        if (prenotazione == null) {
-            System.out.println("Errore: Prenotazione non valida.");
-            return;
-        }
-
-        Referto referto = prenotazione.getReferto();
-        if (referto == null) {
-            System.out.println("Errore: Nessun referto associato a questa prenotazione.");
-            return;
-        }
-        System.out.print("Sei sicuro di voler eliminare il referto? (SI/NO)");
-        String conferma = scanner.nextLine().trim().toUpperCase();
-        if (conferma.equals("SI")) {
-            prenotazione.setReferto(null);
-            paziente.getRefertiCorrenti().remove(referto.getId());
-            System.out.println("Referto eliminato con successo.");
-        } else {
-            System.out.println("Operazione annullata.");
-        }
-    }
 
     //UC7 visualizza referti
     public void visualizzaRefertiPaziente() {
@@ -1208,6 +903,10 @@ public void modificaPaziente() {
 
     //UC11 - aggiunge un personale di laboratorio al sistema
     public void aggiungiPersonale() {
+        if (this.amministratore == null) {
+            System.out.println("Accesso negato: Amministratore non autenticato.");
+            return;
+        }
         Scanner scanner = new Scanner(System.in);
 
         if (!visualizzaSediDisponibili()) { //flusso 1.
@@ -1328,29 +1027,29 @@ public void modificaPaziente() {
         System.out.print("Inserisci il tipo di report (mensile, semestrale, annuale): ");
         String tipo = scanner.nextLine().toLowerCase();
 
+
+
         switch (tipo) {
             case "mensile":
                 ReportMensileFactory factoryMensile = new ReportMensileFactory();
-                ReportMensile reportMensile = factoryMensile.createReport();
+                ReportMensile reportMensile = factoryMensile.createReport(this.prenotazioni);
                 this.setReportCorrente(reportMensile);
                 break;
             case "semestrale":
                 ReportSemestraleFactory factorySemestrale = new ReportSemestraleFactory();
-                ReportSemestrale reportSemestrale = factorySemestrale.createReport();
+                ReportSemestrale reportSemestrale = factorySemestrale.createReport(this.prenotazioni);
                 this.setReportCorrente(reportSemestrale);
                 break;
             case "annuale":
                 ReportAnnualeFactory factoryAnnuale = new ReportAnnualeFactory();
-                ReportAnnuale reportAnnuale = factoryAnnuale.createReport();
+                ReportAnnuale reportAnnuale = factoryAnnuale.createReport(this.prenotazioni);
                 this.setReportCorrente(reportAnnuale);
                 break;
             default:
                 System.out.println("Tipo di report non valido.");
-                return;
+               return;
         }
-        reportCorrente.genera(prenotazioni);
-        System.out.println(reportCorrente);
-
+            System.out.println(reportCorrente.toString());
     }
 
     //UC13 visualizza le prenotazioni attive
@@ -1372,12 +1071,12 @@ public void modificaPaziente() {
                 ", amministratore=" + amministratore +
                 ", prenotazioneCorrente=" + prenotazioneCorrente +
                 ", personaleLaboratorioCorrente=" + personaleLaboratorioCorrente +
-                ", refertoCorrente=" + refertoCorrente +
                 ", sedi=" + sedi +
                 ", prenotazioni=" + prenotazioni +
                 ", personaliLaboratori=" + personaliLaboratori +
                 ", recensioni=" + recensioni +
                 ", observers=" + observers +
+                ", reportCorrente=" + reportCorrente +
                 '}';
     }
 }

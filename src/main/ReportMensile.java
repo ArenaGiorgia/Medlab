@@ -4,18 +4,14 @@ import java.time.LocalDate;
 import java.util.Map;
 
 public class ReportMensile extends Report {
-    public ReportMensile() {
-        this.tipoReport = "MENSILE";
+    public ReportMensile(Map<String, Prenotazione> tutte) {
+        super("Mensile", tutte);
     }
 
     @Override
-    public void genera(Map<String, Prenotazione> tuttePrenotazioni) {
-        LocalDate unMeseFa = LocalDate.now().minusMonths(1);
-
-        for (Prenotazione p : tuttePrenotazioni.values()) {
-            if (p.getEsame().getData().isAfter(unMeseFa)) {
-                this.prenotazioni.put(p.getCodice(), p);
-            }
-        }
+    protected boolean filtroData(Prenotazione p) {
+        LocalDate data = p.getEsame().getData();
+        LocalDate oggi = LocalDate.now();
+        return data.getMonth() == oggi.getMonth() && data.getYear() == oggi.getYear();
     }
 }

@@ -4,18 +4,12 @@ import java.time.LocalDate;
 import java.util.Map;
 
 public class ReportAnnuale extends Report {
-    public ReportAnnuale() {
-        this.tipoReport = "ANNUALE";
+    public ReportAnnuale(Map<String, Prenotazione> tutte) {
+        super("Annuale", tutte);
     }
 
     @Override
-    public void genera(Map<String, Prenotazione> tuttePrenotazioni) {
-        LocalDate unAnnoFa = LocalDate.now().minusYears(1);
-
-        for (Prenotazione p : tuttePrenotazioni.values()) {
-            if (p.getEsame().getData().isAfter(unAnnoFa)) {
-                this.prenotazioni.put(p.getCodice(), p);
-            }
-        }
+    protected boolean filtroData(Prenotazione p) {
+        return p.getEsame().getData().getYear() == LocalDate.now().getYear();
     }
 }

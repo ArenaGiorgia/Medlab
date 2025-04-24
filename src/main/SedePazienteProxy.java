@@ -12,7 +12,7 @@ public class SedePazienteProxy implements PazienteProvider {
 
     @Override
     public Paziente getPazienteByCF(String cf) {
-        Paziente p = medlab.getPazienteByCF(cf);
+        Paziente p = medlab.getPazienti().get(cf);
         PersonaleLaboratorio personale = medlab.getPersonaleLaboratorioCorrente();
         if (p != null && p.getSedi() != null) {
             for (Sede sede : p.getSedi()) {

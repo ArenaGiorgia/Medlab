@@ -7,7 +7,7 @@ import java.util.*;
 public class Sede {
     private Integer codice;
     private String nome;
-    private Map<String, Esame> esami; //di default deve avere una serie di esami che poi associero alle prenotazioni
+    private Map<String, Esame> esami;
 
     public Sede(Integer codice,String nome) {
         this.nome = nome;

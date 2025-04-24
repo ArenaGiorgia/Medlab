@@ -4,18 +4,16 @@ import java.time.LocalDate;
 import java.util.Map;
 
 public class ReportSemestrale extends Report {
-    public ReportSemestrale() {
-        this.tipoReport = "SEMESTRALE";
+    public ReportSemestrale(Map<String, Prenotazione> tutte) {
+        super("Semestrale", tutte);
     }
 
     @Override
-    public void genera(Map<String, Prenotazione> tuttePrenotazioni) {
-        LocalDate seiMesiFa = LocalDate.now().minusMonths(6);
-
-        for (Prenotazione p : tuttePrenotazioni.values()) {
-            if (p.getEsame().getData().isAfter(seiMesiFa)) {
-                this.prenotazioni.put(p.getCodice(), p);
-            }
-        }
+    protected boolean filtroData(Prenotazione p) {
+        LocalDate data = p.getEsame().getData();
+        LocalDate oggi = LocalDate.now();
+        int semestreOggi = (oggi.getMonthValue() - 1) / 6;
+        int semestreData = (data.getMonthValue() - 1) / 6;
+        return data.getYear() == oggi.getYear() && semestreOggi == semestreData;
     }
 }
