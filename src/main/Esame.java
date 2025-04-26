@@ -20,22 +20,6 @@ public class Esame {
 
     }
 
-    public void setnome(String descrizione) {
-        this.nome = descrizione;
-    }
-
-    public void setOrario(LocalTime orario) {
-        this.orario = orario;
-    }
-
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
-
-    public void setCodice(String codice) {
-        this.codice = codice;
-    }
-
     public boolean isPrenotato() {
         return prenotato;
     }

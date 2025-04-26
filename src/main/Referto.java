@@ -15,14 +15,6 @@ public class Referto
         this.risultato = null;
     }
 
-    public void setId(String id) {
-        Id = id;
-    }
-
-    public void setDate(LocalDate data) {
-        this.data = data;
-    }
-
     public void setReferto(String risultato) {
         this.risultato = risultato;
     }

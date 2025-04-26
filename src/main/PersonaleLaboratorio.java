@@ -271,7 +271,7 @@ public void aggiornaReferto() {
         }
 
         String idReferto = refertoCorrente.getId();
-        Map<String, Referto> referti = paziente.getRefertiCorrenti();
+         referti = paziente.getRefertiCorrenti();
 
         if (referti.containsKey(idReferto)) {
             System.out.println("Errore: esiste già un referto con questo ID.");

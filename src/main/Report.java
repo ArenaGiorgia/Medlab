@@ -55,17 +55,16 @@ public abstract class Report {
             else nonCronici++;
         }
 
-        StringBuilder report = new StringBuilder();
-        report.append("=== Report ").append(tipoReport).append(" (").append(codiceReport).append(") ===\n")
-                .append("Generato il: ").append(dataGenerazione).append("\n")
-                .append("Totale prenotazioni: ").append(totale).append("\n\n")
-                .append("Maschi: ").append(maschi).append(" (").append(String.format("%.2f", calcolaPercentuale(maschi, totale))).append("%)\n")
-                .append("Femmine: ").append(femmine).append(" (").append(String.format("%.2f", calcolaPercentuale(femmine, totale))).append("%)\n")
-                .append("Under 18: ").append(under18).append(" (").append(String.format("%.2f", calcolaPercentuale(under18, totale))).append("%)\n")
-                .append("Over 18: ").append(over18).append(" (").append(String.format("%.2f", calcolaPercentuale(over18, totale))).append("%)\n")
-                .append("Cronici: ").append(cronici).append(" (").append(String.format("%.2f", calcolaPercentuale(cronici, totale))).append("%)\n")
-                .append("Non cronici: ").append(nonCronici).append(" (").append(String.format("%.2f", calcolaPercentuale(nonCronici, totale))).append("%)\n");
+        String report = "=== Report " + tipoReport + " (" + codiceReport + ") ===\n" +
+                "Generato il: " + dataGenerazione + "\n" +
+                "Totale prenotazioni: " + totale + "\n\n" +
+                "Maschi: " + maschi + " (" + String.format("%.2f", calcolaPercentuale(maschi, totale)) + "%)\n" +
+                "Femmine: " + femmine + " (" + String.format("%.2f", calcolaPercentuale(femmine, totale)) + "%)\n" +
+                "Under 18: " + under18 + " (" + String.format("%.2f", calcolaPercentuale(under18, totale)) + "%)\n" +
+                "Over 18: " + over18 + " (" + String.format("%.2f", calcolaPercentuale(over18, totale)) + "%)\n" +
+                "Cronici: " + cronici + " (" + String.format("%.2f", calcolaPercentuale(cronici, totale)) + "%)\n" +
+                "Non cronici: " + nonCronici + " (" + String.format("%.2f", calcolaPercentuale(nonCronici, totale)) + "%)\n";
 
-        return report.toString();
+        return report;
     }
 }

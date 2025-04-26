@@ -23,11 +23,8 @@ public class Recensione {
     }
 
     // Getters
-    public String getId() { return id; }
+
     public Paziente getPaziente() { return paziente; }
-    public Sede getSede() { return sede; }
-    public int getValutazione() { return valutazione; }
-    public String getCommento() { return commento; }
     public LocalDate getData() { return data; }
 
     public void marcaComeLetta() {

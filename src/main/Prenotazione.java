@@ -23,13 +23,6 @@ public class Prenotazione {
         return paziente;
     }
 
-    public void completa() {
-        stato.completa(this);
-    }
-
-    public void annulla() {
-        stato.annulla(this);
-    }
 
     public void setStato(StatoPrenotazione stato) {
         this.stato = stato;
@@ -48,16 +41,10 @@ public class Prenotazione {
         return codice;
     }
 
-    public void setEsame(Esame esame) {
-        this.esame = esame;
-    }
+
 
     public Esame getEsame() {
         return esame;
-    }
-
-    public void setCodice(String codice) {
-        this.codice = codice;
     }
 
 

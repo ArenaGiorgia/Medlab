@@ -50,10 +50,6 @@ public class Medlab extends Observable{
         this.reportCorrente = reportCorrente;
     }
 
-    public Report getReportCorrente() {
-        return reportCorrente;
-    }
-
     public void setPersonaleLaboratorioCorrente(PersonaleLaboratorio personaleLaboratorioCorrente) {
         this.personaleLaboratorioCorrente = personaleLaboratorioCorrente;
     }
@@ -899,6 +895,7 @@ public void modificaPaziente() {
             return;
         }
 
+
         System.out.print("Inserisci il nome del personale di laboratorio: ");
         String nome = scanner.nextLine();
         System.out.print("Inserisci il cognome del personale di laboratorio: ");
@@ -992,12 +989,30 @@ public void modificaPaziente() {
             return;
         }
 
+        String tipoReport = InserisciTipoReport(); //flusso 1
+
+        if (tipoReport == null) {
+            System.out.println("Tipo di report non valido.");
+            return;
+        }
+
+        creaReport(tipoReport); //flusso 2
+        visualizzaReport(); //flusso 3
+    }
+
+    private String InserisciTipoReport() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Inserisci il tipo di report (mensile, semestrale, annuale): ");
         String tipo = scanner.nextLine().toLowerCase();
 
+        if (tipo.equals("mensile") || tipo.equals("semestrale") || tipo.equals("annuale")) {
+            return tipo;
+        } else {
+            return null;
+        }
+    }
 
-
+    private void creaReport(String tipo) {
         switch (tipo) {
             case "mensile":
                 ReportMensileFactory factoryMensile = new ReportMensileFactory();
@@ -1014,11 +1029,15 @@ public void modificaPaziente() {
                 ReportAnnuale reportAnnuale = factoryAnnuale.createReport(this.prenotazioni);
                 this.setReportCorrente(reportAnnuale);
                 break;
-            default:
-                System.out.println("Tipo di report non valido.");
-               return;
         }
+    }
+
+    private void visualizzaReport() {
+        if (reportCorrente != null) {
             System.out.println(reportCorrente.toString());
+        } else {
+            System.out.println("Nessun report da visualizzare.");
+        }
     }
 
     //UC13 visualizza le prenotazioni attive

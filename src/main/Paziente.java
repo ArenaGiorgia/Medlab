@@ -62,9 +62,6 @@ public class Paziente {
         return cognome;
     }
 
-    public LocalDate getDataNascita() {
-        return dataNascita;
-    }
 
     public String getCf() {
 
@@ -80,9 +77,6 @@ public class Paziente {
         return eta;
     }
 
-    public void setPrenotazioni(Map<String, Prenotazione> prenotazioni) {
-        this.prenotazioniPaziente = prenotazioni;
-    }
 
     public Map<String, Prenotazione> getPrenotazioniPaziente() {
         return prenotazioniPaziente;
@@ -101,9 +95,6 @@ public class Paziente {
         this.eta = calcolaEta(dataNascita); // Aggiorna l'età
     }
 
-    public void setCf(String cf) {
-        this.cf = cf;
-    }
 
     public void setSesso(String sesso) {
         this.sesso = sesso;
