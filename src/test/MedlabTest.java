@@ -25,16 +25,16 @@ class MedlabTest {
         // Reset dello stato per isolamento test
         medlab.setPazienti(new HashMap<>());
         medlab.setPrenotazioni(new HashMap<>());
-<<<<<<< HEAD
+
         medlab.setSedi(new ArrayList<>());
         // Configurazione fixture di test
         pazienteTest = new Paziente("Mario", "Rossi", LocalDate.of(1990, 5, 15), "MRORSS90E15F205A", "M", false);
         sedeTest = new Sede(1, "Policlinico Catania");
         medlab.getPazienti().put(pazienteTest.getCf(), pazienteTest);
         medlab.getSedi().add(sedeTest);
-=======
+
         medlab.setPersonaleLaboratori(new HashMap<>());
->>>>>>> 277cb068dd8ea06584fccb57eea03a370f00e3aa
+
     }
 
     @AfterEach

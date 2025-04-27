@@ -1019,17 +1019,14 @@ public void modificaPaziente() {
         }
     }
 
-<<<<<<< HEAD
+
     public Report getReportCorrente() {
         return reportCorrente;
     }
 
     public void creaReport(String tipo) {
         switch (tipo) {
-=======
-    private void creaReport(String tipologia) {
-        switch (tipologia) {
->>>>>>> 277cb068dd8ea06584fccb57eea03a370f00e3aa
+
             case "mensile":
                 ReportMensileFactory factoryMensile = new ReportMensileFactory();
                 ReportMensile reportMensile = factoryMensile.createReport(this.prenotazioni);
