@@ -46,8 +46,17 @@ public class Medlab extends Observable{
     }
 
 
+
     public void setReportCorrente(Report reportCorrente) {
         this.reportCorrente = reportCorrente;
+    }
+
+    public void setSedeCorrente(Sede sedeCorrente) {
+        this.sedeCorrente = sedeCorrente;
+    }
+
+    public Sede getSedeCorrente() {
+        return sedeCorrente;
     }
 
     public void setPersonaleLaboratorioCorrente(PersonaleLaboratorio personaleLaboratorioCorrente) {
@@ -193,10 +202,12 @@ public class Medlab extends Observable{
     }
 
 
-    public void nuovoPaziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso,boolean malatoCronico ) {
-        Paziente paziente = new Paziente( nome, cognome, dataNascita, cf, sesso,malatoCronico);
+    public void nuovoPaziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso, boolean malatoCronico) {
+        if (pazienti.containsKey(cf)) {
+            throw new IllegalArgumentException("Codice fiscale già registrato");
+        }
+        Paziente paziente = new Paziente(nome, cognome, dataNascita, cf, sesso, malatoCronico);
         this.pazienteCorrente = paziente;
-
     }
     public void confermaPaziente() {
         this.pazienti.put(this.pazienteCorrente.getCf(), this. pazienteCorrente);
@@ -424,18 +435,14 @@ public class Medlab extends Observable{
   }
 
     public void SelezionaEsame(Esame esameSelezionato) {
-        if (pazienteCorrente == null) {
-            System.out.println("Errore: Nessun paziente attualmente autenticato.");
-            return;
+        if (pazienteCorrente == null || esameSelezionato.isPrenotato()) {
+            throw new IllegalStateException("Errore: Nessun paziente attualmente autenticato o l'esame è gia prenotato.");
         }
         if (!EsameDisponibile(esameSelezionato.getCodice())) {
-            System.out.println("Errore: Questo esame è già stato prenotato.");
-            return;
+            throw new IllegalStateException("Errore: Questo esame è già stato prenotato.");
         }
-        this.prenotazioneCorrente = new Prenotazione(esameSelezionato,pazienteCorrente);
-
+        this.prenotazioneCorrente = new Prenotazione(esameSelezionato, pazienteCorrente);
     }
-
 
     public void ConfermaEsame() {
         if (this.prenotazioneCorrente == null) {
@@ -1012,7 +1019,11 @@ public void modificaPaziente() {
         }
     }
 
-    private void creaReport(String tipo) {
+    public Report getReportCorrente() {
+        return reportCorrente;
+    }
+
+    public void creaReport(String tipo) {
         switch (tipo) {
             case "mensile":
                 ReportMensileFactory factoryMensile = new ReportMensileFactory();

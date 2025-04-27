@@ -22,7 +22,9 @@ public class Recensione {
         this.letta= false;
     }
 
-    // Getters
+    public Sede getSede() {
+        return sede;
+    }
 
     public Paziente getPaziente() { return paziente; }
     public LocalDate getData() { return data; }
