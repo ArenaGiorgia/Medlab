@@ -18,7 +18,7 @@ public class Medlab extends Observable{
     private PersonaleLaboratorio personaleLaboratorioCorrente;
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioni;
-    private Map<String, PersonaleLaboratorio> personaliLaboratori;
+    private Map<String, PersonaleLaboratorio> personaleLaboratori;
     private Recensione recensioneCorrente;
     private Report reportCorrente;
 
@@ -31,7 +31,7 @@ public class Medlab extends Observable{
         this.sedeCorrente = null;
         this.sedi = new ArrayList<>();
         this.personaleLaboratorioCorrente = null;
-        this.personaliLaboratori = new HashMap<String, PersonaleLaboratorio>();
+        this.personaleLaboratori = new HashMap<String, PersonaleLaboratorio>();
         this.reportCorrente=null;
         addObserver(this.amministratore);
         caricamentoDati();
@@ -61,8 +61,8 @@ public class Medlab extends Observable{
         this.prenotazioni = prenotazioni;
     }
 
-    public void setPersonaliLaboratori(Map<String, PersonaleLaboratorio> personaliLaboratori) {
-        this.personaliLaboratori = personaliLaboratori;
+    public void setPersonaleLaboratori(Map<String, PersonaleLaboratorio> personaleLaboratori) {
+        this.personaleLaboratori = personaleLaboratori;
     }
     public void setPazienti(Map<String, Paziente> pazienti) {
         this.pazienti = pazienti;
@@ -84,8 +84,8 @@ public class Medlab extends Observable{
         return pazienteCorrente;
     }
 
-    public Map<String, PersonaleLaboratorio> getPersonaliLaboratori() {
-        return personaliLaboratori;
+    public Map<String, PersonaleLaboratorio> getPersonaleLaboratori() {
+        return personaleLaboratori;
     }
 
     public Map<String, Paziente> getPazienti() {
@@ -137,7 +137,7 @@ public class Medlab extends Observable{
 
             if (cf.isEmpty()) {
                 System.out.println("Errore: Il codice fiscale non può essere vuoto!");
-            } else if (pazienti.containsKey(cf) || personaliLaboratori.containsKey(cf)
+            } else if (pazienti.containsKey(cf) || personaleLaboratori.containsKey(cf)
                     || amministratore.getCodiceFiscale().equals(cf)) {
                 System.out.println("Errore: Esiste già una persona con questo codice fiscale!");
             } else {
@@ -371,11 +371,11 @@ public class Medlab extends Observable{
             return;
         }
 
-        //iterazione 2 applicazione pattern decorator quindi in seleziona ESame sarà modificato da ora in poi il flusso
-        Esame esameDecorato = new EsameControlloFestivi(esameSelezionato,pazienteCorrente);
+        //applicazione pattern decorator 
+        EsameControlloFestivi esameDecorato = new EsameControlloFestivi(esameSelezionato,pazienteCorrente);
 //modifica del flussso del SelezionaEsame perche passa da questa classe
-        if (!((EsameControlloFestivi) esameDecorato).prenotabile()) {
-            DayOfWeek giorno = esameSelezionato.getData().getDayOfWeek();
+        if (!esameDecorato.prenotabile()) {
+            DayOfWeek giorno = esameDecorato.getData().getDayOfWeek();
 
             if (giorno == DayOfWeek.SATURDAY || giorno == DayOfWeek.SUNDAY) {
                 System.out.println("Errore: L'esame è prenotabile solo da pazienti cronici perché cade di " + giorno + ".");
@@ -490,7 +490,7 @@ public class Medlab extends Observable{
             this.pazienteCorrente = this.pazienti.get(codice);
             return "paziente";
         } else if (verificaPersonaleLaboratorio(codice, password)) {
-        this.personaleLaboratorioCorrente=this.personaliLaboratori.get(codice);
+        this.personaleLaboratorioCorrente=this.personaleLaboratori.get(codice);
             return "personale";
         } else {
             return "credenziali errate";
@@ -507,7 +507,7 @@ public class Medlab extends Observable{
     }
 
     public boolean verificaPersonaleLaboratorio(String codice, String password) {
-            PersonaleLaboratorio personaleLaboratorio = this.personaliLaboratori.get(codice);
+            PersonaleLaboratorio personaleLaboratorio = this.personaleLaboratori.get(codice);
         return personaleLaboratorio != null && personaleLaboratorio.verificaPassword(password);
     }
 
@@ -527,9 +527,9 @@ public class Medlab extends Observable{
         PersonaleLaboratorio personaleLaboratorio1 = new PersonaleLaboratorio("b","Alessio","Tornabene",sede1);
         PersonaleLaboratorio personaleLaboratorio2 = new PersonaleLaboratorio("ARNAGG00R14D362F","Giorgia","Arena",sede2);
         PersonaleLaboratorio personaleLaboratorio3 = new PersonaleLaboratorio("MSMCI99DSDV563G","Maria","Musumeci",sede3);
-        this.personaliLaboratori.put(personaleLaboratorio1.getCf(),personaleLaboratorio1);
-        this.personaliLaboratori.put(personaleLaboratorio2.getCf(),personaleLaboratorio2);
-        this.personaliLaboratori.put(personaleLaboratorio3.getCf(),personaleLaboratorio3);
+        this.personaleLaboratori.put(personaleLaboratorio1.getCf(),personaleLaboratorio1);
+        this.personaleLaboratori.put(personaleLaboratorio2.getCf(),personaleLaboratorio2);
+        this.personaleLaboratori.put(personaleLaboratorio3.getCf(),personaleLaboratorio3);
         this.sedi.add(sede1);
         this.sedi.add(sede2);
         this.sedi.add(sede3);
@@ -910,7 +910,7 @@ public void modificaPaziente() {
 
             if (cf.isEmpty()) {
                 System.out.println("Errore: Il codice fiscale non può essere vuoto!");
-            } else if (pazienti.containsKey(cf) || personaliLaboratori.containsKey(cf)
+            } else if (pazienti.containsKey(cf) || personaleLaboratori.containsKey(cf)
                     || amministratore.getCodiceFiscale().equals(cf)) {
                 System.out.println("Errore: Esiste già una persona con questo codice fiscale!");
             } else {
@@ -937,7 +937,7 @@ public void modificaPaziente() {
         System.out.println("Sedi disponibili:");
         for (Sede sede : sedi) {
             boolean occupata = false;
-            for (PersonaleLaboratorio p : personaliLaboratori.values()) {
+            for (PersonaleLaboratorio p : personaleLaboratori.values()) {
                 if (p.getSede().equals(sede)) {
                     occupata = true;
                     break;
@@ -960,7 +960,7 @@ public void modificaPaziente() {
     public Sede selezionaSedePersonaleLab(Integer codSede) {
         for (Sede sede : this.sedi) {
             if (sede.getCodice().equals(codSede)) {
-                for (PersonaleLaboratorio personale : personaliLaboratori.values()) {
+                for (PersonaleLaboratorio personale : personaleLaboratori.values()) {
                     if (personale.getSede().equals(sede)) {
                         return null;
                     }
@@ -978,7 +978,7 @@ public void modificaPaziente() {
 
     public void confermaPersonaleLab()
     {
-        this.personaliLaboratori.put(this.personaleLaboratorioCorrente.getCf(), this.personaleLaboratorioCorrente);
+        this.personaleLaboratori.put(this.personaleLaboratorioCorrente.getCf(), this.personaleLaboratorioCorrente);
         this.personaleLaboratorioCorrente = null;
     }
 
@@ -989,14 +989,14 @@ public void modificaPaziente() {
             return;
         }
 
-        String tipoReport = InserisciTipoReport(); //flusso 1
+        String tipologia = InserisciTipoReport(); //flusso 1
 
-        if (tipoReport == null) {
+        if (tipologia == null) {
             System.out.println("Tipo di report non valido.");
             return;
         }
 
-        creaReport(tipoReport); //flusso 2
+        creaReport(tipologia); //flusso 2
         visualizzaReport(); //flusso 3
     }
 
@@ -1012,8 +1012,8 @@ public void modificaPaziente() {
         }
     }
 
-    private void creaReport(String tipo) {
-        switch (tipo) {
+    private void creaReport(String tipologia) {
+        switch (tipologia) {
             case "mensile":
                 ReportMensileFactory factoryMensile = new ReportMensileFactory();
                 ReportMensile reportMensile = factoryMensile.createReport(this.prenotazioni);
@@ -1061,7 +1061,7 @@ public void modificaPaziente() {
                 ", personaleLaboratorioCorrente=" + personaleLaboratorioCorrente +
                 ", sedi=" + sedi +
                 ", prenotazioni=" + prenotazioni +
-                ", personaliLaboratori=" + personaliLaboratori +
+                ", personaliLaboratori=" + personaleLaboratori +
                 ", recensioneCorrente=" + recensioneCorrente +
                 ", reportCorrente=" + reportCorrente +
                 '}';

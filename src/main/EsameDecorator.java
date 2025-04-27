@@ -58,9 +58,3 @@ public abstract class EsameDecorator extends Esame {
         return esame.toString();
     }
 }
-
-//mantiene il comportamento originale di esame , ma da esso posso poi aggiungere tutte le mie "decorazioni"
-/*UC3 e UC10 dove possiamo andare a fare le prenotazioni possiamo dire che abbiamo voluto aggiungere delle funzionalita
-al nostro progetto, dove stavolta è stata anche aggiunta una funzione per non mettere giorni festivi e feriali e
-riservarli solo ai pazienti che sono malati cronici.
- */

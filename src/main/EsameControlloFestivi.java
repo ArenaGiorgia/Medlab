@@ -9,9 +9,9 @@ import java.util.Set;
 
 public class  EsameControlloFestivi extends EsameDecorator {
 
-    protected Paziente paziente;
-    protected Set<DayOfWeek> weekend;
-    protected Set<MonthDay> festiviNazionali;
+    private Paziente paziente;
+    private Set<DayOfWeek> weekend;
+    private Set<MonthDay> festiviNazionali;
 
     public EsameControlloFestivi(Esame esame, Paziente paziente) {
         super(esame);

@@ -21,7 +21,7 @@ public class MedlabTest {
         medlab.setPazienti(new HashMap<>());
         medlab.setSedi(new ArrayList<>());
         medlab.setPrenotazioni(new HashMap<>());
-        medlab.setPersonaliLaboratori(new HashMap<>());
+        medlab.setPersonaleLaboratori(new HashMap<>());
     }
 
     @Test
