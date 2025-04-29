@@ -26,6 +26,14 @@ public class Recensione {
         return sede;
     }
 
+    public int getValutazione() {
+        return valutazione;
+    }
+
+    public String getCommento() {
+        return commento;
+    }
+
     public Paziente getPaziente() { return paziente; }
     public LocalDate getData() { return data; }
 

@@ -60,8 +60,11 @@ class SedeTest {
 
         assertAll(
                 () -> assertEquals(sizePrima + 1, sizeDopo, "Dovrebbe esserci un esame in più"),
-             // () -> assertTrue(sede.getEsami().containsValue(new Esame(LocalDate.now().plusDays(1),LocalTime.of(19, 0),"Esame Oncologico")),
-               //         "L'esame aggiunto non è presente nella mappa"),
+                ()-> assertTrue(sede.getEsami().values().stream().anyMatch(e ->
+                        e.getData().equals(LocalDate.now().plusDays(1)) &&
+                                e.getOrario().equals(LocalTime.of(19, 0)) &&
+                                e.getNome().equals("Esame Oncologico")
+                ), "L'esame aggiunto non è presente nella mappa"),
                 () -> assertEquals("Esame Oncologico", sede.getEsami().values().stream()
                         .filter(e -> e.getData().equals(LocalDate.now().plusDays(1)) && e.getOrario().equals(LocalTime.of(19, 0)))
                         .findFirst().get().getNome(), "Il nome dell'esame non corrisponde")
@@ -88,15 +91,6 @@ class SedeTest {
                 "L'orario non dovrebbe essere disponibile per sovrapposizione");
     }
 
-  /*  @Test
-    @DisplayName("Test isOrarioDisponibile - orario limite (90 minuti prima)")
-    void testIsOrarioDisponibile_OrarioLimite() {
-        LocalDate data = LocalDate.now();
-        LocalTime orario = LocalTime.of(10, 31); // 1 minuto dopo la fine dell'intervallo di esame2 (10:30)
-
-        assertTrue(sede.isOrarioDisponibile(data, orario),
-                "L'orario dovrebbe essere disponibile essendo fuori dall'intervallo di 90 minuti");
-    }*/
 
 
 }

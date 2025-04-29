@@ -55,6 +55,10 @@ Amministratore implements Observer {
 
 
     }
+
+    public List<Recensione> getRecensioniNonLette() {
+        return recensioniNonLette;
+    }
 }
 
 

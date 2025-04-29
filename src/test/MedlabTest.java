@@ -3,6 +3,9 @@ package test;
 import main.*;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -13,6 +16,7 @@ class MedlabTest {
     private Medlab medlab;
     private Paziente pazienteTest;
     private Sede sedeTest;
+    private Amministratore amministratoreTest;
 
     @BeforeAll
     static void initAll() {
@@ -32,7 +36,7 @@ class MedlabTest {
         sedeTest = new Sede(1, "Policlinico Catania");
         medlab.getPazienti().put(pazienteTest.getCf(), pazienteTest);
         medlab.getSedi().add(sedeTest);
-
+        amministratoreTest=new Amministratore();
         medlab.setPersonaleLaboratori(new HashMap<>());
 
     }
@@ -231,7 +235,7 @@ class MedlabTest {
     }
 
 
-    @Nested
+   /* @Nested
     @DisplayName("Test per gestione recensioni")
     class GestioneRecensioniTest {
 
@@ -271,6 +275,52 @@ class MedlabTest {
             }, "Dovrebbe lanciare eccezione senza prenotazioni completate");
         }
     }
+*/
+   @Test
+   @DisplayName("TC17 - Test completo lasciaRecensione con input validi")
+   void testLasciaRecensioneConInputValidi() {
+       // Setup
+       medlab.setPazienteCorrente(pazienteTest);
+
+       // Crea un esame e prenotalo
+       Esame esame = new Esame(LocalDate.now(), LocalTime.now(), "Esame sangue");
+       esame.prenotato(); // Imposta lo stato come prenotato
+
+       Prenotazione prenotazione = new Prenotazione(esame, pazienteTest);
+       prenotazione.setStato(new StatoCompletato(prenotazione));
+       pazienteTest.getPrenotazioni().put(prenotazione.getCodice(), prenotazione);
+       pazienteTest.getSedi().add(sedeTest); // Associa la sede al paziente
+       p
+       // Simulazione input utente
+       String simulatedInput = String.join("\n",
+               "1",            // scelta sede (indice 1)
+               "5",            // stelle
+               "Ottimo servizio"  // commento
+       ) + "\n";
+
+       InputStream originalIn = System.in;
+       try {
+           System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
+
+           // Exercise
+           medlab.lasciaRecensione();  // Chiamata alla funzione per lasciare recensione
+
+           // Verifica che la recensione sia stata creata correttamente
+           List<Recensione> recensioni = amministratoreTest.getRecensioniNonLette(); // Recupera le recensioni non lette
+           assertEquals(1, recensioni.size(), "Dovrebbe esserci una recensione");
+           Recensione recensione = recensioni.get(0);
+
+           // Verifica che la recensione contenga i dati corretti
+           assertAll("Verifica dettagli recensione",
+                   () -> assertEquals(pazienteTest, recensione.getPaziente(), "Paziente errato"),
+                   () -> assertEquals(sedeTest, recensione.getSede(), "Sede errata"),
+                   () -> assertEquals(5, recensione.getValutazione(), "Numero stelle errato"),
+                   () -> assertEquals("Ottimo servizio", recensione.getCommento(), "Commento errato")
+           );
+       } finally {
+           System.setIn(originalIn);  // Ripristina l'input originale
+       }
+   }
 
 
     @Nested

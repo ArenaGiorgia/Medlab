@@ -85,7 +85,7 @@ class PersonaleLaboratorioTest {
     }
 
     @Test
-    @DisplayName("Test visualizza lista esami prenotati senza esami")
+    @DisplayName("Test visualizza lista esami prenotati senza esami") // QUANDO NON CI SONO DEGLI ESAMI IN ATTESA DI REFERTO
     void testVisualizzaListaEsamiPrenotatiSenzaEsami() {
         // Rimuovo la prenotazione di test
         paziente.getPrenotazioniPaziente().clear();
@@ -142,7 +142,7 @@ class PersonaleLaboratorioTest {
     @Test
     @DisplayName("Test seleziona paziente inesistente")
     void testSelezionaPazienteInesistente() {
-        Paziente result = personale.selezionaPazienteProxy("CF_INESISTENTE");
+        Paziente result = personale.selezionaPazienteProxy("CF5437");
         assertNull(result);
     }
 
@@ -162,7 +162,7 @@ class PersonaleLaboratorioTest {
     }
 
     @Test
-    @DisplayName("Test con ByteArrayInputStream completo")
+    @DisplayName("Test Aggiorna Referto") //aggiorna la descrizione di un referto
     void testAggiornaRefertoComplete() {
         // 1. Configurazione iniziale
         prenotazione.setStato(new StatoCompletato(prenotazione));
@@ -199,7 +199,7 @@ class PersonaleLaboratorioTest {
     }
 
     @Test
-    @DisplayName("Test inserisci referto con input simulato")
+    @DisplayName("Test inserisci referto ") //Aggiorna referto funzione principale che comprende le singole funzioni inserisci conferma ecc...
     void testInserisciRefertoConInputSimulato() {
         // Prepara referto corrente
         Referto referto = new Referto("REF1", LocalDate.now());
