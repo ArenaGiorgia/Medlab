@@ -1,10 +1,7 @@
 package test;
 
-import javafx.beans.value.ObservableBooleanValue;
 import main.*;
 import org.junit.jupiter.api.*;
-
-import static javafx.beans.binding.Bindings.when;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
@@ -165,52 +162,41 @@ class PersonaleLaboratorioTest {
     }
 
     @Test
-    @DisplayName("Test completo aggiornaReferto - Flusso principale")
-    void testAggiornaReferto() {
+    @DisplayName("Test con ByteArrayInputStream completo")
+    void testAggiornaRefertoComplete() {
         // 1. Configurazione iniziale
         prenotazione.setStato(new StatoCompletato(prenotazione));
         Referto referto = new Referto("REF1", LocalDate.now());
         prenotazione.setReferto(referto);
 
-        // 2. Simula l'input utente completo:
-        //    - CF paziente
-        //    - Codice prenotazione
-        //    - Descrizione referto
-        String inputSimulato = String.join("\n",
-                paziente.getCf(),         // CF paziente (flusso 2)
-                prenotazione.getCodice(), // Codice prenotazione (flusso 4)
-                "Risultato negativo"   // Descrizione referto (flusso inserisciReferto)
-                // Conferma (flusso confermaReferto)
-        );
+        // 2. Prepara TUTTI gli input necessari
+        String allInputs = String.join("\n",
+                paziente.getCf(),         // CF paziente
+                prenotazione.getCodice(), // Codice prenotazione
+                "Risultato negativo", // Descrizione referto
+                "" // Conferma finale
+        ) + "\n";  // Aggiungi un'ultima newline
+        System.out.println("Test Input: " + allInputs);
+        // 3. Salva il System.in originale
+        InputStream originalIn = System.in;
 
-        InputStream inputStream = new ByteArrayInputStream(inputSimulato.getBytes());
-        System.setIn(inputStream);
-
-        // 3. Esecuzione
         try {
-            personale.aggiornaReferto(); // Chiama il metodo che sta leggendo l'input
-        } catch (Exception e) {
-            e.printStackTrace(); // Aggiungi la gestione delle eccezioni per capire meglio l'errore
-            fail("Test failed due to unexpected exception");
+            // 4. Imposta il nuovo input stream
+            System.setIn(new ByteArrayInputStream(allInputs.getBytes()));
+
+            // 5. Esegui il test
+            personale.aggiornaReferto();
+
+            // 6. Verifiche
+          assertEquals("Risultato negativo", referto.getRisultato());
+          assertSame(referto, prenotazione.getReferto());
+           assertTrue(paziente.getRefertiCorrenti().containsValue(referto));
+            assertNull(personale.getRefertoCorrente());
+        } finally {
+            // 7. Ripristina System.in
+            System.setIn(originalIn);
         }
-
-        // 4. Verifiche
-        // 4.1 Verifica che il referto sia stato aggiornato
-        assertEquals("Risultato negativo", referto.getRisultato());
-
-        // 4.2 Verifica che sia stato associato alla prenotazione
-        assertSame(referto, prenotazione.getReferto());
-
-        // 4.3 Verifica che sia nel paziente
-        assertTrue(paziente.getRefertiCorrenti().containsValue(referto));
-
-        // 4.4 Verifica che il referto corrente sia stato resettato
-        assertNull(personale.getRefertoCorrente());
-
-        // 5. Pulizia
-        System.setIn(System.in); // Ripristina il flusso di input originale
     }
-
 
     @Test
     @DisplayName("Test inserisci referto con input simulato")
@@ -219,18 +205,29 @@ class PersonaleLaboratorioTest {
         Referto referto = new Referto("REF1", LocalDate.now());
         personale.setRefertoCorrente(referto);
 
-        // Simula input utente
-        String inputSimulato = "Risultato dell'esame negativo\n";
-        InputStream inputStream = new ByteArrayInputStream(inputSimulato.getBytes());
-        System.setIn(inputStream);
+        // Salva l'input originale
+        InputStream inputOriginale = System.in;
 
-        // Esegui
-        personale.inserisciReferto();
+        try {
+            // Simula input utente
+            String inputSimulato = "Risultato dell'esame negativo\n";
+            InputStream inputStream = new ByteArrayInputStream(inputSimulato.getBytes());
+            System.setIn(inputStream);
+            Scanner scanner = new Scanner(System.in); // Scanner su input simulato
 
-        // Verifica
-        assertEquals("Risultato dell'esame negativo", referto.getRisultato());
-        System.setIn(System.in);
+            // Esegui
+            personale.inserisciReferto(scanner);
+
+            // Verifica
+            assertEquals("Risultato dell'esame negativo", referto.getRisultato());
+
+            scanner.close();
+        } finally {
+            // Ripristina l'input originale
+            System.setIn(inputOriginale);
+        }
     }
+
 
 
 }

@@ -200,7 +200,7 @@ public void aggiornaReferto() {
 
     this.refertoCorrente = prenotazioneSelezionata.getReferto();
 
-    inserisciReferto();
+    inserisciReferto(scanner);
     confermaReferto(pazienteSelezionato);
 }
 
@@ -255,13 +255,13 @@ public void aggiornaReferto() {
     }
 
 
-    public void inserisciReferto() {
+    public void inserisciReferto(Scanner scanner) {
         if (refertoCorrente == null) {
             System.out.println("Errore: nessun referto selezionato.");
             return;
         }
 
-        Scanner scanner = new Scanner(System.in);
+        //Scanner scanner = new Scanner(System.in);
         System.out.print("Inserisci la descrizione del referto: ");
         String descrizione = scanner.nextLine().trim();
 
