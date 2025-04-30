@@ -371,11 +371,11 @@ public class Medlab extends Observable{
             return;
         }
 
-        //applicazione pattern decorator 
+        //iterazione 2 applicazione pattern decorator quindi in seleziona ESame sarà modificato da ora in poi il flusso
         EsameControlloFestivi esameDecorato = new EsameControlloFestivi(esameSelezionato,pazienteCorrente);
 //modifica del flussso del SelezionaEsame perche passa da questa classe
         if (!esameDecorato.prenotabile()) {
-            DayOfWeek giorno = esameDecorato.getData().getDayOfWeek();
+            DayOfWeek giorno = esameSelezionato.getData().getDayOfWeek();
 
             if (giorno == DayOfWeek.SATURDAY || giorno == DayOfWeek.SUNDAY) {
                 System.out.println("Errore: L'esame è prenotabile solo da pazienti cronici perché cade di " + giorno + ".");
@@ -1012,7 +1012,7 @@ public void modificaPaziente() {
         }
     }
 
-    private void creaReport(String tipologia) {
+    public void creaReport(String tipologia) {
         switch (tipologia) {
             case "mensile":
                 ReportMensileFactory factoryMensile = new ReportMensileFactory();

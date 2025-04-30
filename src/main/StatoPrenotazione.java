@@ -1,7 +1,7 @@
 package main;
 
 public abstract class StatoPrenotazione {
-private   Prenotazione prenotazione ;
+private  Prenotazione prenotazione ;
 
     public StatoPrenotazione(Prenotazione prenotazione) {
 

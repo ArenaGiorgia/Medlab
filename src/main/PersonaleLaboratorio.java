@@ -141,7 +141,7 @@ private Referto refertoCorrente;
         return esameTrovato;
     }
 
-    private Prenotazione selezionaPrenotazione(String codice) {
+    public Prenotazione selezionaPrenotazione(String codice) {
         List<Paziente> pazientiSede = pazienteProvider.getAllPazienti();
 
         for (Paziente paziente : pazientiSede) {
@@ -154,7 +154,7 @@ private Referto refertoCorrente;
         return null;
     }
 
-    private void inserisciStato(Prenotazione prenotazione) {
+    public void inserisciStato(Prenotazione prenotazione) {
         StatoPrenotazione statoCorrente = prenotazione.getStato();
 
         if (statoCorrente instanceof StatoInAttesa) {
@@ -200,7 +200,7 @@ public void aggiornaReferto() {
     confermaReferto(pazienteSelezionato);
 }
 
-    private boolean visualizzaPazientiAssociatiAllaSede() {
+    public boolean visualizzaPazientiAssociatiAllaSede() {
         List<Paziente> pazientiSede = pazienteProvider.getAllPazienti();
 
         if (pazientiSede.isEmpty()) {
@@ -218,7 +218,7 @@ public void aggiornaReferto() {
         return true;
     }
 
-    private Paziente selezionaPazienteProxy(String cf) {
+    public Paziente selezionaPazienteProxy(String cf) {
         Paziente pazienteSelezionato = pazienteProvider.getPazienteByCF(cf);
         if (pazienteSelezionato == null) {
             System.out.println("Errore: Paziente non trovato con il codice fiscale " + cf);
@@ -226,7 +226,7 @@ public void aggiornaReferto() {
         return pazienteSelezionato;
     }
 
-    private boolean visualizzaPrenotazioniConfermate(Paziente paziente) {
+    public boolean visualizzaPrenotazioniConfermate(Paziente paziente) {
         boolean trovato = false;
         Map<String, Prenotazione> prenotazioni = paziente.getPrenotazioniPaziente();
 
@@ -251,7 +251,7 @@ public void aggiornaReferto() {
     }
 
 
-    private void inserisciReferto() {
+    public void inserisciReferto() {
         if (refertoCorrente == null) {
             System.out.println("Errore: nessun referto selezionato.");
             return;
@@ -264,7 +264,7 @@ public void aggiornaReferto() {
         refertoCorrente.setReferto(descrizione);
     }
 
-    private void confermaReferto(Paziente paziente) {
+    public void confermaReferto(Paziente paziente) {
         if (refertoCorrente == null) {
             System.out.println("Errore: referto non impostato.");
             return;

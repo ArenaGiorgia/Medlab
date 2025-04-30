@@ -117,7 +117,7 @@ public class App {
                         System.out.println("\n===== MENU PAZIENTE =====");
                         System.out.println("1. Registrazione nuova sede");
                         System.out.println("2. Prenotazione esame");
-                        System.out.println("3. Visualizza referto");
+                        System.out.println("3. Visualizza referti");
                         System.out.println("4. Modifica dati personali");
                         System.out.println("5. Inserisci recensione");
                         System.out.println("6. Visualizza prenotazioni");
@@ -170,8 +170,8 @@ public class App {
 
                     while (true) {
                         System.out.println("\n===== MENU PERSONALE LABORATORIO =====");
-                        System.out.println("1. Aggiungi nuovo referto");
-                        System.out.println("2. Modifica referto");
+                        System.out.println("1. Aggiungi stato prenotazione");
+                        System.out.println("2. Gestione referti");
                         System.out.println("3. Elimina referto");
                         System.out.println("4. Logout");
                         System.out.print("Scegli un'opzione: ");
