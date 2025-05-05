@@ -726,7 +726,7 @@ public void modificaPaziente() {
         return sediRecensibili;
     }
 
-    public Sede selezionaSedeRecensibile(Paziente paziente) {
+    public Sede selezionaSedeRecensibile(Paziente paziente,Scanner scanner) {
         if (paziente == null) {
             System.out.println("Paziente non valido!");
             return null;
@@ -742,7 +742,7 @@ public void modificaPaziente() {
         IntStream.range(0, sediRecensibili.size())
                 .forEach(i -> System.out.printf("%d. %s\n", i + 1, sediRecensibili.get(i).getNome()));
 
-        Scanner scanner = new Scanner(System.in);
+       // Scanner scanner = new Scanner(System.in);
         try {
             int scelta = scanner.nextInt() - 1;
             scanner.nextLine(); // Consuma il newline
@@ -758,12 +758,12 @@ public void modificaPaziente() {
         return null;
     }
 
-    public Recensione creaRecensione(Paziente paziente, Sede sede) {
+    public Recensione creaRecensione(Paziente paziente, Sede sede,Scanner scanner) {
         if (paziente == null || sede == null) {
             System.out.println("Dati insufficienti per creare la recensione");
             return null;
         }
-        Scanner scanner = new Scanner(System.in);
+       // Scanner scanner = new Scanner(System.in);
         // Validazione valutazione
         int stelle = 0;
         while (stelle < 1 || stelle > 5) {
@@ -783,18 +783,18 @@ public void modificaPaziente() {
         return new Recensione(paziente, sede, stelle, commento);
     }
 
-    public void lasciaRecensione() {
+    public void lasciaRecensione(Scanner scanner) {
         if (pazienteCorrente == null) {
             System.out.println("Devi essere loggato come paziente!");
             return;
         }
 
-        Sede sedeScelta = selezionaSedeRecensibile(pazienteCorrente);
+        Sede sedeScelta = selezionaSedeRecensibile(pazienteCorrente,scanner);
         if (sedeScelta == null) {
             return;
         }
 
-        Recensione recensioneCorrente = creaRecensione(pazienteCorrente, sedeScelta);
+        Recensione recensioneCorrente = creaRecensione(pazienteCorrente, sedeScelta,scanner);
        confermaRecensione(recensioneCorrente);
     }
     public void confermaRecensione(Recensione recensione) {
