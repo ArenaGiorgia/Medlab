@@ -43,9 +43,6 @@ private Referto refertoCorrente;
         return referti;
     }
 
-    public void setReferti(Map<String, Referto> referti) {
-        this.referti = referti;
-    }
 
     //per il proxy
     public void setPazienteProvider(PazienteProvider provider) {
@@ -340,19 +337,6 @@ public void aggiornaReferto() {
 
     public String getCf() {
         return cf;
-    }
-
-
-    public void setCf(String cf) {
-        this.cf = cf;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
     }
 
 

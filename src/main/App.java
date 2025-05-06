@@ -157,7 +157,7 @@ public class App {
                                 break;
                             case 5:
                                 System.out.println("Inserisci recensione:");
-                                sistema.lasciaRecensione();
+                                sistema.lasciaRecensione(scanner);
                                 break;
                             case 6:
                                 sistema.visualizzaPrenotazioniAttive();

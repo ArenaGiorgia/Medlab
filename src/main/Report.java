@@ -20,17 +20,17 @@ public abstract class Report {
     }
 
 
-    protected abstract boolean filtroData(Prenotazione p);
+    public abstract boolean filtroData(Prenotazione p);
 
 
-    private Map<String, Prenotazione> filtraPrenotazioni(Map<String, Prenotazione> tutte) {
+    public Map<String, Prenotazione> filtraPrenotazioni(Map<String, Prenotazione> tutte) {
         return tutte.entrySet().stream()
                 .filter(e -> filtroData(e.getValue()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 
-    private double calcolaPercentuale(int parte, int totale) {
+    public double calcolaPercentuale(int parte, int totale) {
         return (totale == 0) ? 0.0 : (parte * 100.0 / totale);
     }
 

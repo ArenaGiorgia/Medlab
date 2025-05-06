@@ -15,8 +15,5 @@ public class StatoCompletato extends StatoPrenotazione {
     public void annulla(Prenotazione prenotazione) {
         System.out.println("Impossibile annullare: la prenotazione è già completata.");
     }
-    @Override
-    public String getNomeStato() {
-        return "Completato";
-    }
+
 }

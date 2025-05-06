@@ -127,10 +127,13 @@ class MedlabTest {
         // Creiamo 2 prenotazioni per lo stesso giorno
         Esame esame1 = new Esame(dataTest, LocalTime.of(9, 0), "Emocromo");
         Esame esame2 = new Esame(dataTest, LocalTime.of(11, 0), "Glicemia");
+        Esame esame3 = new Esame(dataTest, LocalTime.of(12, 0), "Urine");
         Prenotazione p1 = new Prenotazione(esame1, pazienteTest);
         Prenotazione p2 = new Prenotazione(esame2, pazienteTest);
+        Prenotazione p3 = new Prenotazione(esame3, pazienteTest);
         pazienteTest.getPrenotazioni().put(p1.getCodice(), p1);
         pazienteTest.getPrenotazioni().put(p2.getCodice(), p2);
+        pazienteTest.getPrenotazioni().put(p3.getCodice(), p3);
 
         assertTrue(medlab.PrenotazioniMaxPerGiorno(pazienteTest, dataTest),
                 "Dovrebbe permettere terza prenotazione");
@@ -235,53 +238,12 @@ class MedlabTest {
     }
 
 
-   /* @Nested
-    @DisplayName("Test per gestione recensioni")
-    class GestioneRecensioniTest {
-
-        @Test
-        @DisplayName("TC15 - Creazione recensione valida")
-        void testCreaRecensioneValida() {
-            // Setup
-            medlab.setPazienteCorrente(pazienteTest);
-            Prenotazione prenotazione = new Prenotazione(
-                    new Esame(LocalDate.now(), LocalTime.now(), "Esame"),
-                    pazienteTest
-            );
-            prenotazione.setStato(new StatoCompletato(prenotazione));
-            pazienteTest.getPrenotazioni().put(prenotazione.getCodice(), prenotazione);
-            pazienteTest.getSedi().add(sedeTest);
-
-            // Exercise
-            Recensione recensione = medlab.creaRecensione(pazienteTest, sedeTest);
-
-            // Verify
-            assertAll("Verifica recensione",
-                    () -> assertNotNull(recensione, "Recensione non creata"),
-                    () -> assertEquals(pazienteTest, recensione.getPaziente(), "Paziente non corrisponde"),
-                    () -> assertEquals(sedeTest, recensione.getSede(), "Sede non corrisponde")
-            );
-        }
-
-        @Test
-        @DisplayName("TC16 - Tentativo recensione senza prenotazioni completate")
-        void testCreaRecensioneSenzaPrenotazioni() {
-            // Setup
-            medlab.setPazienteCorrente(pazienteTest);
-
-            // Exercise & Verify
-            assertThrows(IllegalStateException.class, () -> {
-                medlab.creaRecensione(pazienteTest, sedeTest);
-            }, "Dovrebbe lanciare eccezione senza prenotazioni completate");
-        }
-    }
-*/
    @Test
-   @DisplayName("TC17 - Test completo lasciaRecensione con input validi")
-   void testLasciaRecensioneConInputValidi() {
+   @DisplayName("TC17 - Test completo lasciaRecensione ")
+   void testLasciaRecensione() {
        // Setup
        medlab.setPazienteCorrente(pazienteTest);
-
+       medlab.addObserver(amministratoreTest);
        // Crea un esame e prenotalo
        Esame esame = new Esame(LocalDate.now(), LocalTime.now(), "Esame sangue");
        esame.prenotato(); // Imposta lo stato come prenotato
@@ -290,7 +252,7 @@ class MedlabTest {
        prenotazione.setStato(new StatoCompletato(prenotazione));
        pazienteTest.getPrenotazioni().put(prenotazione.getCodice(), prenotazione);
        pazienteTest.getSedi().add(sedeTest); // Associa la sede al paziente
-       p
+
        // Simulazione input utente
        String simulatedInput = String.join("\n",
                "1",            // scelta sede (indice 1)
@@ -301,9 +263,9 @@ class MedlabTest {
        InputStream originalIn = System.in;
        try {
            System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
-
+           Scanner testScanner = new Scanner(System.in);
            // Exercise
-           medlab.lasciaRecensione();  // Chiamata alla funzione per lasciare recensione
+           medlab.lasciaRecensione(testScanner);  // Chiamata alla funzione per lasciare recensione
 
            // Verifica che la recensione sia stata creata correttamente
            List<Recensione> recensioni = amministratoreTest.getRecensioniNonLette(); // Recupera le recensioni non lette
@@ -318,7 +280,7 @@ class MedlabTest {
                    () -> assertEquals("Ottimo servizio", recensione.getCommento(), "Commento errato")
            );
        } finally {
-           System.setIn(originalIn);  // Ripristina l'input originale
+           System.setIn(originalIn);
        }
    }
 

@@ -20,9 +20,6 @@ public class StatoInAttesa extends StatoPrenotazione {
 
     }
 
-    @Override
-    public String getNomeStato() {
-        return "In Attesa";
-    }
+
 
 }

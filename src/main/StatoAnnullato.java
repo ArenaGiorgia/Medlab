@@ -16,9 +16,6 @@ public class StatoAnnullato extends StatoPrenotazione {
 
         System.out.println("La prenotazione è già annullata.");
     }
-    @Override
-    public String getNomeStato() {
-        return "Annullato";
-    }
+
 
 }

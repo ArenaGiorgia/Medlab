@@ -19,7 +19,6 @@ public class Medlab extends Observable{
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioni;
     private Map<String, PersonaleLaboratorio> personaleLaboratori;
-    private Recensione recensioneCorrente;
     private Report reportCorrente;
 
     private Medlab() {
@@ -46,12 +45,17 @@ public class Medlab extends Observable{
     }
 
 
+
     public void setReportCorrente(Report reportCorrente) {
         this.reportCorrente = reportCorrente;
     }
 
-    public void setPersonaleLaboratorioCorrente(PersonaleLaboratorio personaleLaboratorioCorrente) {
-        this.personaleLaboratorioCorrente = personaleLaboratorioCorrente;
+    public void setSedeCorrente(Sede sedeCorrente) {
+        this.sedeCorrente = sedeCorrente;
+    }
+
+    public Sede getSedeCorrente() {
+        return sedeCorrente;
     }
 
     public void setPazienteCorrente(Paziente pazienteCorrente) {
@@ -72,9 +76,6 @@ public class Medlab extends Observable{
         this.sedi = sedi;
     }
 
-    public void setPrenotazioneCorrente(Prenotazione prenotazioneCorrente) {
-        this.prenotazioneCorrente = prenotazioneCorrente;
-    }
 
     public PersonaleLaboratorio getPersonaleLaboratorioCorrente() {
         return personaleLaboratorioCorrente;
@@ -84,9 +85,6 @@ public class Medlab extends Observable{
         return pazienteCorrente;
     }
 
-    public Map<String, PersonaleLaboratorio> getPersonaleLaboratori() {
-        return personaleLaboratori;
-    }
 
     public Map<String, Paziente> getPazienti() {
         return pazienti;
@@ -100,9 +98,6 @@ public class Medlab extends Observable{
         return prenotazioni;
     }
 
-    public Prenotazione getPrenotazioneCorrente() {
-        return prenotazioneCorrente;
-    }
 
     public Amministratore getAmministratore() {
         return this.amministratore;
@@ -121,7 +116,7 @@ public class Medlab extends Observable{
             try {
                 System.out.print("Inserisci la data di nascita del paziente (yyyy-MM-dd): ");
                 String dataNascitaInput = scanner.nextLine();
-                dataNascita = LocalDate.parse(dataNascitaInput);
+               dataNascita = LocalDate.parse(dataNascitaInput);
                 break;
             } catch (DateTimeParseException e) {
                 System.out.println("Data non valida. Inserisci una data valida.");
@@ -193,10 +188,12 @@ public class Medlab extends Observable{
     }
 
 
-    public void nuovoPaziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso,boolean malatoCronico ) {
-        Paziente paziente = new Paziente( nome, cognome, dataNascita, cf, sesso,malatoCronico);
+    public void nuovoPaziente(String nome, String cognome, LocalDate dataNascita, String cf, String sesso, boolean malatoCronico) {
+        if (pazienti.containsKey(cf)) {
+            throw new IllegalArgumentException("Codice fiscale già registrato");
+        }
+        Paziente paziente = new Paziente(nome, cognome, dataNascita, cf, sesso, malatoCronico);
         this.pazienteCorrente = paziente;
-
     }
     public void confermaPaziente() {
         this.pazienti.put(this.pazienteCorrente.getCf(), this. pazienteCorrente);
@@ -371,11 +368,11 @@ public class Medlab extends Observable{
             return;
         }
 
-        //iterazione 2 applicazione pattern decorator quindi in seleziona ESame sarà modificato da ora in poi il flusso
+        //applicazione pattern decorator 
         EsameControlloFestivi esameDecorato = new EsameControlloFestivi(esameSelezionato,pazienteCorrente);
 //modifica del flussso del SelezionaEsame perche passa da questa classe
         if (!esameDecorato.prenotabile()) {
-            DayOfWeek giorno = esameSelezionato.getData().getDayOfWeek();
+            DayOfWeek giorno = esameDecorato.getData().getDayOfWeek();
 
             if (giorno == DayOfWeek.SATURDAY || giorno == DayOfWeek.SUNDAY) {
                 System.out.println("Errore: L'esame è prenotabile solo da pazienti cronici perché cade di " + giorno + ".");
@@ -424,18 +421,14 @@ public class Medlab extends Observable{
   }
 
     public void SelezionaEsame(Esame esameSelezionato) {
-        if (pazienteCorrente == null) {
-            System.out.println("Errore: Nessun paziente attualmente autenticato.");
-            return;
+        if (pazienteCorrente == null || esameSelezionato.isPrenotato()) {
+            throw new IllegalStateException("Errore: Nessun paziente attualmente autenticato o l'esame è gia prenotato.");
         }
         if (!EsameDisponibile(esameSelezionato.getCodice())) {
-            System.out.println("Errore: Questo esame è già stato prenotato.");
-            return;
+            throw new IllegalStateException("Errore: Questo esame è già stato prenotato.");
         }
-        this.prenotazioneCorrente = new Prenotazione(esameSelezionato,pazienteCorrente);
-
+        this.prenotazioneCorrente = new Prenotazione(esameSelezionato, pazienteCorrente);
     }
-
 
     public void ConfermaEsame() {
         if (this.prenotazioneCorrente == null) {
@@ -459,10 +452,10 @@ public class Medlab extends Observable{
         System.out.println("Prenotazioni trovate per " +paziente.getNome() +
                 " " +paziente.getCognome()+ " in data " +data+ ": " + prenotazioniGiornaliere);
 
-        return prenotazioniGiornaliere < 3;
+        return prenotazioniGiornaliere <= 3;
     }
 
-    private boolean EsameDisponibile(String codiceEsame) {
+    public boolean EsameDisponibile(String codiceEsame) {
         for (Map.Entry<String, Prenotazione> entry : prenotazioni.entrySet()) {
             if (entry.getValue().getEsame().getCodice().equals(codiceEsame)) {
                 return false;
@@ -719,7 +712,7 @@ public void modificaPaziente() {
         return sediRecensibili;
     }
 
-    public Sede selezionaSedeRecensibile(Paziente paziente) {
+    public Sede selezionaSedeRecensibile(Paziente paziente,Scanner scanner) {
         if (paziente == null) {
             System.out.println("Paziente non valido!");
             return null;
@@ -735,7 +728,7 @@ public void modificaPaziente() {
         IntStream.range(0, sediRecensibili.size())
                 .forEach(i -> System.out.printf("%d. %s\n", i + 1, sediRecensibili.get(i).getNome()));
 
-        Scanner scanner = new Scanner(System.in);
+       // Scanner scanner = new Scanner(System.in);
         try {
             int scelta = scanner.nextInt() - 1;
             scanner.nextLine(); // Consuma il newline
@@ -751,12 +744,12 @@ public void modificaPaziente() {
         return null;
     }
 
-    public Recensione creaRecensione(Paziente paziente, Sede sede) {
+    public Recensione creaRecensione(Paziente paziente, Sede sede,Scanner scanner) {
         if (paziente == null || sede == null) {
             System.out.println("Dati insufficienti per creare la recensione");
             return null;
         }
-        Scanner scanner = new Scanner(System.in);
+       // Scanner scanner = new Scanner(System.in);
         // Validazione valutazione
         int stelle = 0;
         while (stelle < 1 || stelle > 5) {
@@ -776,18 +769,18 @@ public void modificaPaziente() {
         return new Recensione(paziente, sede, stelle, commento);
     }
 
-    public void lasciaRecensione() {
+    public void lasciaRecensione(Scanner scanner) {
         if (pazienteCorrente == null) {
             System.out.println("Devi essere loggato come paziente!");
             return;
         }
 
-        Sede sedeScelta = selezionaSedeRecensibile(pazienteCorrente);
+        Sede sedeScelta = selezionaSedeRecensibile(pazienteCorrente,scanner);
         if (sedeScelta == null) {
             return;
         }
 
-        Recensione recensioneCorrente = creaRecensione(pazienteCorrente, sedeScelta);
+        Recensione recensioneCorrente = creaRecensione(pazienteCorrente, sedeScelta,scanner);
        confermaRecensione(recensioneCorrente);
     }
     public void confermaRecensione(Recensione recensione) {
@@ -1000,7 +993,7 @@ public void modificaPaziente() {
         visualizzaReport(); //flusso 3
     }
 
-    private String InserisciTipoReport() {
+    public String InserisciTipoReport() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Inserisci il tipo di report (mensile, semestrale, annuale): ");
         String tipo = scanner.nextLine().toLowerCase();
@@ -1012,8 +1005,14 @@ public void modificaPaziente() {
         }
     }
 
-    public void creaReport(String tipologia) {
-        switch (tipologia) {
+
+    public Report getReportCorrente() {
+        return reportCorrente;
+    }
+
+    public void creaReport(String tipo) {
+        switch (tipo) {
+
             case "mensile":
                 ReportMensileFactory factoryMensile = new ReportMensileFactory();
                 ReportMensile reportMensile = factoryMensile.createReport(this.prenotazioni);
@@ -1032,7 +1031,7 @@ public void modificaPaziente() {
         }
     }
 
-    private void visualizzaReport() {
+    public void visualizzaReport() {
         if (reportCorrente != null) {
             System.out.println(reportCorrente.toString());
         } else {
@@ -1062,7 +1061,6 @@ public void modificaPaziente() {
                 ", sedi=" + sedi +
                 ", prenotazioni=" + prenotazioni +
                 ", personaliLaboratori=" + personaleLaboratori +
-                ", recensioneCorrente=" + recensioneCorrente +
                 ", reportCorrente=" + reportCorrente +
                 '}';
     }

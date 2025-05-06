@@ -16,5 +16,5 @@ private  Prenotazione prenotazione ;
             System.out.println("Operazione non consentita nello stato attuale.");
         }
 
-        public abstract String getNomeStato();
+
 }

@@ -9,7 +9,7 @@ public class ReportAnnuale extends Report {
     }
 
     @Override
-    protected boolean filtroData(Prenotazione p) {
+    public boolean filtroData(Prenotazione p) {
         return p.getEsame().getData().getYear() == LocalDate.now().getYear();
     }
 }
