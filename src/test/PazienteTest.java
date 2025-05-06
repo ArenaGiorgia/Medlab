@@ -2,10 +2,7 @@ package test;
 
 import main.*;
 import org.junit.jupiter.api.*;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -82,12 +79,10 @@ class PazienteTest {
             Esame esame = new Esame(LocalDate.now(), LocalTime.now(), "Esame Urine");
             Prenotazione prenotazione = new Prenotazione(esame, paziente);
             Referto referto = new Referto("REF123", LocalDate.now());
-            referto.setReferto("Tutto ok");  // Impostiamo un risultato al referto
+            referto.setReferto("Tutto ok");
 
-            // Associo referto alla prenotazione
             prenotazione.setReferto(referto);
 
-            // Aggiungo la prenotazione e il referto al paziente
             paziente.getPrenotazioniPaziente().put("PREN123", prenotazione);
             paziente.getRefertiCorrenti().put("REF123", referto);
 

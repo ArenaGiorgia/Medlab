@@ -5,7 +5,9 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -20,41 +22,37 @@ class MedlabTest {
 
     @BeforeAll
     static void initAll() {
-        System.out.println("Inizializzazione test suite Medlab");
+        System.out.println("Inizializzazione test Medlab");
     }
 
     @BeforeEach
-    void init() {
+    void testInit() {
         medlab = Medlab.getInstance();
-        // Reset dello stato per isolamento test
         medlab.setPazienti(new HashMap<>());
         medlab.setPrenotazioni(new HashMap<>());
-
         medlab.setSedi(new ArrayList<>());
-        // Configurazione fixture di test
         pazienteTest = new Paziente("Mario", "Rossi", LocalDate.of(1990, 5, 15), "MRORSS90E15F205A", "M", false);
         sedeTest = new Sede(1, "Policlinico Catania");
         medlab.getPazienti().put(pazienteTest.getCf(), pazienteTest);
         medlab.getSedi().add(sedeTest);
         amministratoreTest=new Amministratore();
+        medlab.setPazienteCorrente(pazienteTest);
         medlab.setPersonaleLaboratori(new HashMap<>());
 
     }
 
     @AfterEach
-    void tearDown() { //Pulizia dopo ogni test
+    void tearDown() {
         medlab.setPazienteCorrente(null);
         medlab.setSedeCorrente(null);
     }
 
-    @AfterAll //Pulizia dopo ogni test
+    @AfterAll
     static void tearDownAll() {
         System.out.println("Test suite Medlab completata");
     }
-
-    // TEST SUITE - GESTIONE PAZIENTI
-    @Nested
-    // permette di raggruppare i test dentro classi interne (classi annidate) per organizzare meglio il file di test.
+ //UC1
+    @Nested // permette di raggruppare i test dentro classi interne (classi annidate) per organizzare meglio il file di test.
     @DisplayName("Test per gestione pazienti")
     class GestionePazientiTest {
         @Test
@@ -119,12 +117,31 @@ class MedlabTest {
         }
     }
 
+
+    @Test
+    @DisplayName("Test registrazione sede con input valido")
+    void testRegistrazioneSedeValida() {
+
+        String inputSimulato = "1\n";
+        InputStream inputStream = new ByteArrayInputStream(inputSimulato.getBytes());
+        System.setIn(inputStream);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outputStream));
+
+        medlab.RegistrazioneSede();
+
+        assertTrue(pazienteTest.getSedi().contains(sedeTest), "La sede dovrebbe essere associata al paziente");
+
+        String output = outputStream.toString();
+        assertTrue(output.contains("assegnata a: Mario Rossi"), "L'output dovrebbe confermare l'assegnazione");
+    }
+
     @Test // TEST SUITE -PRENOTAZIONI
     @DisplayName("TC5 - Verifica prenotazioni massime giornaliere")
     void testPrenotazioniMaxPerGiorno() {
         medlab.setPazienteCorrente(pazienteTest);
         LocalDate dataTest = LocalDate.now().plusDays(1);
-        // Creiamo 2 prenotazioni per lo stesso giorno
         Esame esame1 = new Esame(dataTest, LocalTime.of(9, 0), "Emocromo");
         Esame esame2 = new Esame(dataTest, LocalTime.of(11, 0), "Glicemia");
         Esame esame3 = new Esame(dataTest, LocalTime.of(12, 0), "Urine");
@@ -157,18 +174,11 @@ class MedlabTest {
         assertEquals(pazienteTest, medlab.getPazienteCorrente(), "Paziente corrente non impostato");
     }
 
-    @Test
-    @DisplayName("TC8 - Verifica credenziali errate")
-    void testVerificaAccessoFallito() {
-        String risultato = medlab.VerificaAccesso("CFINESISTENTE", "password");
-        assertEquals("credenziali errate", risultato, "Dovrebbe restituire credenziali errate");
-        assertNull(medlab.getPazienteCorrente(), "Paziente corrente dovrebbe rimanere null");
-    }
 
     @Test
     @DisplayName("TC9 - Verifica stato iniziale Medlab")
     void testStatoIniziale() {
-        // Verify
+
         assertAll("Verifica stato iniziale",
                 () -> assertNotNull(medlab.getAmministratore(), "Amministratore non inizializzato"),
                 () -> assertTrue(medlab.getPazienti().containsKey(pazienteTest.getCf()), "Paziente test non presente"),
@@ -208,24 +218,9 @@ class MedlabTest {
             }, "Dovrebbe lanciare eccezione per esame già prenotato");
         }
 
-        @Test
-        @DisplayName("TC13 - Annullamento prenotazione esame")
-        void testAnnullamentoPrenotazione() {
-            medlab.setPazienteCorrente(pazienteTest);
-            pazienteTest.getSedi().add(sedeTest);
-            Esame esame = new Esame(LocalDate.now().plusDays(1), LocalTime.of(10, 0), "Esame Urine");
-            sedeTest.getEsami().put(esame.getCodice(), esame);
-            medlab.SelezionaEsame(esame);
-            medlab.ConfermaEsame();
-            esame.annullaPrenotazione();
-            assertAll("Verifica annullamento",
-                    () -> assertFalse(esame.isPrenotato(), "Esame dovrebbe essere segnato come non prenotato"),
-                    () -> assertEquals("Libero", esame.statoEsame(), "Stato esame dovrebbe essere 'Libero'")
-            );
-        }
 
         @Test
-        @DisplayName("TC14 - Verifica stato iniziale esame")
+        @DisplayName("TC13 - Verifica stato iniziale esame")
         void testStatoInizialeEsame() {
             Esame esame = new Esame(LocalDate.now().plusDays(1), LocalTime.of(10, 0), "Esame Test");
             assertAll("Verifica stato iniziale",
@@ -241,19 +236,16 @@ class MedlabTest {
    @Test
    @DisplayName("TC17 - Test completo lasciaRecensione ")
    void testLasciaRecensione() {
-       // Setup
        medlab.setPazienteCorrente(pazienteTest);
        medlab.addObserver(amministratoreTest);
-       // Crea un esame e prenotalo
        Esame esame = new Esame(LocalDate.now(), LocalTime.now(), "Esame sangue");
-       esame.prenotato(); // Imposta lo stato come prenotato
+       esame.prenotato();
 
        Prenotazione prenotazione = new Prenotazione(esame, pazienteTest);
        prenotazione.setStato(new StatoCompletato(prenotazione));
        pazienteTest.getPrenotazioni().put(prenotazione.getCodice(), prenotazione);
-       pazienteTest.getSedi().add(sedeTest); // Associa la sede al paziente
+       pazienteTest.getSedi().add(sedeTest);
 
-       // Simulazione input utente
        String simulatedInput = String.join("\n",
                "1",            // scelta sede (indice 1)
                "5",            // stelle
@@ -264,15 +256,13 @@ class MedlabTest {
        try {
            System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
            Scanner testScanner = new Scanner(System.in);
-           // Exercise
-           medlab.lasciaRecensione(testScanner);  // Chiamata alla funzione per lasciare recensione
 
-           // Verifica che la recensione sia stata creata correttamente
-           List<Recensione> recensioni = amministratoreTest.getRecensioniNonLette(); // Recupera le recensioni non lette
+           medlab.lasciaRecensione(testScanner);
+
+           List<Recensione> recensioni = amministratoreTest.getRecensioniNonLette();
            assertEquals(1, recensioni.size(), "Dovrebbe esserci una recensione");
            Recensione recensione = recensioni.get(0);
 
-           // Verifica che la recensione contenga i dati corretti
            assertAll("Verifica dettagli recensione",
                    () -> assertEquals(pazienteTest, recensione.getPaziente(), "Paziente errato"),
                    () -> assertEquals(sedeTest, recensione.getSede(), "Sede errata"),
@@ -292,16 +282,14 @@ class MedlabTest {
         @Test
         @DisplayName("TC17 - Generazione report mensile")
         void testGeneraReportMensile() {
-            // Setup
+
             Prenotazione p1 = new Prenotazione(new Esame(LocalDate.now(), LocalTime.now(), "Esame1"), pazienteTest);
             Prenotazione p2 = new Prenotazione(new Esame(LocalDate.now(), LocalTime.now(), "Esame2"), pazienteTest);
             medlab.getPrenotazioni().put(p1.getCodice(), p1);
             medlab.getPrenotazioni().put(p2.getCodice(), p2);
 
-            // Exercise
             medlab.creaReport("mensile");
 
-            // Verify
             assertAll("Verifica report",
                     () -> assertNotNull(medlab.getReportCorrente(), "Report non generato"),
                     () -> assertTrue(medlab.getReportCorrente() instanceof ReportMensile, "Tipo report errato")

@@ -30,7 +30,7 @@ class PersonaleLaboratorioTest {
         esame = new Esame( LocalDate.now(), LocalTime.now(),"Esame Urine");
         prenotazione = new Prenotazione( esame, paziente);
         prenotazione.setStato(new StatoInAttesa(prenotazione));
-        esame.prenotato(); // Aggiungi questa linea
+        esame.prenotato();
         paziente.getPrenotazioniPaziente().put(prenotazione.getCodice(),prenotazione);
     }
 
@@ -87,7 +87,7 @@ class PersonaleLaboratorioTest {
     @Test
     @DisplayName("Test visualizza lista esami prenotati senza esami") // QUANDO NON CI SONO DEGLI ESAMI IN ATTESA DI REFERTO
     void testVisualizzaListaEsamiPrenotatiSenzaEsami() {
-        // Rimuovo la prenotazione di test
+
         paziente.getPrenotazioniPaziente().clear();
         boolean result = personale.visualizzaListaEsamiPrenotati();
         assertFalse(result);
@@ -96,7 +96,7 @@ class PersonaleLaboratorioTest {
     @Test
     @DisplayName("Test seleziona prenotazione esistente")
     void testSelezionaPrenotazioneEsistente() {
-        String codicePrenotazione = prenotazione.getCodice(); // Usa il codice reale
+        String codicePrenotazione = prenotazione.getCodice();
         Prenotazione result = personale.selezionaPrenotazione(codicePrenotazione);
         assertNotNull(result);
         assertEquals(prenotazione, result);
@@ -111,7 +111,7 @@ class PersonaleLaboratorioTest {
 
     @Test
     @DisplayName("Test inserisci stato da InAttesa a Completato")
-    void testInserisciStatoDaInAttesaACompletato() {
+    void testInserisciStato() {
         personale.inserisciStato(prenotazione);
         assertTrue(prenotazione.getStato() instanceof StatoCompletato);
     }
@@ -164,66 +164,60 @@ class PersonaleLaboratorioTest {
     @Test
     @DisplayName("Test Aggiorna Referto") //aggiorna la descrizione di un referto
     void testAggiornaRefertoComplete() {
-        // 1. Configurazione iniziale
+
         prenotazione.setStato(new StatoCompletato(prenotazione));
         Referto referto = new Referto("REF1", LocalDate.now());
         prenotazione.setReferto(referto);
 
-        // 2. Prepara TUTTI gli input necessari
         String allInputs = String.join("\n",
                 paziente.getCf(),         // CF paziente
                 prenotazione.getCodice(), // Codice prenotazione
                 "Risultato negativo", // Descrizione referto
                 "" // Conferma finale
-        ) + "\n";  // Aggiungi un'ultima newline
+        ) + "\n";
         System.out.println("Test Input: " + allInputs);
-        // 3. Salva il System.in originale
+
         InputStream originalIn = System.in;
 
         try {
-            // 4. Imposta il nuovo input stream
+
             System.setIn(new ByteArrayInputStream(allInputs.getBytes()));
 
-            // 5. Esegui il test
             personale.aggiornaReferto();
 
-            // 6. Verifiche
           assertEquals("Risultato negativo", referto.getRisultato());
           assertSame(referto, prenotazione.getReferto());
            assertTrue(paziente.getRefertiCorrenti().containsValue(referto));
             assertNull(personale.getRefertoCorrente());
         } finally {
-            // 7. Ripristina System.in
+
             System.setIn(originalIn);
         }
     }
 
     @Test
     @DisplayName("Test inserisci referto ") //Aggiorna referto funzione principale che comprende le singole funzioni inserisci conferma ecc...
-    void testInserisciRefertoConInputSimulato() {
-        // Prepara referto corrente
+    void testInserisciReferto() {
+
         Referto referto = new Referto("REF1", LocalDate.now());
         personale.setRefertoCorrente(referto);
 
-        // Salva l'input originale
         InputStream inputOriginale = System.in;
 
         try {
-            // Simula input utente
+
             String inputSimulato = "Risultato dell'esame negativo\n";
             InputStream inputStream = new ByteArrayInputStream(inputSimulato.getBytes());
             System.setIn(inputStream);
-            Scanner scanner = new Scanner(System.in); // Scanner su input simulato
+            Scanner scanner = new Scanner(System.in);
 
-            // Esegui
             personale.inserisciReferto(scanner);
 
-            // Verifica
             assertEquals("Risultato dell'esame negativo", referto.getRisultato());
 
             scanner.close();
         } finally {
-            // Ripristina l'input originale
+
             System.setIn(inputOriginale);
         }
     }
