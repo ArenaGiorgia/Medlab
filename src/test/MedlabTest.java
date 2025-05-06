@@ -127,10 +127,13 @@ class MedlabTest {
         // Creiamo 2 prenotazioni per lo stesso giorno
         Esame esame1 = new Esame(dataTest, LocalTime.of(9, 0), "Emocromo");
         Esame esame2 = new Esame(dataTest, LocalTime.of(11, 0), "Glicemia");
+        Esame esame3 = new Esame(dataTest, LocalTime.of(12, 0), "Urine");
         Prenotazione p1 = new Prenotazione(esame1, pazienteTest);
         Prenotazione p2 = new Prenotazione(esame2, pazienteTest);
+        Prenotazione p3 = new Prenotazione(esame3, pazienteTest);
         pazienteTest.getPrenotazioni().put(p1.getCodice(), p1);
         pazienteTest.getPrenotazioni().put(p2.getCodice(), p2);
+        pazienteTest.getPrenotazioni().put(p3.getCodice(), p3);
 
         assertTrue(medlab.PrenotazioniMaxPerGiorno(pazienteTest, dataTest),
                 "Dovrebbe permettere terza prenotazione");

@@ -9,7 +9,7 @@ public class ReportMensile extends Report {
     }
 
     @Override
-    protected boolean filtroData(Prenotazione p) {
+    public boolean filtroData(Prenotazione p) {
         LocalDate data = p.getEsame().getData();
         LocalDate oggi = LocalDate.now();
         return data.getMonth() == oggi.getMonth() && data.getYear() == oggi.getYear();

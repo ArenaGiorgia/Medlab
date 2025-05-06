@@ -9,7 +9,7 @@ public class ReportSemestrale extends Report {
     }
 
     @Override
-    protected boolean filtroData(Prenotazione p) {
+    public boolean filtroData(Prenotazione p) {
         LocalDate data = p.getEsame().getData();
         LocalDate oggi = LocalDate.now();
         int semestreOggi = (oggi.getMonthValue() - 1) / 6;

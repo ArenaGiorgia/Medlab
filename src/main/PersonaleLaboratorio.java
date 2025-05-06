@@ -18,10 +18,6 @@ private Map<String,Referto> referti;
 private Referto refertoCorrente;
 
 
-    public PazienteProvider getPazienteProvider() {
-        return pazienteProvider;
-    }
-
     public PersonaleLaboratorio(String cf, String nome, String cognome, Sede sede) {
         this.nome = nome;
         this.cognome = cognome;
@@ -47,9 +43,6 @@ private Referto refertoCorrente;
         return referti;
     }
 
-    public void setReferti(Map<String, Referto> referti) {
-        this.referti = referti;
-    }
 
     //per il proxy
     public void setPazienteProvider(PazienteProvider provider) {
@@ -344,19 +337,6 @@ public void aggiornaReferto() {
 
     public String getCf() {
         return cf;
-    }
-
-
-    public void setCf(String cf) {
-        this.cf = cf;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
     }
 
 

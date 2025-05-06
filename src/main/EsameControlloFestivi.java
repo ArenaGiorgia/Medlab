@@ -19,7 +19,7 @@ public class  EsameControlloFestivi extends EsameDecorator {
         inizializzaFestivi();
     }
 
-    private void inizializzaFestivi() {
+    public void inizializzaFestivi() {
         weekend = new HashSet<>(Arrays.asList(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
 
         festiviNazionali = new HashSet<>(Arrays.asList(

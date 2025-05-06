@@ -19,7 +19,6 @@ public class Medlab extends Observable{
     private List<Sede> sedi;
     private Map<String, Prenotazione> prenotazioni;
     private Map<String, PersonaleLaboratorio> personaleLaboratori;
-    private Recensione recensioneCorrente;
     private Report reportCorrente;
 
     private Medlab() {
@@ -59,10 +58,6 @@ public class Medlab extends Observable{
         return sedeCorrente;
     }
 
-    public void setPersonaleLaboratorioCorrente(PersonaleLaboratorio personaleLaboratorioCorrente) {
-        this.personaleLaboratorioCorrente = personaleLaboratorioCorrente;
-    }
-
     public void setPazienteCorrente(Paziente pazienteCorrente) {
         this.pazienteCorrente = pazienteCorrente;
     }
@@ -81,9 +76,6 @@ public class Medlab extends Observable{
         this.sedi = sedi;
     }
 
-    public void setPrenotazioneCorrente(Prenotazione prenotazioneCorrente) {
-        this.prenotazioneCorrente = prenotazioneCorrente;
-    }
 
     public PersonaleLaboratorio getPersonaleLaboratorioCorrente() {
         return personaleLaboratorioCorrente;
@@ -93,9 +85,6 @@ public class Medlab extends Observable{
         return pazienteCorrente;
     }
 
-    public Map<String, PersonaleLaboratorio> getPersonaleLaboratori() {
-        return personaleLaboratori;
-    }
 
     public Map<String, Paziente> getPazienti() {
         return pazienti;
@@ -109,9 +98,6 @@ public class Medlab extends Observable{
         return prenotazioni;
     }
 
-    public Prenotazione getPrenotazioneCorrente() {
-        return prenotazioneCorrente;
-    }
 
     public Amministratore getAmministratore() {
         return this.amministratore;
@@ -130,7 +116,7 @@ public class Medlab extends Observable{
             try {
                 System.out.print("Inserisci la data di nascita del paziente (yyyy-MM-dd): ");
                 String dataNascitaInput = scanner.nextLine();
-                dataNascita = LocalDate.parse(dataNascitaInput);
+               dataNascita = LocalDate.parse(dataNascitaInput);
                 break;
             } catch (DateTimeParseException e) {
                 System.out.println("Data non valida. Inserisci una data valida.");
@@ -466,10 +452,10 @@ public class Medlab extends Observable{
         System.out.println("Prenotazioni trovate per " +paziente.getNome() +
                 " " +paziente.getCognome()+ " in data " +data+ ": " + prenotazioniGiornaliere);
 
-        return prenotazioniGiornaliere < 3;
+        return prenotazioniGiornaliere <= 3;
     }
 
-    private boolean EsameDisponibile(String codiceEsame) {
+    public boolean EsameDisponibile(String codiceEsame) {
         for (Map.Entry<String, Prenotazione> entry : prenotazioni.entrySet()) {
             if (entry.getValue().getEsame().getCodice().equals(codiceEsame)) {
                 return false;
@@ -1007,7 +993,7 @@ public void modificaPaziente() {
         visualizzaReport(); //flusso 3
     }
 
-    private String InserisciTipoReport() {
+    public String InserisciTipoReport() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Inserisci il tipo di report (mensile, semestrale, annuale): ");
         String tipo = scanner.nextLine().toLowerCase();
@@ -1045,7 +1031,7 @@ public void modificaPaziente() {
         }
     }
 
-    private void visualizzaReport() {
+    public void visualizzaReport() {
         if (reportCorrente != null) {
             System.out.println(reportCorrente.toString());
         } else {
@@ -1075,7 +1061,6 @@ public void modificaPaziente() {
                 ", sedi=" + sedi +
                 ", prenotazioni=" + prenotazioni +
                 ", personaliLaboratori=" + personaleLaboratori +
-                ", recensioneCorrente=" + recensioneCorrente +
                 ", reportCorrente=" + reportCorrente +
                 '}';
     }
