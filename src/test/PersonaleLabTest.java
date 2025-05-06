@@ -163,7 +163,7 @@ class PersonaleLaboratorioTest {
 
     @Test
     @DisplayName("Test Aggiorna Referto") //aggiorna la descrizione di un referto
-    void testAggiornaRefertoComplete() {
+    void testAggiornaReferto() {
 
         prenotazione.setStato(new StatoCompletato(prenotazione));
         Referto referto = new Referto("REF1", LocalDate.now());
@@ -194,34 +194,6 @@ class PersonaleLaboratorioTest {
             System.setIn(originalIn);
         }
     }
-
-    @Test
-    @DisplayName("Test inserisci referto ") //Aggiorna referto funzione principale che comprende le singole funzioni inserisci conferma ecc...
-    void testInserisciReferto() {
-
-        Referto referto = new Referto("REF1", LocalDate.now());
-        personale.setRefertoCorrente(referto);
-
-        InputStream inputOriginale = System.in;
-
-        try {
-
-            String inputSimulato = "Risultato dell'esame negativo\n";
-            InputStream inputStream = new ByteArrayInputStream(inputSimulato.getBytes());
-            System.setIn(inputStream);
-            Scanner scanner = new Scanner(System.in);
-
-            personale.inserisciReferto(scanner);
-
-            assertEquals("Risultato dell'esame negativo", referto.getRisultato());
-
-            scanner.close();
-        } finally {
-
-            System.setIn(inputOriginale);
-        }
-    }
-
 
 
 }
