@@ -92,7 +92,7 @@ class PersonaleLaboratorioTest {
         boolean result = personale.visualizzaListaEsamiPrenotati();
         assertFalse(result);
     }
-
+//UC5
     @Test
     @DisplayName("Test seleziona prenotazione esistente")
     void testSelezionaPrenotazioneEsistente() {
@@ -160,7 +160,7 @@ class PersonaleLaboratorioTest {
         boolean result = personale.visualizzaPrenotazioniConfermate(paziente);
         assertFalse(result);
     }
-
+//UC6
     @Test
     @DisplayName("Test Aggiorna Referto") //aggiorna la descrizione di un referto
     void testAggiornaReferto() {

@@ -45,6 +45,9 @@ public class Medlab extends Observable{
     }
 
 
+    public Map<String, PersonaleLaboratorio> getPersonaleLaboratori() {
+        return personaleLaboratori;
+    }
 
     public void setReportCorrente(Report reportCorrente) {
         this.reportCorrente = reportCorrente;
@@ -1064,6 +1067,8 @@ public void modificaPaziente() {
                 ", reportCorrente=" + reportCorrente +
                 '}';
     }
+
+
 }
 
 

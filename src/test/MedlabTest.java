@@ -89,7 +89,7 @@ class MedlabTest {
         }
     }
 
-    // TEST SUITE - GESTIONE SEDI
+
     @Nested
     @DisplayName("TC4- Test per gestione sedi")
     class GestioneSediTest {
@@ -297,6 +297,40 @@ class MedlabTest {
         }
     }
 
-//TODO:: TEST NUOVO ESAME, PERSONALE
+
+
+    @Test //UC10
+    void testNuovoEsameAggiunto() {
+        medlab.setSedeCorrente(sedeTest);
+        int esamiIniziali = sedeTest.getEsami().size();
+        medlab.nuovoEsame(LocalDate.of(2025, 6, 1), LocalTime.of(10, 0), "Esame Oncologico");
+        assertEquals(esamiIniziali+1, sedeTest.getEsami().size());
+        assertNull(medlab.getSedeCorrente());
+    }
+  //UC11
+    @Test
+    @DisplayName("Test inserimento personale laboratorio")
+    void testInserisciPersonaleLab() {
+        medlab.inserisciPersonaleLab("CF123", "Pippo", "Punzo", sedeTest);
+        PersonaleLaboratorio personale = medlab.getPersonaleLaboratorioCorrente();
+
+        assertAll("Verifica proprietà personale",
+                () -> assertEquals("CF123", personale.getCf()),
+                () -> assertEquals("Pippo", personale.getNome()),
+                () -> assertEquals("Punzo", personale.getCognome()),
+                () -> assertEquals(sedeTest, personale.getSede())
+        );
+    }
+    @Test
+    @DisplayName("Test conferma personale laboratorio")
+    void testConfermaPersonaleLab() {
+        medlab.inserisciPersonaleLab("CF123", "Pippo", "Punzo", sedeTest);
+        medlab.confermaPersonaleLab();
+
+        assertNull(medlab.getPersonaleLaboratorioCorrente(),
+                "Il personale corrente dovrebbe essere null dopo la conferma");
+        assertTrue(medlab.getPersonaleLaboratori().containsKey("CF123"),
+                "Il personale dovrebbe essere stato aggiunto alla mappa");
+    }
 
 }
