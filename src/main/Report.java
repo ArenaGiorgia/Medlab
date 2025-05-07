@@ -29,6 +29,9 @@ public abstract class Report {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    public Map<String, Prenotazione> getPrenotazioni() {
+        return prenotazioni;
+    }
 
     public double calcolaPercentuale(int parte, int totale) {
         return (totale == 0) ? 0.0 : (parte * 100.0 / totale);

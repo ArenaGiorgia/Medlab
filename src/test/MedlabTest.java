@@ -119,8 +119,8 @@ class MedlabTest {
 
 
     @Test
-    @DisplayName("Test registrazione sede con input valido")
-    void testRegistrazioneSedeValida() {
+    @DisplayName("Test registrazione sede")
+    void testRegistrazioneSede() {
 
         String inputSimulato = "1\n";
         InputStream inputStream = new ByteArrayInputStream(inputSimulato.getBytes());
@@ -222,7 +222,7 @@ class MedlabTest {
         @Test
         @DisplayName("TC13 - Verifica stato iniziale esame")
         void testStatoInizialeEsame() {
-            Esame esame = new Esame(LocalDate.now().plusDays(1), LocalTime.of(10, 0), "Esame Test");
+            Esame esame = new Esame(LocalDate.now().plusDays(1), LocalTime.of(10, 0), "Esame Urine");
             assertAll("Verifica stato iniziale",
                     () -> assertFalse(esame.isPrenotato(), "Esame dovrebbe essere libero inizialmente"),
                     () -> assertEquals("Libero", esame.statoEsame(), "Stato iniziale dovrebbe essere 'Libero'"),
@@ -262,6 +262,63 @@ void testVisualizzaSediRecensibili() {
             () -> assertTrue(risultato.contains(sede2), "Dovrebbe contenere sede2")
     );
 }
+    @Test
+    @DisplayName("Selezione sede recensibile valida")
+    void testSelezionaSedeRecensibile() {
+        // Configurazione
+        Esame esame1 = new Esame(LocalDate.now(), LocalTime.now(), "Esame sangue");
+        medlab.setPazienteCorrente(pazienteTest);
+        medlab.confermaSede(sedeTest);
+        sedeTest.getEsami().put(esame1.getCodice(), esame1);
+        esame1.prenotato();
+        Prenotazione prenotazione1 = new Prenotazione(esame1, pazienteTest);
+        prenotazione1.setStato(new StatoCompletato(prenotazione1));
+        pazienteTest.getPrenotazioniPaziente().put(prenotazione1.getCodice(),prenotazione1);
+        String input = "1\n";
+        Scanner scanner = new Scanner(input);
+        scanner.useDelimiter("\n");
+
+        Sede sedeSelezionata = medlab.selezionaSedeRecensibile(pazienteTest, scanner);
+        assertNotNull(sedeSelezionata, "La sede selezionata non dovrebbe essere null");
+        assertEquals(sedeTest, sedeSelezionata);
+    }
+    @Test
+    @DisplayName("Creazione recensione con dati validi")
+    void testCreaRecensioneDatiValidi() {
+
+        Scanner scanner = new Scanner("5\nOttimo servizio");
+        Esame esame1 = new Esame(LocalDate.now(), LocalTime.now(), "Esame sangue");
+        medlab.setPazienteCorrente(pazienteTest);
+        medlab.confermaSede(sedeTest);
+        sedeTest.getEsami().put(esame1.getCodice(), esame1);
+        esame1.prenotato();
+        Prenotazione prenotazione1 = new Prenotazione(esame1, pazienteTest);
+        prenotazione1.setStato(new StatoCompletato(prenotazione1));
+        pazienteTest.getPrenotazioniPaziente().put(prenotazione1.getCodice(),prenotazione1);
+
+        Recensione recensione = medlab.creaRecensione(pazienteTest, sedeTest, scanner);
+
+        assertNotNull(recensione);
+        assertEquals(5, recensione.getValutazione());
+        assertEquals("Ottimo servizio", recensione.getCommento());
+        assertEquals(pazienteTest, recensione.getPaziente());
+        assertEquals(sedeTest, recensione.getSede());
+    }
+    @Test
+    @DisplayName("Conferma recensione valida")
+    void testConfermaRecensioneValida() {
+        amministratoreTest.getRecensioniNonLette().clear();
+        medlab.addObserver(amministratoreTest);
+        Recensione recensione = new Recensione(pazienteTest, sedeTest, 4, "Buona esperienza");
+
+        medlab.confermaRecensione(recensione);
+        List<Recensione> recensioniNonLette = amministratoreTest.getRecensioniNonLette();
+        assertTrue(!recensioniNonLette.isEmpty(), "La lista recensioni non lette non dovrebbe essere vuota");
+        assertEquals(1, recensioniNonLette.size(), "Dovrebbe esserci esattamente una recensione non letta");
+        assertSame(recensione, recensioniNonLette.get(0), "La recensione aggiunta non corrisponde a quella creata");
+
+
+    }
    @Test // caso completo in cui viene testato il funzionamento del observer
    @DisplayName("TC17 - Test completo lasciaRecensione ")
    void testLasciaRecensione() {
@@ -295,6 +352,7 @@ void testVisualizzaSediRecensibili() {
            assertAll("Verifica dettagli recensione",
                    () -> assertEquals(pazienteTest, recensione.getPaziente(), "Paziente errato"),
                    () -> assertEquals(sedeTest, recensione.getSede(), "Sede errata"),
+                   ()-> assertTrue(amministratoreTest.isNotified()),
                    () -> assertEquals(5, recensione.getValutazione(), "Numero stelle errato"),
                    () -> assertEquals("Ottimo servizio", recensione.getCommento(), "Commento errato")
            );
@@ -312,16 +370,24 @@ void testVisualizzaSediRecensibili() {
         @DisplayName("TC17 - Generazione report mensile")
         void testGeneraReportMensile() {
 
-            Prenotazione p1 = new Prenotazione(new Esame(LocalDate.now(), LocalTime.now(), "Esame1"), pazienteTest);
-            Prenotazione p2 = new Prenotazione(new Esame(LocalDate.now(), LocalTime.now(), "Esame2"), pazienteTest);
+            Paziente maschio  = new Paziente("Mario", "Rossi", LocalDate.of(1990, 5, 15), "CF63892", "M", false);
+            Paziente donna = new Paziente("Giovanna", "D'arco", LocalDate.of(1990, 5, 15), "CF028399", "F", true);
+            Prenotazione p1 = new Prenotazione(new Esame(LocalDate.now(), LocalTime.now(), "Esame1"), maschio);
+            Prenotazione p2 = new Prenotazione(new Esame(LocalDate.now(), LocalTime.now(), "Esame2"), donna);
             medlab.getPrenotazioni().put(p1.getCodice(), p1);
             medlab.getPrenotazioni().put(p2.getCodice(), p2);
 
             medlab.creaReport("mensile");
-
+            String reportString = medlab.getReportCorrente().toString();
             assertAll("Verifica report",
                     () -> assertNotNull(medlab.getReportCorrente(), "Report non generato"),
-                    () -> assertTrue(medlab.getReportCorrente() instanceof ReportMensile, "Tipo report errato")
+                    () -> assertTrue(medlab.getReportCorrente() instanceof ReportMensile, "Tipo report errato"),
+                    ()->assertEquals(2, medlab.getReportCorrente().getPrenotazioni().size(),
+                            "Il report dovrebbe contenere 2 prenotazioni"),
+                    ()->assertTrue(reportString.contains("Maschi: 1"), "Dovrebbe esserci 1 maschio"),
+                    ()->assertTrue(reportString.contains("Femmine: 1"), "Dovrebbe esserci 1 femmina"),
+                    () -> assertTrue(reportString.contains("Cronici: 1"), "Dovrebbe esserci 1 cronico")
+
             );
         }
     }
