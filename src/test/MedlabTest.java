@@ -232,8 +232,37 @@ class MedlabTest {
         }
     }
 
+// UC9
+@Test
+@DisplayName("Test visualizzaSediRecensibili ")
+void testVisualizzaSediRecensibili() {
+    medlab.setPazienteCorrente(pazienteTest);
+    Sede sede1 = new Sede(1, "Roma");
+    Sede sede2 = new Sede(2, " Milano");
 
-   @Test
+    medlab.confermaSede(sede1);
+    medlab.confermaSede(sede2);
+    Esame esame1 = new Esame(LocalDate.now(), LocalTime.now(), "Esame sangue");
+    sede1.getEsami().put(esame1.getCodice(), esame1);
+    esame1.prenotato();
+    Prenotazione prenotazione1 = new Prenotazione(esame1, pazienteTest);
+    prenotazione1.setStato(new StatoCompletato(prenotazione1));
+    Esame esame2 = new Esame(LocalDate.now(), LocalTime.now(), "Esame Urine");
+    sede2.getEsami().put(esame2.getCodice(), esame2);
+    esame2.prenotato();
+    Prenotazione prenotazione2 = new Prenotazione(esame2, pazienteTest);
+    prenotazione2.setStato(new StatoCompletato(prenotazione2));
+    pazienteTest.getPrenotazioniPaziente().put(prenotazione1.getCodice(),prenotazione1);
+    pazienteTest.getPrenotazioniPaziente().put(prenotazione2.getCodice(),prenotazione2);
+
+    List<Sede> risultato = medlab.visualizzaSediRecensibili(pazienteTest);
+    assertAll("Verifica sedi recensibili",
+            () -> assertEquals(2, risultato.size(), "Dovrebbero esserci 2 sedi recensibili"),
+            () -> assertTrue(risultato.contains(sede1), "Dovrebbe contenere sede1"),
+            () -> assertTrue(risultato.contains(sede2), "Dovrebbe contenere sede2")
+    );
+}
+   @Test // caso completo in cui viene testato il funzionamento del observer
    @DisplayName("TC17 - Test completo lasciaRecensione ")
    void testLasciaRecensione() {
        medlab.setPazienteCorrente(pazienteTest);
@@ -247,7 +276,7 @@ class MedlabTest {
        pazienteTest.getSedi().add(sedeTest);
 
        String simulatedInput = String.join("\n",
-               "1",            // scelta sede (indice 1)
+               "1",            // scelta sede
                "5",            // stelle
                "Ottimo servizio"  // commento
        ) + "\n";

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
-class PersonaleLaboratorioTest {
+class PersonaleLabTest {
     private PersonaleLaboratorio personale;
     private Sede sede;
     private PazienteProviderMock pazienteProvider;
@@ -161,8 +161,37 @@ class PersonaleLaboratorioTest {
         assertFalse(result);
     }
 //UC6
+// Test per gestione referti
+@Test
+@DisplayName("Test inserisci referto ")
+void testInserisciReferto() {
+    String input = "Tutto Ok";
+    InputStream in = new ByteArrayInputStream(input.getBytes());
+    System.setIn(in);
+    Referto referto = new Referto("REF1", LocalDate.now());
+    personale.setRefertoCorrente(referto);
+    personale.inserisciReferto(new Scanner(System.in));
+
+    assertEquals("Tutto Ok", referto.getRisultato());
+    System.setIn(System.in);
+}
     @Test
-    @DisplayName("Test Aggiorna Referto") //aggiorna la descrizione di un referto
+    @DisplayName("Test conferma referto")
+    void testConfermaReferto() {
+        Referto referto = new Referto("REF1", LocalDate.now());
+        String input = "Tutto Ok";
+        InputStream in = new ByteArrayInputStream(input.getBytes());
+        System.setIn(in);
+        personale.setRefertoCorrente(referto);
+        referto.setReferto(input);
+        personale.confermaReferto(paziente);
+
+        assertTrue(paziente.getRefertiCorrenti().containsKey("REF1"));
+        assertEquals("Tutto Ok", referto.getRisultato());
+        assertNull(personale.getRefertoCorrente());
+    }
+    @Test
+    @DisplayName("Test Aggiorna Referto") //aggiorna la descrizione di un referto in modo completo con un input da tastiera
     void testAggiornaReferto() {
 
         prenotazione.setStato(new StatoCompletato(prenotazione));
@@ -198,25 +227,5 @@ class PersonaleLaboratorioTest {
 
 }
 
-// Classe mock per PazienteProvider per isolare i test
-class PazienteProviderMock implements PazienteProvider {
-    private Map<String, Paziente> pazienti = new HashMap<>();
 
-    public void addPaziente(Paziente paziente) {
-        pazienti.put(paziente.getCf(), paziente);
-    }
 
-    public void clearPazienti() {
-        pazienti.clear();
-    }
-
-    @Override
-    public List<Paziente> getAllPazienti() {
-        return new ArrayList<>(pazienti.values());
-    }
-
-    @Override
-    public Paziente getPazienteByCF(String cf) {
-        return pazienti.get(cf);
-    }
-}

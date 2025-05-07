@@ -688,27 +688,24 @@ public void modificaPaziente() {
 
     //UC9- PATTERN OBSERVER
     public List<Sede> visualizzaSediRecensibili(Paziente paziente) {
-        // 1. Ottieni tutte le prenotazioni completate del paziente
+
         List<Prenotazione> prenotazioniCompletate = paziente.getPrenotazioni().values().stream()
                 .filter(p -> p.getStato() instanceof StatoCompletato)
                 .collect(Collectors.toList());
 
-        // 2. Per ogni prenotazione completata, trova la sede corrispondente
         List<Sede> sediRecensibili = new ArrayList<>();
 
-        // Ottieni la lista delle sedi associate al paziente
         List<Sede> sediAssociate = paziente.getSedi();
 
         for (Prenotazione prenotazione : prenotazioniCompletate) {
             // Cerca la sede tra quelle associate al paziente
             for (Sede sede : sediAssociate) {
-                // Verifica che la sede non sia già stata aggiunta
                 boolean giaPresente = sediRecensibili.stream()
                         .anyMatch(s -> s.getCodice().equals(sede.getCodice()));
                 if (!giaPresente) {
                     // Aggiungi la sede se il paziente ha almeno una prenotazione completata lì
                     sediRecensibili.add(sede);
-                    break; // Passa alla prossima prenotazione
+                    break;
                 }
             }
         }
@@ -731,16 +728,15 @@ public void modificaPaziente() {
         IntStream.range(0, sediRecensibili.size())
                 .forEach(i -> System.out.printf("%d. %s\n", i + 1, sediRecensibili.get(i).getNome()));
 
-       // Scanner scanner = new Scanner(System.in);
         try {
             int scelta = scanner.nextInt() - 1;
-            scanner.nextLine(); // Consuma il newline
+            scanner.nextLine();
 
             if (scelta >= 0 && scelta < sediRecensibili.size()) {
                 return sediRecensibili.get(scelta);
             }
         } catch (InputMismatchException e) {
-            scanner.nextLine(); // Pulisci buffer input
+            scanner.nextLine();
         }
 
         System.out.println("Scelta non valida!");
@@ -752,16 +748,15 @@ public void modificaPaziente() {
             System.out.println("Dati insufficienti per creare la recensione");
             return null;
         }
-       // Scanner scanner = new Scanner(System.in);
-        // Validazione valutazione
+
         int stelle = 0;
         while (stelle < 1 || stelle > 5) {
             System.out.print("Valutazione (1-5 stelle): ");
             try {
                 stelle = scanner.nextInt();
-                scanner.nextLine(); // Consuma il newline
+                scanner.nextLine();
             } catch (InputMismatchException e) {
-                scanner.nextLine(); // Pulisci buffer input
+                scanner.nextLine();
                 System.out.println("Inserisci un numero valido!");
             }
         }
