@@ -341,7 +341,7 @@ public class Medlab extends Observable{
         visualizzaSedePaziente(pazienteCorrente);// flusso 1.
 
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Seleziona il codice della sede per la prenotazione: "); //Regola di buisness perche posso avere piu sedi associate
+        System.out.print("Seleziona il codice della sede per la prenotazione: ");
         int codiceSede = -1;
 
         while (codiceSede < 0) {
@@ -374,7 +374,7 @@ public class Medlab extends Observable{
         }
 
         //applicazione pattern decorator 
-        EsameControlloFestivi esameDecorato = new EsameControlloFestivi(esameSelezionato,pazienteCorrente);
+        EsameControlloFestivi esameDecorato = new EsameControlloFestivi(esameSelezionato,pazienteCorrente.isCronico());
 
         if (!esameDecorato.prenotabile()) {
             DayOfWeek giorno = esameDecorato.getData().getDayOfWeek();

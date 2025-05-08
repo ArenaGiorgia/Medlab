@@ -9,13 +9,13 @@ import java.util.Set;
 
 public class  EsameControlloFestivi extends EsameDecorator {
 
-    private Paziente paziente;
+    private boolean cronico;
     private Set<DayOfWeek> weekend;
     private Set<MonthDay> festiviNazionali;
 
-    public EsameControlloFestivi(Esame esame, Paziente paziente) {
+    public EsameControlloFestivi(Esame esame, boolean cronico) {
         super(esame);
-        this.paziente = paziente;
+        this.cronico=cronico;
         inizializzaFestivi();
     }
 
@@ -34,9 +34,7 @@ public class  EsameControlloFestivi extends EsameDecorator {
 
     @Override
     public boolean prenotabile() {
-        if (paziente.isCronico()) {
-            return true;
-        }
+        if (cronico) return true;
 
         LocalDate dataEsame = esame.getData();
         DayOfWeek giorno = dataEsame.getDayOfWeek();

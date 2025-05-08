@@ -65,7 +65,7 @@ public class Sede {
     //metodo per l'UC10 dell amministratore
     public void aggiungiEsame(LocalDate data, LocalTime orario, String nome) {
         Esame nuovoEsame = new Esame(data, orario, nome);
-        Esame esameDecorato = new EsameControlloFestivi(nuovoEsame, null);
+        Esame esameDecorato = new EsameControlloFestivi(nuovoEsame, nuovoEsame.isPrenotato());
         this.esami.put(esameDecorato.getCodice(), nuovoEsame);
     }
 
