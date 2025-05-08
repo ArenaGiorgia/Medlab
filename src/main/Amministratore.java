@@ -12,8 +12,8 @@ Amministratore implements Observer {
 
 
     public Amministratore(){
-    this.codiceFiscale ="a"; //settato al codice fiscale di alessio
-    this.password = "a"; //password setta di default da me
+    this.codiceFiscale ="a";
+    this.password = "a"; //password settata di default
     this.recensioniNonLette= new ArrayList<>();
 }
 
