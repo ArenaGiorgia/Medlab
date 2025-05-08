@@ -261,15 +261,17 @@ public class Paziente {
         boolean trovato = false;
         for (Map.Entry<String, Prenotazione> entry : prenotazioniPaziente.entrySet()) {
             Prenotazione prenotazione = entry.getValue();
-            Esame esame = prenotazione.getEsame();
+            if (prenotazione.getStato() instanceof StatoInAttesa) {
 
-            if (esame.isPrenotato()) {
-                System.out.println("Codice prenotazione: " + entry.getKey() + " Esame: " + esame.getNome()
-                        + " Data: " + esame.getData() + " Orario: " + esame.getOrario());
-                trovato = true;
+                Esame esame = prenotazione.getEsame();
+
+                if (esame.isPrenotato()) {
+                    System.out.println("Codice prenotazione: " + entry.getKey() + " Esame: " + esame.getNome()
+                            + " Data: " + esame.getData() + " Orario: " + esame.getOrario());
+                    trovato = true;
+                }
             }
         }
-
         if (!trovato) {
             System.out.println("Nessuna prenotazione attiva.");
         }
