@@ -62,7 +62,7 @@ public class Sede {
         esami.put(esame9.getCodice(), esame9);
     }
 
-    //metodi per aggiungere un esame mi servirà per l'UC10 dell amministratore
+    //metodo per l'UC10 dell amministratore
     public void aggiungiEsame(LocalDate data, LocalTime orario, String nome) {
         Esame nuovoEsame = new Esame(data, orario, nome);
         Esame esameDecorato = new EsameControlloFestivi(nuovoEsame, null);

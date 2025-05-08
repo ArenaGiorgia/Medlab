@@ -1060,8 +1060,9 @@ public void modificaPaziente() {
                 ", personaleLaboratorioCorrente=" + personaleLaboratorioCorrente +
                 ", sedi=" + sedi +
                 ", prenotazioni=" + prenotazioni +
-                ", personaliLaboratori=" + personaleLaboratori +
+                ", personaleLaboratori=" + personaleLaboratori +
                 ", reportCorrente=" + reportCorrente +
+                ", recensioneCorrente=" + recensioneCorrente +
                 '}';
     }
 

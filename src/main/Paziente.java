@@ -92,7 +92,7 @@ public class Paziente {
 
     public void setDataNascita(LocalDate dataNascita) {
         this.dataNascita = dataNascita;
-        this.eta = calcolaEta(dataNascita); // Aggiorna l'età
+        this.eta = calcolaEta(dataNascita);
     }
 
 
