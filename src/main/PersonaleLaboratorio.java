@@ -18,6 +18,10 @@ private Map<String,Referto> referti;
 private Referto refertoCorrente;
 
 
+    public PazienteProvider getPazienteProvider() {
+        return pazienteProvider;
+    }
+
     public PersonaleLaboratorio(String cf, String nome, String cognome, Sede sede) {
         this.nome = nome;
         this.cognome = cognome;
@@ -54,7 +58,7 @@ private Referto refertoCorrente;
         return pazienteProvider.getAllPazienti();
     }
 
-    //metodo che ci serve per fare l UC5
+
     public void aggiungiReferto() {
         if (this.sede == null) {
             System.out.println("Errore: Nessuna sede associata.");
@@ -193,7 +197,7 @@ public void aggiornaReferto() {
 
     this.refertoCorrente = prenotazioneSelezionata.getReferto();
 
-    inserisciReferto();
+    inserisciReferto(scanner);
     confermaReferto(pazienteSelezionato);
 }
 
@@ -248,13 +252,12 @@ public void aggiornaReferto() {
     }
 
 
-    public void inserisciReferto() {
+    public void inserisciReferto(Scanner scanner) {
         if (refertoCorrente == null) {
             System.out.println("Errore: nessun referto selezionato.");
             return;
         }
 
-        Scanner scanner = new Scanner(System.in);
         System.out.print("Inserisci la descrizione del referto: ");
         String descrizione = scanner.nextLine().trim();
 

@@ -38,5 +38,7 @@ public class Referto
                 "  Data=" + data +
                 "  Risultato=" + risultato;
     }
+
+
 }
 

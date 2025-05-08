@@ -35,7 +35,7 @@ public class  EsameControlloFestivi extends EsameDecorator {
     @Override
     public boolean prenotabile() {
         if (paziente.isCronico()) {
-            return true; // Pazienti cronici hanno sempre accesso
+            return true;
         }
 
         LocalDate dataEsame = esame.getData();

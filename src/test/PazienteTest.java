@@ -2,10 +2,7 @@ package test;
 
 import main.*;
 import org.junit.jupiter.api.*;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -77,21 +74,18 @@ class PazienteTest {
 
         @Test
         @DisplayName("Visualizzazione referti con referti presenti")
-        void testVisualizzaRefertiConReferti() {
-            // Setup semplice: creo esame, prenotazione, referto
+        void testVisualizzaReferti() {
+
             Esame esame = new Esame(LocalDate.now(), LocalTime.now(), "Esame Urine");
             Prenotazione prenotazione = new Prenotazione(esame, paziente);
             Referto referto = new Referto("REF123", LocalDate.now());
-            referto.setReferto("Tutto ok");  // Impostiamo un risultato al referto
+            referto.setReferto("Tutto ok");
 
-            // Associo referto alla prenotazione
             prenotazione.setReferto(referto);
 
-            // Aggiungo la prenotazione e il referto al paziente
             paziente.getPrenotazioniPaziente().put("PREN123", prenotazione);
             paziente.getRefertiCorrenti().put("REF123", referto);
 
-            // Cattura l'output della console
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             PrintStream printStream = new PrintStream(outputStream);
             System.setOut(printStream);
@@ -100,7 +94,7 @@ class PazienteTest {
 
                 paziente.visualizzaRefertiAssociatiEsami();
 
-                // Verifica che l'output contenga le informazioni corrette
+
                 String output = outputStream.toString();
                 assertTrue(output.contains("Referti associati agli esami per il paziente"), "Dovrebbe mostrare l'intestazione");
                 assertTrue(output.contains("Esame: Esame Urine"), "Dovrebbe mostrare il nome dell'esame");
@@ -118,8 +112,8 @@ class PazienteTest {
 
         @Test
         @DisplayName("Stampa prenotazioni attive con prenotazioni")
-        void testStampaPrenotazioniAttiveConPrenotazioni() {
-            // Setup
+        void testVisualizzaPrenotazioniAttive() {
+
             Esame esame=new Esame(LocalDate.now(), LocalTime.now(),"Esame Urine");
             Prenotazione prenotazione = new Prenotazione(esame,paziente);
             prenotazione.getEsame().prenotato();

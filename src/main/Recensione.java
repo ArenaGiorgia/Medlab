@@ -16,13 +16,23 @@ public class Recensione {
         this.id = UUID.randomUUID().toString();
         this.paziente = paziente;
         this.sede = sede;
-        this.valutazione = Math.max(1, Math.min(5, valutazione)); // Forza tra 1 e 5
+        this.valutazione = Math.max(1, Math.min(5, valutazione));
         this.commento = commento;
         this.data = LocalDate.now();
         this.letta= false;
     }
 
-    // Getters
+    public Sede getSede() {
+        return sede;
+    }
+
+    public int getValutazione() {
+        return valutazione;
+    }
+
+    public String getCommento() {
+        return commento;
+    }
 
     public Paziente getPaziente() { return paziente; }
     public LocalDate getData() { return data; }

@@ -20,6 +20,7 @@ public class Medlab extends Observable{
     private Map<String, Prenotazione> prenotazioni;
     private Map<String, PersonaleLaboratorio> personaleLaboratori;
     private Report reportCorrente;
+    private Recensione recensioneCorrente;
 
     private Medlab() {
         this.pazienti = new HashMap< String, Paziente>();
@@ -32,6 +33,7 @@ public class Medlab extends Observable{
         this.personaleLaboratorioCorrente = null;
         this.personaleLaboratori = new HashMap<String, PersonaleLaboratorio>();
         this.reportCorrente=null;
+        this.recensioneCorrente=null;
         addObserver(this.amministratore);
         caricamentoDati();
     }
@@ -45,6 +47,9 @@ public class Medlab extends Observable{
     }
 
 
+    public Map<String, PersonaleLaboratorio> getPersonaleLaboratori() {
+        return personaleLaboratori;
+    }
 
     public void setReportCorrente(Report reportCorrente) {
         this.reportCorrente = reportCorrente;
@@ -250,7 +255,7 @@ public class Medlab extends Observable{
         modificaPaziente(codiceFiscale);
     }
 
-    public void modificaPaziente(String cf) {  //ci puo servire per l'UC8
+    public void modificaPaziente(String cf) {
         Paziente paziente = selezionaPaziente(cf);
         if (paziente != null) {
             paziente.modificaPaziente();
@@ -269,7 +274,7 @@ public class Medlab extends Observable{
 
     //UC2 Registrazione sede laboratorio
     public void RegistrazioneSede() {
-        visualizzaSedi(); //1. visualizza tutte le sedi attuali
+        visualizzaSedi(); // flusso 1.
         Scanner scanner = new Scanner(System.in);
         System.out.print("Inserisci il codice della sede scelta: ");
         int codiceSede = -1;
@@ -280,7 +285,7 @@ public class Medlab extends Observable{
                 System.out.println("Errore: Devi inserire un codice(intero) valido.");
             }
         }
-        Sede sedeSelezionata=selezionaSede(codiceSede); //2. seleziona la sede (da vedere se fallo globale)
+        Sede sedeSelezionata=selezionaSede(codiceSede); // flusso 2.
         if (sedeSelezionata !=null) {
         if (!pazienteSedeAssociata(sedeSelezionata)) {
             confermaSede(sedeSelezionata);
@@ -333,7 +338,7 @@ public class Medlab extends Observable{
             return;
         }
 
-        visualizzaSedePaziente(pazienteCorrente);//1. visaulizzazione
+        visualizzaSedePaziente(pazienteCorrente);// flusso 1.
 
         Scanner scanner = new Scanner(System.in);
         System.out.print("Seleziona il codice della sede per la prenotazione: "); //Regola di buisness perche posso avere piu sedi associate
@@ -347,7 +352,7 @@ public class Medlab extends Observable{
             }
         }
 
-        Sede sedeSelezionata = selezionaSede(codiceSede); // 2
+        Sede sedeSelezionata = selezionaSede(codiceSede); // flusso 2.
         if (sedeSelezionata == null) {
             System.out.println("Errore: Sede non trovata.");
             return;
@@ -357,7 +362,7 @@ public class Medlab extends Observable{
             System.out.println("Errore: La sede selezionata non è associata a questo paziente.");
             return;
         }
-        VisualizzaEsamiDisponibili(sedeSelezionata); //3
+        VisualizzaEsamiDisponibili(sedeSelezionata); // flusso 3.
 
         System.out.print("Inserisci il codice dell'esame che desideri prenotare: ");
         String codiceEsame = scanner.nextLine().trim();
@@ -370,7 +375,7 @@ public class Medlab extends Observable{
 
         //applicazione pattern decorator 
         EsameControlloFestivi esameDecorato = new EsameControlloFestivi(esameSelezionato,pazienteCorrente);
-//modifica del flussso del SelezionaEsame perche passa da questa classe
+
         if (!esameDecorato.prenotabile()) {
             DayOfWeek giorno = esameDecorato.getData().getDayOfWeek();
 
@@ -392,8 +397,8 @@ public class Medlab extends Observable{
             return;
         }
 
-        SelezionaEsame(esameSelezionato); //4
-        ConfermaEsame(); // 5
+        SelezionaEsame(esameSelezionato); // flusso 4.
+        ConfermaEsame(); // flusso 5.
         System.out.println("Prenotazione confermata");
 
     }
@@ -562,14 +567,14 @@ public class Medlab extends Observable{
                 return;
             }
         }
-        nuovaSede(nome,codice); //1. nuova sede
+        nuovaSede(nome,codice); // flusso 1.
         if (this.sedeCorrente == null) {
             System.out.println("Errore: Nessuna sede da confermare!");
             return;
         }
         System.out.println("Riepilogo informazioni inserite: ");
         System.out.println(this.sedeCorrente);
-        confermaSede(); //2. conferma
+        confermaNuovaSede();    // flusso 2.
         System.out.println("Sede aggiunta con successo!");
     }
 
@@ -579,7 +584,7 @@ public class Medlab extends Observable{
     }
 
 
-    public void confermaSede() {
+    public void confermaNuovaSede() {
         this.sedi.add(this.sedeCorrente);
         this.sedeCorrente= null;
     }
@@ -602,7 +607,7 @@ public void eliminaSede() {
             System.out.println("Errore: Il codice deve essere un numero intero.");
         }
     }
-    Iterator<Sede> iterator = sedi.iterator(); //meglio l iterator per evitare le eccezioni
+    Iterator<Sede> iterator = sedi.iterator(); //iterator per evitare eventuali eccezioni
     while (iterator.hasNext()) {
         Sede sede = iterator.next();
         if (sede.getCodice().equals(codice)) {
@@ -613,7 +618,8 @@ public void eliminaSede() {
     }
     System.out.println("Errore: Nessuna sede trovata con il codice specificato.");
 }
-//UC4 modifica Sede
+
+    //UC4 modifica Sede
     public void modificaSedeAmministratore(){
     Scanner scanner = new Scanner(System.in);
     Integer codice=null;
@@ -634,6 +640,7 @@ public void eliminaSede() {
             System.out.println("Errore: Sede non trovata.");
         }
     }
+
     // UC5
     public void aggiungiReferto(){
         if(personaleLaboratorioCorrente!=null){
@@ -645,7 +652,7 @@ public void eliminaSede() {
     }
 
 
-//UC6 Aggiorna referto, il personale accede vede i pazienti della sua sede e poi ne seleziona uno e gli mette la descrizione del referto
+//UC6 Aggiorna referto
 public void aggiornaReferto(){
         if(personaleLaboratorioCorrente!=null){
             personaleLaboratorioCorrente.aggiornaReferto();
@@ -685,27 +692,22 @@ public void modificaPaziente() {
 
     //UC9- PATTERN OBSERVER
     public List<Sede> visualizzaSediRecensibili(Paziente paziente) {
-        // 1. Ottieni tutte le prenotazioni completate del paziente
+
         List<Prenotazione> prenotazioniCompletate = paziente.getPrenotazioni().values().stream()
                 .filter(p -> p.getStato() instanceof StatoCompletato)
                 .collect(Collectors.toList());
 
-        // 2. Per ogni prenotazione completata, trova la sede corrispondente
         List<Sede> sediRecensibili = new ArrayList<>();
 
-        // Ottieni la lista delle sedi associate al paziente
         List<Sede> sediAssociate = paziente.getSedi();
 
         for (Prenotazione prenotazione : prenotazioniCompletate) {
-            // Cerca la sede tra quelle associate al paziente
             for (Sede sede : sediAssociate) {
-                // Verifica che la sede non sia già stata aggiunta
                 boolean giaPresente = sediRecensibili.stream()
                         .anyMatch(s -> s.getCodice().equals(sede.getCodice()));
                 if (!giaPresente) {
-                    // Aggiungi la sede se il paziente ha almeno una prenotazione completata lì
                     sediRecensibili.add(sede);
-                    break; // Passa alla prossima prenotazione
+                    break;
                 }
             }
         }
@@ -727,17 +729,15 @@ public void modificaPaziente() {
         System.out.println("Scegli una sede da recensire:");
         IntStream.range(0, sediRecensibili.size())
                 .forEach(i -> System.out.printf("%d. %s\n", i + 1, sediRecensibili.get(i).getNome()));
-
-       // Scanner scanner = new Scanner(System.in);
         try {
             int scelta = scanner.nextInt() - 1;
-            scanner.nextLine(); // Consuma il newline
+            scanner.nextLine();
 
             if (scelta >= 0 && scelta < sediRecensibili.size()) {
                 return sediRecensibili.get(scelta);
             }
         } catch (InputMismatchException e) {
-            scanner.nextLine(); // Pulisci buffer input
+            scanner.nextLine();
         }
 
         System.out.println("Scelta non valida!");
@@ -749,24 +749,24 @@ public void modificaPaziente() {
             System.out.println("Dati insufficienti per creare la recensione");
             return null;
         }
-       // Scanner scanner = new Scanner(System.in);
-        // Validazione valutazione
+
         int stelle = 0;
         while (stelle < 1 || stelle > 5) {
             System.out.print("Valutazione (1-5 stelle): ");
             try {
                 stelle = scanner.nextInt();
-                scanner.nextLine(); // Consuma il newline
+                scanner.nextLine();
             } catch (InputMismatchException e) {
-                scanner.nextLine(); // Pulisci buffer input
+                scanner.nextLine();
                 System.out.println("Inserisci un numero valido!");
             }
         }
 
         System.out.print("Commento (opzionale): ");
         String commento = scanner.nextLine();
+        recensioneCorrente = new Recensione(paziente, sede, stelle, commento);
 
-        return new Recensione(paziente, sede, stelle, commento);
+        return recensioneCorrente;
     }
 
     public void lasciaRecensione(Scanner scanner) {
@@ -779,8 +779,7 @@ public void modificaPaziente() {
         if (sedeScelta == null) {
             return;
         }
-
-        Recensione recensioneCorrente = creaRecensione(pazienteCorrente, sedeScelta,scanner);
+        recensioneCorrente = creaRecensione(pazienteCorrente, sedeScelta,scanner);
        confermaRecensione(recensioneCorrente);
     }
     public void confermaRecensione(Recensione recensione) {
@@ -792,6 +791,7 @@ public void modificaPaziente() {
 
         setChanged();
         notifyObservers(recensione);
+        recensioneCorrente = null;
 
         System.out.println("Recensione inviata con successo!");
     }
@@ -982,15 +982,15 @@ public void modificaPaziente() {
             return;
         }
 
-        String tipologia = InserisciTipoReport(); //flusso 1
+        String tipologia = InserisciTipoReport(); //flusso 1.
 
         if (tipologia == null) {
             System.out.println("Tipo di report non valido.");
             return;
         }
 
-        creaReport(tipologia); //flusso 2
-        visualizzaReport(); //flusso 3
+        creaReport(tipologia); //flusso 2.
+        visualizzaReport(); //flusso 3.
     }
 
     public String InserisciTipoReport() {
@@ -1064,6 +1064,8 @@ public void modificaPaziente() {
                 ", reportCorrente=" + reportCorrente +
                 '}';
     }
+
+
 }
 
 

@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Observable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,6 +29,22 @@ public class AmministratoreTest {
         Amministratore amministratore = new Amministratore();
         assertTrue(amministratore.verificaPassword("a"), "La password dovrebbe essere corretta");
         assertFalse(amministratore.verificaPassword("wrongPassword"), "La password dovrebbe essere errata");
+    }
+
+    @Test
+    @DisplayName("Verifica Update")
+    void testUpdate() {
+
+        Amministratore amministratore=new Amministratore();
+        Paziente paziente = new Paziente("Mario", "Rossi", LocalDate.of(1980, 1, 1),"CF123","M",true);
+        Sede sede = new Sede(01, "Catania");
+        Recensione recensione = new Recensione(paziente, sede, 5, "Ottimo servizio");
+
+        amministratore.update(new Observable(), recensione);
+
+        assertFalse(amministratore.getRecensioniNonLette().isEmpty());
+        assertEquals(1, amministratore.getRecensioniNonLette().size());
+        assertEquals(recensione, amministratore.getRecensioniNonLette().get(0));
     }
     @Test
     @DisplayName("Test visualizza recensioni non lette")

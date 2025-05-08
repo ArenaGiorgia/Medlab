@@ -8,6 +8,7 @@ Amministratore implements Observer {
     private  String codiceFiscale;
     private  String password;
     private final List<Recensione> recensioniNonLette ;
+    private boolean notified;
 
 
     public Amministratore(){
@@ -19,16 +20,22 @@ Amministratore implements Observer {
     public String getCodiceFiscale() {
         return codiceFiscale;
     }
+    public List<Recensione> getRecensioniNonLette() {
+        return recensioniNonLette;
+    }
     public boolean verificaPassword(String password) {
         return this.password.equals(password);
     }
-
+    public boolean isNotified() {
+        return notified;
+    }
 
     public void update(Observable o, Object arg) {
 
         if (arg instanceof Recensione) {
             Recensione recensione = (Recensione) arg;
             recensioniNonLette.add(recensione);
+            notified=true;
             System.out.println(
                     "[NOTIFICA AMMINISTRATORE] Nuova recensione da " +
                             recensione.getPaziente().getNome() + " " +
@@ -55,6 +62,7 @@ Amministratore implements Observer {
 
 
     }
+
 }
 
 
