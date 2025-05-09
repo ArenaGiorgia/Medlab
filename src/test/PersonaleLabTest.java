@@ -122,7 +122,7 @@ class PersonaleLabTest {
 
     @Test
     @DisplayName("Test visualizza pazienti associati alla sede con pazienti")
-    void testVisualizzaPazientiAssociatiAllaSedeConPazienti() {
+    void testVisualizzaPazientiAssociatiAllaSede() {
         boolean result = personale.visualizzaPazientiAssociatiAllaSede();
         assertTrue(result);
     }
@@ -152,7 +152,7 @@ class PersonaleLabTest {
 
     @Test
     @DisplayName("Test visualizza prenotazioni confermate con prenotazioni")
-    void testVisualizzaPrenotazioniConfermateConPrenotazioni() {
+    void testVisualizzaPrenotazioniConfermate() {
         prenotazione.setStato(new StatoCompletato(prenotazione));
         sede.getEsamiCompletati().put(esame.getCodice(), esame);
         boolean result = personale.visualizzaPrenotazioniConfermate(paziente);
