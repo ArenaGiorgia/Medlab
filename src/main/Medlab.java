@@ -966,6 +966,7 @@ public void modificaPaziente() {
 
     public void inserisciPersonaleLab(String cf, String nome, String cognome, Sede sede){
         PersonaleLaboratorio personale = new PersonaleLaboratorio( cf, nome, cognome,sede);
+        personale.setPazienteProvider(new SedePazienteProxy(this));
         this.personaleLaboratorioCorrente = personale;
     }
 

@@ -18,9 +18,7 @@ private Map<String,Referto> referti;
 private Referto refertoCorrente;
 
 
-    public PazienteProvider getPazienteProvider() {
-        return pazienteProvider;
-    }
+
 
     public PersonaleLaboratorio(String cf, String nome, String cognome, Sede sede) {
         this.nome = nome;
@@ -30,6 +28,7 @@ private Referto refertoCorrente;
         this.sede = sede;
         this.referti = new HashMap<String,Referto>();
         this.refertoCorrente = null;
+
 
 
 }
@@ -58,7 +57,7 @@ private Referto refertoCorrente;
         return pazienteProvider.getAllPazienti();
     }
 
-
+    //metodo per UC5
     public void aggiungiReferto() {
         if (this.sede == null) {
             System.out.println("Errore: Nessuna sede associata.");
@@ -91,12 +90,14 @@ private Referto refertoCorrente;
                 inserisciStato(prenotazioneSelezionata); // flusso 3.
 
                 if (prenotazioneSelezionata.getStato() instanceof StatoCompletato) {
+                    this.sede.getEsamiCompletati().put(codiceEsame,prenotazioneSelezionata.getEsame());
                     this.sede.getEsami().remove(codiceEsame);
                     System.out.println("Prenotazione completata con successo.");
                 }
 
             } else if (scelta.equals("NO")) {
                 prenotazioneSelezionata.setStato(new StatoAnnullato(prenotazioneSelezionata));
+                this.sede.getEsamiCompletati().put(codiceEsame,prenotazioneSelezionata.getEsame());
                 this.sede.getEsami().remove(codiceEsame);
                 System.out.println("Prenotazione annullata.");
             } else {
@@ -121,7 +122,8 @@ private Referto refertoCorrente;
             for (Prenotazione prenotazione : paziente.getPrenotazioniPaziente().values()) {
                 if (prenotazione.getStato() instanceof StatoInAttesa &&
                         prenotazione.getEsame().isPrenotato() &&
-                        prenotazione.getEsame().getData().equals(LocalDate.now())) {
+                        prenotazione.getEsame().getData().equals(LocalDate.now()) &&
+                        this.sede.getEsami().containsKey(prenotazione.getEsame().getCodice())) {
 
                     Esame esame = prenotazione.getEsame();
                     System.out.println("Codice: " + prenotazione.getCodice() +
@@ -229,27 +231,29 @@ public void aggiornaReferto() {
 
     public boolean visualizzaPrenotazioniConfermate(Paziente paziente) {
         boolean trovato = false;
+
         Map<String, Prenotazione> prenotazioni = paziente.getPrenotazioniPaziente();
 
         System.out.println("Prenotazioni confermate per " + paziente.getNome() + " " + paziente.getCognome() + ":");
-
         for (Prenotazione pren : prenotazioni.values()) {
-            Referto ref = pren.getReferto();
-            if (pren.getStato() instanceof StatoCompletato && (ref == null || ref.getRisultato() == null || ref.getRisultato().isEmpty())) {
-                System.out.println("Codice: " + pren.getCodice() +
-                        " Esame: " + pren.getEsame().getNome() +
-                        " Data: " + pren.getEsame().getData() +
-                        " Ora: " + pren.getEsame().getOrario());
-                trovato = true;
+                Referto ref = pren.getReferto();
+                if (pren.getStato() instanceof StatoCompletato
+                        && (ref == null || ref.getRisultato() == null || ref.getRisultato().isEmpty()) &&
+                        this.sede.getEsamiCompletati().containsKey(pren.getEsame().getCodice())) {
+                    System.out.println("Codice: " + pren.getCodice() +
+                            " Esame: " + pren.getEsame().getNome() +
+                            " Data: " + pren.getEsame().getData() +
+                            " Ora: " + pren.getEsame().getOrario());
+                    trovato = true;
+                }
             }
-        }
 
-        if (!trovato) {
-            System.out.println("Nessuna prenotazione confermata trovata.");
-        }
+            if (!trovato) {
+                System.out.println("Nessuna prenotazione confermata trovata.");
+            }
 
-        return trovato;
-    }
+            return trovato;
+        }
 
 
     public void inserisciReferto(Scanner scanner) {

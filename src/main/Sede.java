@@ -8,13 +8,19 @@ public class Sede {
     private Integer codice;
     private String nome;
     private Map<String, Esame> esami;
+    private Map<String, Esame> esamiCompletati;
 
     public Sede(Integer codice,String nome) {
         this.nome = nome;
         this.codice = codice;
         this.esami = new HashMap<>();
+        this.esamiCompletati = new HashMap<>();
         caricaEsami();
 
+    }
+
+    public Map<String, Esame> getEsamiCompletati() {
+        return esamiCompletati;
     }
 
 
@@ -65,8 +71,8 @@ public class Sede {
     //metodo per l'UC10 dell amministratore
     public void aggiungiEsame(LocalDate data, LocalTime orario, String nome) {
         Esame nuovoEsame = new Esame(data, orario, nome);
-        Esame esameDecorato = new EsameControlloFestivi(nuovoEsame, nuovoEsame.isPrenotato());
-        this.esami.put(esameDecorato.getCodice(), nuovoEsame);
+        Esame esameDecorato = new EsameControlloFestivi(nuovoEsame, false);
+        this.esami.put(esameDecorato.getCodice(), esameDecorato);
     }
 
     public boolean isOrarioDisponibile(LocalDate dataEsame, LocalTime orarioEsame) {
@@ -97,7 +103,7 @@ public class Sede {
                 case 1:
                     System.out.print("Inserisci il nuovo nome della sede: ");
                     String nome = scanner.nextLine();
-                    setNome(nome);  // Metodo per impostare il nuovo nome
+                    setNome(nome);
                     break;
                 case 0:
                     System.out.println("Modifica sede terminata con successo.");

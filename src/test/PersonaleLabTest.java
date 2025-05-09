@@ -32,6 +32,7 @@ class PersonaleLabTest {
         prenotazione.setStato(new StatoInAttesa(prenotazione));
         esame.prenotato();
         paziente.getPrenotazioniPaziente().put(prenotazione.getCodice(),prenotazione);
+
     }
 
     @AfterEach
