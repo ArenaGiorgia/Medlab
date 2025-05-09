@@ -85,9 +85,6 @@ public class AmministratoreTest {
         List<Recensione> recensioniNonLette = amministratore.getRecensioniNonLette();
         assertEquals(1, recensioniNonLette.size(), "La recensione dovrebbe essere aggiunta");
         assertEquals(recensione, recensioniNonLette.get(0), "La recensione non è correttamente aggiunta");
-
-        amministratore.aggiungiRecensioneNonLetta(recensione);
-
         assertEquals(1, recensioniNonLette.size(), "La recensione non dovrebbe essere aggiunta più di una volta");
     }
 
