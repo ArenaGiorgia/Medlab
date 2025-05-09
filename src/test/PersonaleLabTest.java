@@ -28,10 +28,13 @@ class PersonaleLabTest {
         paziente = new Paziente("Luca", "Bianchi", LocalDate.of(1990, 5, 15) ,"CF456", "M",true);
         pazienteProvider.addPaziente(paziente);
         esame = new Esame( LocalDate.now(), LocalTime.now(),"Esame Urine");
+        sede.getEsami().put(esame.getCodice(), esame);
         prenotazione = new Prenotazione( esame, paziente);
         prenotazione.setStato(new StatoInAttesa(prenotazione));
         esame.prenotato();
         paziente.getPrenotazioniPaziente().put(prenotazione.getCodice(),prenotazione);
+
+
 
     }
 
@@ -151,6 +154,7 @@ class PersonaleLabTest {
     @DisplayName("Test visualizza prenotazioni confermate con prenotazioni")
     void testVisualizzaPrenotazioniConfermateConPrenotazioni() {
         prenotazione.setStato(new StatoCompletato(prenotazione));
+        sede.getEsamiCompletati().put(esame.getCodice(), esame);
         boolean result = personale.visualizzaPrenotazioniConfermate(paziente);
         assertTrue(result);
     }
@@ -196,6 +200,7 @@ void testInserisciReferto() {
     void testAggiornaReferto() {
 
         prenotazione.setStato(new StatoCompletato(prenotazione));
+        sede.getEsamiCompletati().put(esame.getCodice(),esame);
         Referto referto = new Referto("REF1", LocalDate.now());
         prenotazione.setReferto(referto);
 
