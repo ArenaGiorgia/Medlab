@@ -628,7 +628,14 @@ public void eliminaSede() {
         System.out.println(sede.toString());
     }
     System.out.print("Inserisci il codice della sede da modificare: ");
-    codice = Integer.parseInt(scanner.nextLine());
+        while (true) {
+            try {
+                codice = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Errore: Il codice deve essere un numero intero.");
+            }
+        }
     modificaSede(codice);
 }
  public void modificaSede(Integer codice){
